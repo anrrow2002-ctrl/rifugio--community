@@ -1,0 +1,100 @@
+/* ============ 🦀 Companion 小蟹蟹（戴魔法帽 + 跳跳） ============ */
+        .crab-mascot {
+            display: inline-block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            shape-rendering: crispEdges;
+            animation: crab-hop 1.6s cubic-bezier(.4, 0, .3, 1) infinite;
+            transform-origin: 50% 90%;
+            flex-shrink: 0;
+        }
+        .crab-mascot.sm { width: 38px; height: 38px; }
+        .crab-mascot.md { width: 56px; height: 56px; }
+        .crab-mascot.lg { width: 110px; height: 110px; animation-duration: 2s; }
+        @keyframes crab-hop {
+            0%        { transform: translateY(0) rotate(-1deg) scaleY(1); }
+            20%       { transform: translateY(0) rotate(2deg) scaleY(0.92); }
+            45%       { transform: translateY(-9%) rotate(0deg) scaleY(1.05); }
+            55%       { transform: translateY(-9%) rotate(0deg) scaleY(1.05); }
+            80%       { transform: translateY(0) rotate(-2deg) scaleY(0.96); }
+            100%      { transform: translateY(0) rotate(-1deg) scaleY(1); }
+        }
+        /* 星星 sparkle */
+        .crab-mascot .twinkle {
+            animation: twinkle 1.4s ease-in-out infinite;
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.6); }
+        }
+
+        /* 聊天里头像 + 气泡 */
+        .chat-row.claude { align-items: flex-end; gap: 6px; }
+        .chat-row.claude .crab-avatar-wrap {
+            margin-bottom: 2px;
+            flex-shrink: 0;
+        }
+
+        /* 思维链 */
+        .chat-thinking {
+            margin-bottom: 4px;
+            border-radius: 14px;
+            background: color-mix(in srgb, var(--gold) 6%, transparent);
+            border: 1px solid color-mix(in srgb, var(--gold) 18%, transparent);
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .chat-thinking-head {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            font-size: 0.625rem;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+            color: color-mix(in srgb, var(--gold) 80%, transparent);
+            cursor: pointer;
+            user-select: none;
+            letter-spacing: 0.1em;
+        }
+        .chat-thinking-head:hover { background: color-mix(in srgb, var(--gold) 10%, transparent); }
+        .chat-thinking-head .chev {
+            transition: transform 0.25s;
+            display: inline-block; font-size: 0.5625rem;
+        }
+        .chat-thinking.open .chat-thinking-head .chev { transform: rotate(90deg); }
+        .chat-thinking-body {
+            padding: 0 12px 10px;
+            font-size: 0.7188rem;
+            line-height: 1.65;
+            color: color-mix(in srgb, var(--ink) 60%, transparent);
+            font-style: italic;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border-top: 1px solid color-mix(in srgb, var(--gold) 12%, transparent);
+            padding-top: 8px;
+            margin-top: 2px;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .chat-thinking-body::-webkit-scrollbar { width: 2px; }
+        .chat-thinking-body::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--gold) 30%, transparent); border-radius: 2px; }
+        /* 空状态大蟹 */
+        .chat-empty-stage {
+            text-align: center;
+            padding: 32px 16px 24px;
+        }
+        .chat-empty-stage .crab-shadow {
+            width: 60px; height: 6px;
+            margin: -4px auto 12px;
+            background: radial-gradient(ellipse at center,
+                color-mix(in srgb, var(--ink) 22%, transparent) 0%,
+                transparent 70%);
+            animation: crab-shadow 1.6s ease-in-out infinite;
+        }
+        @keyframes crab-shadow {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50%      { transform: scale(0.6); opacity: 0.3; }
+        }

@@ -1,0 +1,42 @@
+/* === Ombre Dashboard === */
+        .ombre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .ombre-card { background: var(--card-bg); border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent); padding: 14px 12px 10px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+        .ombre-card:hover { border-color: color-mix(in srgb, var(--gold) 55%, transparent); box-shadow: 0 4px 20px color-mix(in srgb, var(--gold) 12%, transparent); }
+        .ombre-card-title { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--gold); opacity: 0.7; margin-bottom: 8px; }
+        .ombre-reveal { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 440px; background: var(--card-bg); border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent); padding: 20px; z-index: 90; box-shadow: 0 12px 40px rgba(0,0,0,0.2); animation: floatUp 0.3s ease forwards; }
+        .ombre-unresolved { margin-top: 20px; border-top: 1px solid color-mix(in srgb, var(--gold) 15%, transparent); padding-top: 16px; }
+
+        /* === Breath window (Companion 在想...) === */
+        .breath-window { background: color-mix(in srgb, var(--card-bg) 80%, transparent); backdrop-filter: blur(12px); border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent); padding: 16px 18px; margin-top: 28px; position: relative; }
+        .breath-window::before { content: "Companion 在想…"; position: absolute; top: -9px; left: 14px; font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 0.6875rem; color: var(--gold); background: var(--paper); padding: 0 6px; letter-spacing: 0.15em; }
+        .breath-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); opacity: 0.6; animation: breathPulse 2.4s ease-in-out infinite; }
+        .breath-dot:nth-child(2) { animation-delay: 0.4s; } .breath-dot:nth-child(3) { animation-delay: 0.8s; }
+        @keyframes breathPulse { 0%,100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.8; transform: scale(1.2); } }
+        .breath-text-enter-active { transition: opacity 1.2s ease, transform 0.8s ease; }
+        .breath-text-enter-from { opacity: 0; transform: translateY(6px); }
+        .hold-btn { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); padding: 2px 8px; cursor: pointer; background: transparent; transition: all 0.2s; white-space: nowrap; }
+        .hold-btn:hover { background: color-mix(in srgb, var(--gold) 12%, transparent); }
+
+        /* ===== 深色主题文字补丁 =====
+           Tailwind color var + /opacity 失效时的 color-mix 兜底 */
+        [data-theme="crepuscolo"], [data-theme="aurora"], [data-theme="notte"] {
+            --ink-faint: color-mix(in srgb, var(--ink) 35%, transparent);
+            --ink-mid:   color-mix(in srgb, var(--ink) 55%, transparent);
+        }
+        [data-theme="crepuscolo"] .opacity-60,
+        [data-theme="aurora"] .opacity-60,
+        [data-theme="notte"] .opacity-60 { opacity: 0.75 !important; }
+        [data-theme="crepuscolo"] .opacity-40,
+        [data-theme="aurora"] .opacity-40,
+        [data-theme="notte"] .opacity-40 { opacity: 0.65 !important; }
+        [data-theme="crepuscolo"] .opacity-30,
+        [data-theme="aurora"] .opacity-30,
+        [data-theme="notte"] .opacity-30 { opacity: 0.55 !important; }
+        /* nav blur bg */
+        [data-theme="crepuscolo"] .nav-blur,
+        [data-theme="aurora"] .nav-blur,
+        [data-theme="notte"] .nav-blur { background: color-mix(in srgb, var(--paper) 90%, transparent); }
+        /* sub-tab inactive buttons */
+        [data-theme="crepuscolo"] .border-gold\/20,
+        [data-theme="aurora"] .border-gold\/20,
+        [data-theme="notte"] .border-gold\/20 { border-color: color-mix(in srgb, var(--gold) 30%, transparent) !important; }

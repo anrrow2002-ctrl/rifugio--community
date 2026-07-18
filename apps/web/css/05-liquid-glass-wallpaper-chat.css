@@ -1,0 +1,414 @@
+/* ============================================================
+           ✦  iPhone Liquid Glass + Wallpaper + Cute Nav + Chat
+           ============================================================ */
+
+        /* 壁纸层：每页一张，固定在容器内最底层 */
+        .wallpaper-layer {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 0;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            transform-origin: center;
+            will-change: filter, transform;
+            transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease, background-image 0s;
+            pointer-events: none;
+        }
+        .wallpaper-tint {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 0;
+            background: color-mix(in srgb, var(--paper) 35%, transparent);
+            pointer-events: none;
+            transition: background 0.8s ease;
+        }
+        body.abyss-mode .wallpaper-tint { background: color-mix(in srgb, var(--abyss) 50%, transparent); }
+        /* 当有壁纸时，paper 底色稍稍透明，让壁纸透出来 */
+        .app-container.has-wallpaper { background-color: transparent !important; }
+
+        /* === Liquid Glass 通用类（iOS 26 风） === */
+        .liquid-glass {
+            background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+            border: 1px solid color-mix(in srgb, white 35%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.55),
+                inset 0 0 0 0.5px color-mix(in srgb, var(--gold) 18%, transparent),
+                0 10px 30px -10px rgba(0,0,0,0.18);
+            border-radius: 22px;
+        }
+        body.abyss-mode .liquid-glass,
+        [data-theme="crepuscolo"] .liquid-glass,
+        [data-theme="aurora"] .liquid-glass,
+        [data-theme="notte"] .liquid-glass {
+            background: color-mix(in srgb, var(--card-bg) 35%, transparent);
+            border-color: color-mix(in srgb, white 12%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.10),
+                inset 0 0 0 0.5px color-mix(in srgb, var(--gold) 25%, transparent),
+                0 12px 36px -10px rgba(0,0,0,0.45);
+        }
+
+        /* === Glass Mode：把现有方角卡片软化成毛玻璃 === */
+        body.glass-mode .bg-cardBg,
+        body.glass-mode .bg-altBg,
+        body.glass-mode .modal-card,
+        body.glass-mode .breath-window,
+        body.glass-mode .ombre-card,
+        body.glass-mode .ombre-reveal,
+        body.glass-mode .theme-popover,
+        body.glass-mode .polaroid {
+            background: color-mix(in srgb, var(--card-bg) 60%, transparent) !important;
+            backdrop-filter: blur(20px) saturate(170%);
+            -webkit-backdrop-filter: blur(20px) saturate(170%);
+            border-radius: 18px !important;
+            border-color: color-mix(in srgb, white 30%, transparent) !important;
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.45),
+                0 8px 24px -8px rgba(0,0,0,0.12) !important;
+        }
+        body.glass-mode.abyss-mode .bg-cardBg,
+        body.glass-mode.abyss-mode .bg-altBg,
+        body.glass-mode[data-glass-dark] .bg-cardBg,
+        body.glass-mode[data-glass-dark] .bg-altBg {
+            background: color-mix(in srgb, var(--card-bg) 40%, transparent) !important;
+            border-color: color-mix(in srgb, white 12%, transparent) !important;
+        }
+        /* polaroid 保留它的「相纸」感，但内框圆一点 */
+        body.glass-mode .polaroid { background: rgba(255,255,255,0.72) !important; border-radius: 6px !important; }
+
+        body.glass-mode input,
+        body.glass-mode textarea { border-radius: 10px; }
+        body.glass-mode button:not(.theme-dot):not(.nav-icon-btn):not(.dock-btn) {
+            border-radius: 12px;
+        }
+
+        /* === 可爱的图标 Dock 导航 === */
+        .glass-dock {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 10px;
+            width: calc(100% - 24px);
+            max-width: 456px;
+            padding: 6px 8px 4px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            z-index: 50;
+
+            background: color-mix(in srgb, var(--card-bg) 50%, transparent);
+            backdrop-filter: blur(26px) saturate(200%);
+            -webkit-backdrop-filter: blur(26px) saturate(200%);
+            border: 1px solid color-mix(in srgb, white 38%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.55),
+                inset 0 -1px 0 0 rgba(255,255,255,0.10),
+                0 14px 40px -10px rgba(0,0,0,0.22),
+                0 2px 6px -2px rgba(0,0,0,0.08);
+            border-radius: 24px;
+        }
+        body.abyss-mode .glass-dock,
+        [data-theme="crepuscolo"] .glass-dock,
+        [data-theme="aurora"] .glass-dock,
+        [data-theme="notte"] .glass-dock {
+            background: color-mix(in srgb, var(--card-bg) 32%, transparent);
+            border-color: color-mix(in srgb, white 12%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.12),
+                0 18px 48px -10px rgba(0,0,0,0.55);
+        }
+
+        .dock-btn {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            padding: 4px 0 3px;
+            border-radius: 14px;
+            transition: transform 0.35s cubic-bezier(.2,.9,.3,1.2), background 0.3s;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+        }
+        .dock-btn .icon-wrap {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.4s cubic-bezier(.2,.9,.3,1.2);
+        }
+        .dock-btn svg { width: 22px; height: 22px; display: block; }
+        .dock-btn .label {
+            font-size: 0.5625rem;
+            letter-spacing: 0.22em;
+            color: color-mix(in srgb, var(--ink) 55%, transparent);
+            transition: color 0.3s, opacity 0.3s;
+            font-family: "Noto Serif SC", serif;
+            font-weight: 300;
+        }
+        body.abyss-mode .dock-btn .label,
+        [data-theme="crepuscolo"] .dock-btn .label,
+        [data-theme="aurora"] .dock-btn .label,
+        [data-theme="notte"] .dock-btn .label {
+            color: rgba(255,255,255,0.55);
+        }
+
+        .dock-btn.active {
+            background: color-mix(in srgb, var(--gold) 18%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.5),
+                0 4px 14px -4px color-mix(in srgb, var(--gold) 55%, transparent);
+        }
+        .dock-btn.active .icon-wrap { transform: translateY(-2px) scale(1.10); }
+        .dock-btn.active .label {
+            color: var(--gold);
+            font-weight: 500;
+            text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 50%, transparent);
+        }
+        .dock-btn:active { transform: scale(0.94); }
+
+        /* 中间 Casa 按钮，气泡浮起 */
+        .dock-btn.center .icon-wrap { width: 36px; height: 36px; }
+        .dock-btn.center svg { width: 28px; height: 28px; }
+        .dock-btn.center.active .icon-wrap { transform: translateY(-4px) scale(1.14); }
+
+        /* 图标颜色 */
+        .dock-btn svg .ink { stroke: color-mix(in srgb, var(--ink) 70%, transparent); fill: none; }
+        .dock-btn svg .fill { fill: color-mix(in srgb, var(--ink) 8%, transparent); stroke: none; }
+        .dock-btn svg .blush { fill: color-mix(in srgb, var(--gold) 45%, transparent); }
+        .dock-btn.active svg .ink { stroke: var(--gold); }
+        .dock-btn.active svg .fill { fill: color-mix(in srgb, var(--gold) 28%, transparent); }
+        .dock-btn.active svg .blush { fill: var(--warm-gold); }
+        body.abyss-mode .dock-btn svg .ink,
+        [data-theme="crepuscolo"] .dock-btn svg .ink,
+        [data-theme="aurora"] .dock-btn svg .ink,
+        [data-theme="notte"] .dock-btn svg .ink { stroke: rgba(255,255,255,0.55); }
+
+        /* 用户提供的 jpg 图标：方形软裁，未激活时稍微褪色 */
+        .dock-btn img.dock-icon {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #fff;
+            filter: saturate(0.7) brightness(0.95);
+            transition: filter 0.35s, transform 0.35s;
+        }
+        .dock-btn.active img.dock-icon {
+            filter: saturate(1.1) brightness(1.02) drop-shadow(0 4px 10px color-mix(in srgb, var(--gold) 45%, transparent));
+        }
+        body.abyss-mode .dock-btn img.dock-icon,
+        [data-theme="crepuscolo"] .dock-btn img.dock-icon,
+        [data-theme="aurora"] .dock-btn img.dock-icon,
+        [data-theme="notte"] .dock-btn img.dock-icon {
+            filter: saturate(0.6) brightness(0.85);
+        }
+        body.abyss-mode .dock-btn.active img.dock-icon,
+        [data-theme="crepuscolo"] .dock-btn.active img.dock-icon,
+        [data-theme="aurora"] .dock-btn.active img.dock-icon,
+        [data-theme="notte"] .dock-btn.active img.dock-icon {
+            filter: saturate(1) brightness(1) drop-shadow(0 4px 12px color-mix(in srgb, var(--gold) 60%, transparent));
+        }
+
+        /* 把原 content-scroll 底padding给 dock 让位 */
+        .content-scroll { padding-bottom: 100px !important; position: relative; z-index: 1; }
+
+        /* === Header 也用毛玻璃 + 圆角 === */
+        body.glass-mode header.app-header {
+            position: sticky; top: 0; z-index: 30;
+            background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid color-mix(in srgb, white 28%, transparent);
+            box-shadow: 0 1px 0 0 rgba(255,255,255,0.4) inset, 0 4px 16px -8px rgba(0,0,0,0.08);
+        }
+
+        /* 聊天气泡 */
+        .chat-thread {
+            display: flex; flex-direction: column; gap: 12px;
+            padding-bottom: 8px;
+        }
+        .chat-row { display: flex; width: 100%; }
+        .chat-row.user { justify-content: flex-end; }
+        .chat-row.claude { justify-content: flex-start; align-items: flex-end; gap: 6px; }
+        .chat-row .msg-col { display: flex; flex-direction: column; min-width: 0; }
+        .chat-row.user .msg-col { max-width: 82%; align-items: flex-end; }
+        .chat-row.claude .msg-col { max-width: calc(100% - 44px); align-items: flex-start; }
+        /* 微信式：一条消息拆成多条气泡时，每条之间留间隔，像分开的消息 */
+        .msg-col > .chat-bubble,
+        .msg-col > .chat-sticker-bubble,
+        .msg-col > .chat-genimage { margin-top: 6px; }
+        .msg-col > .chat-bubble:first-child,
+        .msg-col > .chat-sticker-bubble:first-child { margin-top: 2px; }
+        .chat-row.claude > .crab-avatar-wrap { flex-shrink: 0; margin-bottom: 2px; }
+        .chat-bubble {
+            max-width: 100%;
+            padding: 11px 15px;
+            border-radius: 20px;
+            font-size: 0.8438rem;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+            width: fit-content;
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.4),
+                0 6px 20px -10px rgba(0,0,0,0.18);
+            border: 1px solid color-mix(in srgb, white 32%, transparent);
+            position: relative;
+        }
+        .chat-row.user .chat-bubble {
+            background: color-mix(in srgb, var(--warm-gold) 75%, transparent);
+            color: #fff;
+            border-bottom-right-radius: 6px;
+            border-color: color-mix(in srgb, white 40%, transparent);
+        }
+        .chat-row.claude .chat-bubble {
+            background: color-mix(in srgb, var(--card-bg) 60%, transparent);
+            color: var(--warm-ink);
+            border-bottom-left-radius: 6px;
+        }
+        body.abyss-mode .chat-row.claude .chat-bubble,
+        [data-theme="crepuscolo"] .chat-row.claude .chat-bubble,
+        [data-theme="aurora"] .chat-row.claude .chat-bubble,
+        [data-theme="notte"] .chat-row.claude .chat-bubble {
+            background: color-mix(in srgb, var(--card-bg) 38%, transparent);
+            color: var(--ink);
+            border-color: color-mix(in srgb, white 14%, transparent);
+        }
+        .chat-meta {
+            font-size: 0.5625rem;
+            letter-spacing: 0.2em;
+            color: color-mix(in srgb, var(--ink) 35%, transparent);
+            margin: 0 8px 2px;
+            text-transform: uppercase;
+            font-family: "Cormorant Garamond", serif;
+            font-style: italic;
+        }
+        .chat-row.user .chat-meta { text-align: right; }
+        .log-source-index {
+            margin:0 8px 3px; font-size:0.5rem; letter-spacing:.08em;
+            color:rgba(181,87,119,.52);
+        }
+        .log-chat-thread .chat-row { border-radius:22px; transition:background .25s ease, box-shadow .25s ease; }
+        .log-chat-thread .chat-row.log-search-match { background:rgba(232,157,181,.07); }
+        .log-chat-thread .chat-row.log-jump-highlight {
+            animation:logMessageFocus 2.4s ease both;
+        }
+        @keyframes logMessageFocus {
+            0%,100% { background:transparent; box-shadow:0 0 0 0 rgba(214,116,149,0); }
+            18%,68% { background:rgba(255,221,233,.72); box-shadow:0 0 0 5px rgba(214,116,149,.12); }
+        }
+        .log-feature-list { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:0 0 22px; }
+        .log-feature-list span {
+            padding:5px 8px; border-radius:999px; border:1px solid rgba(204,116,146,.13);
+            background:rgba(255,255,255,.36); color:rgba(120,72,88,.44); font-size:0.5rem;
+        }
+        .chat-typing {
+            display: inline-flex; gap: 4px; padding: 6px 2px;
+        }
+        .chat-typing span {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: color-mix(in srgb, var(--gold) 55%, transparent);
+            animation: breathPulse 1.4s ease-in-out infinite;
+        }
+        .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        .chat-composer {
+            position: sticky; bottom: 0; padding: 12px 0 6px;
+            background: transparent;
+            z-index: 5;
+        }
+        .chat-input-wrap {
+            display: flex; align-items: flex-end; gap: 8px;
+            padding: 8px 10px 8px 16px;
+            border-radius: 24px;
+            background: color-mix(in srgb, var(--card-bg) 35%, transparent);
+            backdrop-filter: blur(30px) saturate(220%);
+            -webkit-backdrop-filter: blur(30px) saturate(220%);
+            border: 1px solid color-mix(in srgb, white 50%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.65),
+                inset 0 -0.5px 0 0 rgba(255,255,255,0.15),
+                0 10px 36px -10px rgba(0,0,0,0.15),
+                0 2px 6px -2px rgba(0,0,0,0.06);
+        }
+        body.abyss-mode .chat-input-wrap,
+        [data-theme="crepuscolo"] .chat-input-wrap,
+        [data-theme="aurora"] .chat-input-wrap,
+        [data-theme="notte"] .chat-input-wrap {
+            background: color-mix(in srgb, var(--card-bg) 20%, transparent);
+            border-color: color-mix(in srgb, white 15%, transparent);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.15),
+                0 12px 40px -10px rgba(0,0,0,0.55);
+        }
+        .chat-input-wrap textarea {
+            flex: 1; resize: none; background: transparent; border: 0;
+            font-size: 0.8438rem; line-height: 1.55; color: var(--ink);
+            max-height: 120px; min-height: 24px; padding: 4px 0;
+        }
+        .chat-send {
+            flex-shrink: 0;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--warm-gold);
+            color: #fff;
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.5),
+                0 4px 12px -2px color-mix(in srgb, var(--warm-gold) 50%, transparent);
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .chat-send:active { transform: scale(0.92); }
+        .chat-send:disabled { opacity: 0.4; }
+
+        /* 壁纸设置 Modal */
+        .wp-preview {
+            width: 100%; height: 160px; border-radius: 16px;
+            background-size: cover; background-position: center;
+            border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+            position: relative; overflow: hidden;
+            background-color: color-mix(in srgb, var(--ink) 6%, transparent);
+        }
+        .wp-preview .empty {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            color: color-mix(in srgb, var(--ink) 35%, transparent);
+            font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase;
+            font-style: italic; font-family: "Cormorant Garamond", serif;
+        }
+        .wp-chip {
+            flex: 1; min-width: 0;
+            padding: 6px 10px;
+            font-size: 0.625rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            border-radius: 10px;
+            border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
+            background: transparent;
+            color: color-mix(in srgb, var(--ink) 55%, transparent);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wp-chip.active {
+            background: color-mix(in srgb, var(--gold) 18%, transparent);
+            color: var(--gold);
+            border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+        }
+
+        /* 漂亮的滑块 */
+        input[type="range"].wp-range {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 4px; background: color-mix(in srgb, var(--gold) 25%, transparent);
+            border-radius: 4px; outline: none; padding: 0;
+        }
+        input[type="range"].wp-range::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--warm-gold); border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }

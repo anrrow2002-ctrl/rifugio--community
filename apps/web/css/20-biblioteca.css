@@ -1,0 +1,606 @@
+/* ── Biblioteca · 共读书屋 2.0 ───────────────────────────────────── */
+.biblio-app-shell {
+    position: relative;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--ink, #443a34);
+    background:
+        radial-gradient(circle at 12% 8%, rgba(184, 131, 99, .09), transparent 24%),
+        linear-gradient(145deg, rgba(255, 252, 245, .98), rgba(245, 235, 219, .96));
+}
+
+.biblio-shelf {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: calc(env(safe-area-inset-top) + 14px) 14px calc(env(safe-area-inset-bottom) + 28px);
+    scrollbar-width: none;
+}
+.biblio-shelf::-webkit-scrollbar,
+.biblio-reader-scroll::-webkit-scrollbar { display: none; }
+.biblio-shelf-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 720px;
+    margin: 0 auto 16px;
+}
+.biblio-title { flex: 1; min-width: 0; }
+.biblio-title > span {
+    display: block;
+    color: #a36f55;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .18em;
+}
+.biblio-title h2 {
+    margin: 1px 0 0;
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-size: 22px;
+    font-weight: 650;
+    letter-spacing: .03em;
+}
+.biblio-title p {
+    overflow: hidden;
+    margin-top: 2px;
+    color: rgba(68, 58, 52, .52);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.biblio-icon-btn {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(130, 91, 68, .18);
+    border-radius: 50%;
+    color: inherit;
+    background: rgba(255, 253, 248, .68);
+    box-shadow: 0 5px 18px rgba(90, 58, 35, .08);
+    font-size: 14px;
+}
+.biblio-icon-btn.active {
+    color: #fff;
+    border-color: #a76753;
+    background: #a76753;
+}
+.biblio-upload { cursor: pointer; font-size: 21px; }
+.biblio-upload input { display: none; }
+
+.biblio-welcome {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto 18px;
+    overflow: hidden;
+    padding: 22px 24px 18px;
+    border: 1px solid rgba(147, 108, 80, .16);
+    border-radius: 22px;
+    background:
+        linear-gradient(100deg, rgba(255,255,255,.72), rgba(255,248,235,.52)),
+        repeating-linear-gradient(0deg, transparent 0 26px, rgba(136,99,73,.045) 27px);
+    box-shadow: 0 12px 38px rgba(102, 67, 42, .09);
+}
+.biblio-welcome::after {
+    content: "⌁";
+    position: absolute;
+    right: 22px;
+    top: 14px;
+    color: rgba(163, 111, 85, .32);
+    font-size: 36px;
+    transform: rotate(-8deg);
+}
+.biblio-welcome-mark {
+    position: absolute;
+    top: -18px;
+    left: 10px;
+    color: rgba(163, 111, 85, .12);
+    font-family: Georgia, serif;
+    font-size: 86px;
+}
+.biblio-welcome p {
+    position: relative;
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    letter-spacing: .08em;
+}
+.biblio-welcome small {
+    display: block;
+    margin-top: 8px;
+    color: rgba(68, 58, 52, .42);
+    font-size: 9px;
+    letter-spacing: .14em;
+}
+.biblio-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 44px 20px;
+    color: rgba(68, 58, 52, .42);
+    text-align: center;
+    font-size: 12px;
+}
+.biblio-empty b { color: rgba(68, 58, 52, .65); font-size: 15px; }
+
+.biblio-book-grid {
+    display: grid;
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 12px;
+}
+.biblio-book-card {
+    min-height: 150px;
+    display: flex;
+    overflow: hidden;
+    border: 1px solid rgba(130, 91, 68, .14);
+    border-radius: 18px;
+    background: rgba(255, 253, 248, .76);
+    box-shadow: 0 7px 24px rgba(92, 61, 40, .08);
+}
+.biblio-book-spine {
+    width: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    color: rgba(255,255,255,.9);
+    background: #9e6455;
+}
+.biblio-book-spine[data-tone="1"] { background: #65796a; }
+.biblio-book-spine[data-tone="2"] { background: #687b91; }
+.biblio-book-spine[data-tone="3"] { background: #aa8761; }
+.biblio-book-spine span {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .18em;
+    writing-mode: vertical-rl;
+}
+.biblio-book-spine i { font-family: Georgia, serif; font-size: 20px; }
+.biblio-book-info {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 14px 14px 12px;
+}
+.biblio-book-info h3 {
+    max-width: calc(100% - 26px);
+    overflow: hidden;
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-size: 16px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.biblio-book-info > p { color: rgba(68,58,52,.45); font-size: 10px; }
+.biblio-book-info > small { color: rgba(68,58,52,.45); font-size: 10px; }
+.biblio-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    color: rgba(68,58,52,.32);
+    background: transparent;
+    font-size: 17px;
+}
+.biblio-progress-track {
+    height: 3px;
+    overflow: hidden;
+    margin: 13px 0 5px;
+    border-radius: 99px;
+    background: rgba(126, 91, 67, .12);
+}
+.biblio-progress-track i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #b97861, #d7a272);
+}
+.biblio-book-actions { display: flex; gap: 8px; margin-top: 12px; }
+.biblio-book-actions button,
+.biblio-selection-bar button,
+.biblio-sheet-actions button {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid rgba(157, 103, 79, .22);
+    border-radius: 999px;
+    color: #805844;
+    background: rgba(255,255,255,.55);
+    font-size: 11px;
+    font-weight: 650;
+}
+.biblio-book-actions .is-primary,
+.biblio-selection-bar .is-primary,
+.biblio-sheet-actions .is-primary {
+    color: #fff8f0;
+    border-color: #a76753;
+    background: #a76753;
+}
+
+.biblio-reader-shell {
+    position: relative;
+    --biblio-paper: #fbf5e9;
+    --biblio-ink: #413933;
+    --biblio-muted: #9a8879;
+    --biblio-accent: #a86652;
+    --biblio-line: rgba(115, 82, 60, .15);
+    --biblio-card: rgba(255, 252, 246, .94);
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    color: var(--biblio-ink);
+    background: var(--biblio-paper);
+}
+.biblio-theme-rose {
+    --biblio-paper: #f9eeeb;
+    --biblio-ink: #4a3939;
+    --biblio-muted: #a17e7b;
+    --biblio-accent: #a85f62;
+    --biblio-line: rgba(138, 82, 85, .15);
+    --biblio-card: rgba(255, 247, 245, .95);
+}
+.biblio-theme-night {
+    --biblio-paper: #191d24;
+    --biblio-ink: #ddd8cd;
+    --biblio-muted: #8d929b;
+    --biblio-accent: #d89b88;
+    --biblio-line: rgba(228, 216, 199, .12);
+    --biblio-card: rgba(39, 43, 52, .97);
+}
+.biblio-reader-head {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: calc(env(safe-area-inset-top) + 8px) 10px 8px !important;
+    border-bottom: 1px solid var(--biblio-line) !important;
+    background: color-mix(in srgb, var(--biblio-paper) 90%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 8;
+}
+.biblio-reader-shell .biblio-icon-btn {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+    color: var(--biblio-ink);
+    border-color: var(--biblio-line);
+    background: var(--biblio-card);
+    box-shadow: none;
+    font-size: 12px;
+}
+.biblio-reader-shell .biblio-icon-btn.active {
+    color: #fff;
+    border-color: var(--biblio-accent);
+    background: var(--biblio-accent);
+}
+.biblio-reader-title {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    color: var(--biblio-ink);
+    background: transparent;
+}
+.biblio-reader-title b,
+.biblio-reader-title span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.biblio-reader-title b { font-family: "Noto Serif SC", Georgia, serif; font-size: 12px; }
+.biblio-reader-title span { color: var(--biblio-muted); font-size: 9px; }
+
+.biblio-settings {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--biblio-line);
+    background: var(--biblio-card);
+}
+.biblio-settings > div { display: flex; align-items: center; gap: 6px; }
+.biblio-settings > div + div { margin-top: 7px; }
+.biblio-settings span { width: 34px; color: var(--biblio-muted); font-size: 9px; }
+.biblio-settings button {
+    padding: 5px 9px;
+    border: 1px solid var(--biblio-line);
+    border-radius: 999px;
+    color: var(--biblio-muted);
+    background: transparent;
+    font-size: 9px;
+}
+.biblio-settings button.active {
+    color: #fff;
+    border-color: var(--biblio-accent);
+    background: var(--biblio-accent);
+}
+.biblio-toc {
+    position: absolute;
+    inset: calc(env(safe-area-inset-top) + 56px) 0 0;
+    z-index: 20;
+    overflow-y: auto;
+    padding: 10px 14px calc(env(safe-area-inset-bottom) + 24px);
+    background: var(--biblio-card);
+    box-shadow: 0 16px 35px rgba(0,0,0,.16);
+}
+.biblio-toc-head { display: flex; justify-content: space-between; padding: 8px 4px 12px; }
+.biblio-toc-head button { color: var(--biblio-muted); background: transparent; font-size: 11px; }
+.biblio-toc > button {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 8px;
+    padding: 10px 5px;
+    border-bottom: 1px solid var(--biblio-line);
+    text-align: left;
+    color: var(--biblio-ink);
+    background: transparent;
+    font-size: 11px;
+}
+.biblio-toc > button i,
+.biblio-toc > button small { color: var(--biblio-muted); font-size: 9px; }
+.biblio-toc > button.active span { color: var(--biblio-accent); font-weight: 700; }
+
+.biblio-reader-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+.biblio-page {
+    position: relative;
+    width: min(100%, 700px);
+    min-height: 100%;
+    margin: 0 auto;
+    padding: 34px 24px calc(env(safe-area-inset-bottom) + 34px);
+}
+.biblio-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .25;
+    background: repeating-linear-gradient(0deg, transparent 0 27px, rgba(120,90,60,.035) 28px);
+}
+.biblio-page > * { position: relative; }
+.biblio-chapter-kicker {
+    color: var(--biblio-accent);
+    text-align: center;
+    font-family: Georgia, serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .22em;
+}
+.biblio-page h3 {
+    margin: 8px 0 10px;
+    text-align: center;
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: .08em;
+}
+.biblio-chapter-rule { display: flex; align-items: center; gap: 9px; width: 120px; margin: 0 auto 28px; }
+.biblio-chapter-rule i { flex: 1; height: 1px; background: var(--biblio-line); }
+.biblio-chapter-rule span { color: var(--biblio-accent); font-family: Georgia, serif; }
+.biblio-chapter-content {
+    position: relative;
+    z-index: 1;
+    min-height: 42vh;
+    white-space: pre-wrap;
+    color: var(--biblio-ink);
+    font-family: "Noto Serif SC", Georgia, serif;
+    line-height: 2;
+    letter-spacing: .025em;
+    text-align: justify;
+    user-select: text;
+    -webkit-user-select: text;
+}
+.biblio-mark {
+    position: relative;
+    padding: 1px 0;
+    color: inherit;
+    border-radius: 2px;
+    background: linear-gradient(transparent 48%, rgba(226, 170, 151, .44) 48%);
+    cursor: pointer;
+}
+.biblio-mark.is-replied {
+    background: linear-gradient(transparent 48%, rgba(137, 174, 197, .4) 48%);
+}
+.biblio-mark i {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-left: 2px;
+    border-radius: 50%;
+    vertical-align: super;
+    background: #cf816d;
+}
+.biblio-mark.is-replied i { background: #6f9bb8; }
+.biblio-page-count { margin: 20px 0 -6px; color: var(--biblio-muted); text-align: center; font-size: 9px; }
+.biblio-reader-nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: 34px;
+    padding-top: 14px;
+    border-top: 1px solid var(--biblio-line);
+}
+.biblio-reader-nav button {
+    padding: 7px 2px;
+    color: var(--biblio-accent);
+    background: transparent;
+    font-size: 11px;
+}
+.biblio-reader-nav button:disabled { opacity: .25; }
+.biblio-reader-nav span { color: var(--biblio-muted); text-align: center; font-size: 8px; }
+.biblio-flow-page .biblio-page { animation: biblio-page-in .2s ease-out; }
+@keyframes biblio-page-in { from { opacity:.5; transform:translateX(5px); } }
+
+.biblio-selection-bar {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 9px 8px 12px;
+    border: 1px solid var(--biblio-line);
+    border-radius: 16px;
+    background: var(--biblio-card);
+    box-shadow: 0 12px 30px rgba(0,0,0,.17);
+    backdrop-filter: blur(16px);
+}
+.biblio-selection-bar span { flex: 1; color: var(--biblio-muted); font-size: 9px; }
+.biblio-selection-bar button { flex: 0 0 auto; padding: 7px 11px; }
+.biblio-ask-panel {
+    flex: 0 0 auto;
+    max-height: 45%;
+    overflow-y: auto;
+    padding: 9px 11px calc(env(safe-area-inset-bottom) + 10px);
+    border-top: 1px solid var(--biblio-line);
+    background: var(--biblio-card);
+}
+.biblio-ai-bubble {
+    margin-bottom: 8px;
+    padding: 10px 12px;
+    border-left: 3px solid #789eb7;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    background: rgba(126, 168, 195, .13);
+    font-size: 11px;
+    line-height: 1.7;
+}
+.biblio-thinking { padding: 6px; color: var(--biblio-muted); font-size: 10px; }
+.biblio-ask-row { display: flex; gap: 7px; }
+.biblio-ask-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 1px solid var(--biblio-line);
+    border-radius: 999px;
+    color: var(--biblio-ink);
+    background: transparent;
+    font-size: 11px;
+}
+.biblio-ask-row button {
+    padding: 8px 14px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--biblio-accent);
+    font-size: 10px;
+}
+
+.biblio-sheet-mask {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: flex-end;
+    background: rgba(28, 22, 20, .28);
+    backdrop-filter: blur(2px);
+}
+.biblio-annotation-sheet {
+    position: relative;
+    width: 100%;
+    max-height: 78%;
+    overflow-y: auto;
+    padding: 18px 16px calc(env(safe-area-inset-bottom) + 18px);
+    border-radius: 22px 22px 0 0;
+    color: var(--biblio-ink);
+    background: var(--biblio-card);
+    box-shadow: 0 -15px 50px rgba(0,0,0,.2);
+}
+.biblio-sheet-close {
+    position: absolute;
+    top: 9px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    color: var(--biblio-muted);
+    background: transparent;
+    font-size: 19px;
+}
+.biblio-annotation-sheet > small {
+    color: var(--biblio-muted);
+    font-size: 9px;
+    letter-spacing: .1em;
+}
+.biblio-annotation-sheet blockquote {
+    margin: 8px 28px 14px 0;
+    padding-left: 10px;
+    border-left: 3px solid var(--biblio-accent);
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-size: 12px;
+    line-height: 1.75;
+}
+.biblio-annotation-sheet textarea {
+    width: 100%;
+    min-height: 86px;
+    padding: 11px 12px;
+    resize: none;
+    border: 1px solid var(--biblio-line);
+    border-radius: 13px;
+    color: var(--biblio-ink);
+    background: color-mix(in srgb, var(--biblio-paper) 78%, transparent);
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.biblio-sheet-actions { display: flex; gap: 8px; margin-top: 11px; }
+.biblio-sheet-actions .is-danger { color: #a45f62; }
+.biblio-note-bubble,
+.biblio-reply-bubble {
+    max-width: 88%;
+    margin: 8px 0;
+    padding: 9px 11px;
+    border-radius: 13px;
+    font-size: 11px;
+    line-height: 1.7;
+}
+.biblio-note-bubble { margin-left: auto; background: rgba(218, 142, 139, .15); }
+.biblio-reply-bubble { background: rgba(126, 168, 195, .15); }
+.biblio-note-bubble b,
+.biblio-reply-bubble b { display: block; margin-bottom: 2px; color: var(--biblio-muted); font-size: 8px; }
+.biblio-no-reply { padding: 12px 2px; color: var(--biblio-muted); font-size: 10px; }
+
+@media (min-width: 640px) {
+    .biblio-book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .biblio-page { padding-left: 52px; padding-right: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .biblio-flow-page .biblio-page { animation: none; }
+}
+
+/* Biblioteca owns its only header; the generic app bar would duplicate both
+   the title and back control. Its own shelf/reader headers carry safe-area. */
+.phone-app-content.phone-biblio-app {
+    display: flex !important;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+.phone-biblio-app > .phone-app-topbar {
+    display: none !important;
+}
+.phone-biblio-app > .biblio-app-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+}
+.phone-biblio-app .biblio-shelf {
+    padding-top: max(calc(env(safe-area-inset-top) + 14px), 28px);
+}
+.phone-biblio-app .biblio-reader-head {
+    padding-top: max(calc(env(safe-area-inset-top) + 8px), 18px) !important;
+}

@@ -1,0 +1,178 @@
+/* ============================================================
+   Responsive shell patch · phones / tablets / desktop preview
+   - Keep the UI vertical, but stop hard-locking desktop to iPhone 15 Pro.
+   - Use dynamic viewport units and safe-area padding across phone sizes.
+   ============================================================ */
+:root {
+    --rf-app-max-w: 520px;
+    --rf-app-radius: 0px;
+    --rf-page-pad-x: clamp(14px, 5.2vw, 24px);
+    --rf-chat-pad-x: clamp(10px, 3.5vw, 18px);
+    --rf-bottom-gap: max(10px, env(safe-area-inset-bottom));
+}
+
+html, body {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+}
+
+.app-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: var(--app-h, 100dvh) !important;
+    min-height: 0 !important;
+}
+
+.phone-home-top,
+.phone-page,
+.phone-app-content > .px-8,
+.phone-app-content .px-8 {
+    padding-left: var(--rf-page-pad-x) !important;
+    padding-right: var(--rf-page-pad-x) !important;
+}
+
+.phone-app-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: clamp(8px, 3.5vw, 14px);
+}
+.phone-icon-tile {
+    width: clamp(50px, 14vw, 62px) !important;
+    height: clamp(50px, 14vw, 62px) !important;
+}
+.phone-app-label { max-width: clamp(58px, 17vw, 76px); }
+
+.talk-thread,
+.terminal-imessage-scroll {
+    padding-left: var(--rf-chat-pad-x) !important;
+    padding-right: var(--rf-chat-pad-x) !important;
+}
+.talk-composer-wrap,
+.terminal-imessage-composer {
+    padding-bottom: calc(var(--rf-bottom-gap) + 8px) !important;
+}
+.chat-row.claude .msg-col,
+.terminal-chat-col {
+    max-width: min(82%, 380px) !important;
+}
+.chat-row.user .msg-col,
+.terminal-chat-row.user .terminal-chat-col {
+    max-width: min(82%, 380px) !important;
+}
+
+@media (max-width: 374px) {
+    :root {
+        --rf-page-pad-x: 12px;
+        --rf-chat-pad-x: 8px;
+    }
+    .phone-home-title .hello { font-size: 2.25rem !important; }
+    .phone-mini-actions { gap: 5px !important; }
+    .phone-mini-btn { min-width: 31px !important; height: 31px !important; padding: 0 8px !important; }
+    .phone-app-grid { column-gap: 6px; row-gap: 14px; }
+    .sticker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .talk-tool-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 700px) {
+    :root {
+        --desktop-phone-w: min(var(--rf-app-max-w), calc(100vw - 32px));
+        --desktop-phone-h: min(980px, calc(100dvh - 24px));
+        --desktop-phone-half-w: calc(var(--desktop-phone-w) / 2);
+        --desktop-phone-half-h: calc(var(--desktop-phone-h) / 2);
+        --rf-app-radius: 34px;
+        --rf-page-pad-x: 24px;
+        --rf-chat-pad-x: 18px;
+    }
+    html, body { width: 100%; height: 100dvh; overflow: hidden; }
+    body {
+        display: grid !important;
+        place-items: center !important;
+        background:
+            radial-gradient(circle at 50% 12%, rgba(255,225,235,.88), transparent 34%),
+            linear-gradient(180deg, #fff8fb 0%, #f7edf1 100%) !important;
+    }
+    .app-container {
+        width: var(--desktop-phone-w) !important;
+        max-width: var(--desktop-phone-w) !important;
+        height: var(--desktop-phone-h) !important;
+        max-height: var(--desktop-phone-h) !important;
+        border-radius: var(--rf-app-radius) !important;
+        box-shadow: 0 24px 82px rgba(88, 49, 62, .22), 0 0 0 1px rgba(255,255,255,.80) !important;
+        overflow: hidden !important;
+    }
+    #lock-screen {
+        inset: auto !important;
+        top: 50% !important;
+        left: 50% !important;
+        width: var(--desktop-phone-w) !important;
+        height: var(--desktop-phone-h) !important;
+        min-height: var(--desktop-phone-h) !important;
+        transform: translate(-50%, -50%) !important;
+        border-radius: var(--rf-app-radius) !important;
+    }
+    .relock-btn {
+        top: calc(50% - var(--desktop-phone-half-h) + 14px) !important;
+        right: calc(50% - var(--desktop-phone-half-w) + 14px) !important;
+    }
+    .phone-page { padding-bottom: 14px !important; }
+    .phone-app-content { overflow-y: auto; }
+}
+
+@media (min-width: 1100px) {
+    :root { --rf-app-max-w: 560px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    .app-container { border-radius: 0 !important; }
+    .phone-home-top,
+    .phone-app-topbar { padding-top: 10px !important; }
+    .phone-dock, .glass-dock { transform: translateX(-50%) scale(.92); transform-origin: bottom center; }
+}
+
+/* Terminal Chat call/mobile controls */
+.terminal-call-strip {
+    margin: 0 12px 8px;
+    padding: 9px 10px;
+    border-radius: 18px;
+    background: rgba(255,248,251,.86);
+    border: 1px solid rgba(216,141,165,.16);
+    display: grid;
+    gap: 7px;
+    color: rgba(78,48,58,.72);
+    font-size: .62rem;
+}
+.terminal-call-strip strong { color: rgba(181,72,111,.78); font-weight: 700; }
+.terminal-call-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+.terminal-call-actions button {
+    min-height: 30px;
+    padding: 0 11px;
+    border-radius: 15px;
+    background: rgba(216,141,165,.16);
+    color: rgba(170,70,108,.82);
+}
+.terminal-call-actions button.danger { background: rgba(255,92,122,.16); color: #b43958; }
+.terminal-imessage-mini.on { background: rgba(216,141,165,.75); color: #fff; }
+
+/* Terminal Chat v6: keep the chat usable across phone heights instead of assuming an iPhone 15 Pro canvas. */
+.terminal-imessage-shell,
+.terminal-raw-wrap,
+.terminal-handoff-panel {
+    min-height: 0 !important;
+}
+.terminal-mobile-keybox {
+    max-height: min(36dvh, 286px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.terminal-imessage-composer textarea {
+    max-height: min(28dvh, 132px) !important;
+}
+@media (max-width: 380px), (max-height: 720px) {
+    .terminal-imessage-status { gap: 5px !important; padding-left: 10px !important; padding-right: 10px !important; }
+    .terminal-imessage-status em { display: none !important; }
+    .terminal-mobile-keybox { max-height: min(32dvh, 230px); }
+    .terminal-mobile-keys-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 340px) {
+    .terminal-mobile-keys-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}

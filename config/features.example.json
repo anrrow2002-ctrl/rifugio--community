@@ -1,0 +1,11 @@
+{
+  "memory": true,
+  "chat": true,
+  "mcp": true,
+  "health": false,
+  "radio": false,
+  "image": false,
+  "voice": false,
+  "toy": false,
+  "cliBridge": false
+}

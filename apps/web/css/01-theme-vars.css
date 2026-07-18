@@ -1,0 +1,185 @@
+/* ============ THEMES (CSS vars) ============ */
+        /* Ivory · Ivory Beige (default) */
+        :root, [data-theme="avorio"] {
+            --paper: #F9F7F2;
+            --card-bg: #FCFAF5;
+            --alt-bg: #F4F1EA;
+            --ink: #2C2A29;
+            --warm-ink: #4A3B32;
+            --gold: #A68B5B;
+            --warm-gold: #D4AF37;
+            --abyss: #050505;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #D4AF37;
+            --glow-color: rgba(212, 175, 55, 0.12);
+        }
+        /* Lemon · Lemon Yellow */
+        [data-theme="limone"] {
+            --paper: #FFFBE8;
+            --card-bg: #FFF8D4;
+            --alt-bg: #FFF1B8;
+            --ink: #3D3415;
+            --warm-ink: #6B5B1F;
+            --gold: #B89537;
+            --warm-gold: #E0B83A;
+            --abyss: #0a0900;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #E0B83A;
+            --glow-color: rgba(224, 184, 58, 0.18);
+        }
+        /* Mint · Mint Green */
+        [data-theme="menta"] {
+            --paper: #EFF7F0;
+            --card-bg: #F5FBF5;
+            --alt-bg: #DFEDE0;
+            --ink: #1F3A28;
+            --warm-ink: #345A3F;
+            --gold: #6FA77E;
+            --warm-gold: #8FC79E;
+            --abyss: #04100a;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #8FC79E;
+            --glow-color: rgba(143, 199, 158, 0.18);
+        }
+        /* Mist · Misty Blue */
+        [data-theme="nebbia"] {
+            --paper: #ECF3F8;
+            --card-bg: #F4F8FC;
+            --alt-bg: #DCE8F0;
+            --ink: #1E3247;
+            --warm-ink: #3A526B;
+            --gold: #6E94B5;
+            --warm-gold: #94B4D1;
+            --abyss: #04080d;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #94B4D1;
+            --glow-color: rgba(148, 180, 209, 0.18);
+        }
+        /* Petal · Soft Pink */
+        [data-theme="petalo"] {
+            --paper: #FBEFEF;
+            --card-bg: #FDF6F6;
+            --alt-bg: #F5DEDE;
+            --ink: #3F2226;
+            --warm-ink: #6B3A40;
+            --gold: #C68A8A;
+            --warm-gold: #E2A9A9;
+            --abyss: #100507;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #E2A9A9;
+            --glow-color: rgba(226, 169, 169, 0.18);
+        }
+        /* Dusk · Twilight */
+        [data-theme="crepuscolo"] {
+            --paper: #1E1526;
+            --card-bg: #261B33;
+            --alt-bg: #2E1F3E;
+            --ink: #E8D5F0;
+            --warm-ink: #D4B8E8;
+            --gold: #C47FC4;
+            --warm-gold: #9FCCBA;
+            --abyss: #0A0610;
+            --paper-texture: none;
+            --dust-color: #C47FC4;
+            --glow-color: rgba(196, 127, 196, 0.18);
+        }
+        /* Aurora · Northern Lights */
+        [data-theme="aurora"] {
+            --paper: #0B1628;
+            --card-bg: #111E38;
+            --alt-bg: #162644;
+            --ink: #E2EEF8;
+            --warm-ink: #C8E0F0;
+            --gold: #F0A8B8;
+            --warm-gold: #96D8E8;
+            --abyss: #040810;
+            --paper-texture: none;
+            --dust-color: #96D8E8;
+            --glow-color: rgba(150, 216, 232, 0.15);
+        }
+        /* Night · Midnight */
+        [data-theme="notte"] {
+            --paper: #0C0C0E;
+            --card-bg: #111116;
+            --alt-bg: #18181E;
+            --ink: #D0D0D8;
+            --warm-ink: #B0B0C0;
+            --gold: #C8C8D8;
+            --warm-gold: #8B1A2A;
+            --abyss: #030304;
+            --paper-texture: none;
+            --dust-color: #8B1A2A;
+            --glow-color: rgba(139, 26, 42, 0.2);
+        }
+        /* Antique Rose · Ancient Rose */
+        [data-theme="rosa"] {
+            --paper: #F7EDE8;
+            --card-bg: #FBF3F0;
+            --alt-bg: #EDD8D0;
+            --ink: #2E1A18;
+            --warm-ink: #5A2E28;
+            --gold: #C48A70;
+            --warm-gold: #D4A090;
+            --abyss: #100806;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #C48A70;
+            --glow-color: rgba(196, 138, 112, 0.18);
+        }
+        /* Sage Green · Sage */
+        [data-theme="salvia"] {
+            --paper: #EFF0E8;
+            --card-bg: #F5F6EE;
+            --alt-bg: #DEE0D4;
+            --ink: #202820;
+            --warm-ink: #3A4830;
+            --gold: #7A9460;
+            --warm-gold: #C07850;
+            --abyss: #080C06;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #7A9460;
+            --glow-color: rgba(122, 148, 96, 0.18);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: #FFF6F9 !important;
+        }
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            background-color: #FFF6F9 !important; transition: background-color 0.8s ease;
+            background-image: var(--paper-texture);
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.abyss-mode { background-color: var(--abyss); background-image: none; }
+        /* 深渊模式：强制全区域文字可见 */
+        body.abyss-mode .content-scroll { color: rgba(255,255,255,0.75); }
+        body.abyss-mode .content-scroll p,
+        body.abyss-mode .content-scroll span,
+        body.abyss-mode .content-scroll div { color: inherit; }
+        body.abyss-mode .content-scroll .text-gold\/90,
+        body.abyss-mode .content-scroll .text-gold\/60,
+        body.abyss-mode .content-scroll .text-gold\/30 { color: rgba(212,175,55,0.85) !important; }
+        body.abyss-mode .content-scroll .text-white\/70 { color: rgba(255,255,255,0.75) !important; }
+        body.abyss-mode .content-scroll .text-white\/40 { color: rgba(255,255,255,0.55) !important; }
+        body.abyss-mode .content-scroll .text-white\/30 { color: rgba(255,255,255,0.50) !important; }
+        body.abyss-mode .content-scroll .text-white\/20 { color: rgba(255,255,255,0.42) !important; }
+        body.abyss-mode .content-scroll .opacity-50 { opacity: 0.7 !important; }
+        body.abyss-mode .content-scroll .opacity-40 { opacity: 0.65 !important; }
+        body.abyss-mode nav { background: rgba(0,0,0,0.85) !important; }
+        .app-container {
+            width: 100%;
+            max-width: none;
+            height: 100vh;
+            height: 100dvh;
+            height: var(--app-h, 100dvh);
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.8s ease;
+        }

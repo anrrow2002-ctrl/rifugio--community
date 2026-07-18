@@ -1,0 +1,23 @@
+/* 我 / I —— 自我认知成长轴。安静、克制，像一条会生长的线。 */
+.self-axis        { position: relative; padding: 2px 2px 0 4px; }
+.self-node        { position: relative; display: flex; gap: 14px; }
+
+.self-rail        { position: relative; flex-shrink: 0; width: 12px; display: flex; justify-content: center; }
+.self-dot         { position: relative; z-index: 1; width: 9px; height: 9px; margin-top: 5px;
+                    border-radius: 50%; background: var(--paper);
+                    border: 1.5px solid rgba(var(--gold-rgb), 0.4); }
+.self-dot-latest  { background: var(--gold); border-color: var(--gold);
+                    box-shadow: 0 0 0 3px rgba(var(--gold-rgb), 0.12); }
+.self-line        { position: absolute; top: 14px; bottom: -8px; left: 50%; transform: translateX(-50%);
+                    width: 1px; background: linear-gradient(to bottom,
+                      rgba(var(--gold-rgb), 0.38), rgba(var(--gold-rgb), 0.10)); }
+
+.self-body        { flex: 1; min-width: 0; padding-bottom: 28px; cursor: pointer; }
+.self-ver         { font-family: var(--font-serif, "Noto Serif SC", serif); font-size: 13px;
+                    letter-spacing: .05em; color: rgba(var(--gold-rgb), 0.7); }
+.self-ver-latest  { color: var(--gold); font-weight: 600; }
+.self-summary     { font-size: 11px; line-height: 1.75; color: var(--ink); opacity: .82; overflow-wrap: anywhere; word-break: break-word; }
+.self-content     { font-size: 10px; line-height: 1.9; color: var(--ink); opacity: .62; margin-top: 9px;
+                    padding: 10px 13px; border-left: 1px solid rgba(var(--gold-rgb), 0.22);
+                    background: rgba(var(--gold-rgb), 0.035); border-radius: 0 4px 4px 0;
+                    white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; max-width: 100%; }

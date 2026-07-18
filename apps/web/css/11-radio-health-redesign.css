@@ -1,0 +1,1151 @@
+/* ============================================================
+   Radio + Health polish pass
+   目标：更像真正 App、减少堆砌感，并保持主题色跟随 CSS vars。
+   ============================================================ */
+
+.radio-app-redesign,
+.health-app-shell {
+    --app-soft-bg: color-mix(in srgb, var(--paper) 90%, white 10%);
+    --app-panel: color-mix(in srgb, var(--card-bg) 78%, white 22%);
+    --app-panel-strong: color-mix(in srgb, var(--card-bg) 92%, white 8%);
+    --app-line: color-mix(in srgb, var(--gold) 16%, transparent);
+    --app-text: var(--ink);
+    --app-subtext: color-mix(in srgb, var(--ink) 48%, transparent);
+    --app-muted: color-mix(in srgb, var(--ink) 32%, transparent);
+    --app-accent: var(--gold);
+    --app-accent-2: var(--warm-gold);
+    background:
+        radial-gradient(circle at 18% 4%, color-mix(in srgb, var(--warm-gold) 22%, transparent), transparent 36%),
+        linear-gradient(180deg, color-mix(in srgb, var(--paper) 98%, white 2%), color-mix(in srgb, var(--paper) 86%, white 14%)) !important;
+    color: var(--app-text) !important;
+}
+
+.radio-audio-core {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ===================== Radio / Music App ===================== */
+.radio-music-scroll {
+    padding: 14px 18px calc(env(safe-area-inset-bottom) + 24px) !important;
+}
+
+.radio-music-hero-v2 {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    display: grid;
+    gap: 10px;
+    padding: 12px 0 14px;
+    margin: -14px 0 4px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 96%, transparent), color-mix(in srgb, var(--paper) 76%, transparent));
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.radio-search-v2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 62px;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 26px;
+    background: color-mix(in srgb, var(--app-panel) 68%, transparent);
+    border: 1px solid color-mix(in srgb, white 68%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.65), 0 16px 36px -28px color-mix(in srgb, var(--gold) 52%, #000);
+}
+
+.radio-search-v2 input {
+    min-width: 0;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 21px;
+    background: transparent;
+    color: var(--app-text);
+    font-size: 0.8125rem;
+}
+
+.radio-search-v2 input::placeholder { color: var(--app-muted); }
+
+.radio-search-v2 button {
+    min-height: 42px;
+    border-radius: 21px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 12px 24px -16px color-mix(in srgb, var(--app-accent) 80%, #000);
+}
+
+.radio-filter-strip-v2 {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 1px;
+}
+.radio-filter-strip-v2::-webkit-scrollbar { display: none; }
+.radio-filter-strip-v2 button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 13px;
+    border-radius: 999px;
+    color: var(--app-subtext);
+    background: color-mix(in srgb, var(--app-panel) 62%, transparent);
+    border: 1px solid color-mix(in srgb, white 54%, transparent);
+    font-size: 0.625rem;
+    font-weight: 700;
+}
+.radio-filter-strip-v2 button.active {
+    color: #fff;
+    background: color-mix(in srgb, var(--app-accent) 86%, var(--app-panel));
+    box-shadow: 0 10px 24px -18px color-mix(in srgb, var(--app-accent) 70%, #000);
+}
+
+.radio-status-v2,
+.radio-empty-v2 {
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.55;
+}
+.radio-status-v2.error { color: #b3263f; }
+.radio-empty-v2 {
+    padding: 18px;
+    border-radius: 22px;
+    text-align: center;
+    background: color-mix(in srgb, var(--app-panel) 56%, transparent);
+    border: 1px dashed var(--app-line);
+}
+
+.radio-settings-panel-v2 { margin-bottom: 12px; }
+.radio-settings-panel-v2 .radio-settings-section {
+    background: color-mix(in srgb, var(--app-panel) 78%, transparent);
+    border-color: color-mix(in srgb, white 58%, transparent);
+    border-radius: 24px;
+}
+
+.radio-discovery-card-v2,
+.radio-now-card-v2,
+.radio-list-card-v2,
+.radio-detail-card-v2,
+.radio-detail-player-v2,
+.radio-detail-hero-v2 {
+    background: color-mix(in srgb, var(--app-panel) 82%, transparent);
+    border: 1px solid color-mix(in srgb, white 66%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 18px 42px -30px color-mix(in srgb, var(--gold) 50%, #000);
+    backdrop-filter: blur(22px) saturate(175%);
+    -webkit-backdrop-filter: blur(22px) saturate(175%);
+}
+
+.radio-discovery-card-v2 {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    margin: 8px 0 14px;
+    padding: 17px;
+    border-radius: 30px;
+    cursor: pointer;
+}
+.radio-discovery-icon-v2 {
+    width: 54px;
+    height: 54px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 68%, transparent);
+    border: 1px solid color-mix(in srgb, white 70%, transparent);
+    font-size: 1.875rem;
+    font-weight: 200;
+}
+.radio-discovery-card-v2 b,
+.radio-section-head-v2 b,
+.radio-now-copy-v2 b,
+.radio-detail-card-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.radio-discovery-card-v2 span,
+.radio-section-head-v2 span,
+.radio-now-copy-v2 span {
+    display: block;
+    margin-top: 5px;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.45;
+}
+
+.radio-now-card-v2 {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 48px;
+    grid-template-areas:
+        "cover copy play"
+        "progress progress progress"
+        "time time time"
+        "error error error";
+    gap: 10px 12px;
+    align-items: center;
+    padding: 14px;
+    margin: 8px 0 14px;
+    border-radius: 30px;
+}
+.radio-now-cover-v2 { grid-area: cover; }
+.radio-now-copy-v2 { grid-area: copy; min-width: 0; }
+.radio-big-play-v2 { grid-area: play; }
+.radio-progress-v2 { grid-area: progress; }
+.radio-time-row-v2 { grid-area: time; }
+.radio-now-card-v2 .radio-status-v2 { grid-area: error; }
+
+.radio-now-cover-v2,
+.radio-cover-v2,
+.radio-detail-cover-v2 {
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    background:
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, white 55%, transparent), transparent 32%),
+        linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+}
+.radio-now-cover-v2 {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    font-size: 1.5rem;
+}
+.radio-now-cover-v2 img,
+.radio-cover-v2 img,
+.radio-detail-cover-v2 img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.radio-now-copy-v2 small {
+    display: block;
+    color: var(--app-accent);
+    font-size: 0.5625rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.radio-now-copy-v2 b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.radio-big-play-v2,
+.radio-row-play-v2,
+.radio-round-control-v2 {
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    box-shadow: 0 12px 22px -16px color-mix(in srgb, var(--app-accent) 78%, #000);
+    font-weight: 800;
+}
+.radio-big-play-v2 {
+    width: 48px;
+    height: 48px;
+    font-size: 0.9375rem;
+}
+.radio-progress-v2 {
+    width: 100%;
+    accent-color: var(--app-accent);
+}
+.radio-time-row-v2 {
+    display: flex;
+    justify-content: space-between;
+    color: var(--app-muted);
+    font-size: 0.5625rem;
+}
+.radio-continue-v2 {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 64%, transparent);
+    border: 1px solid var(--app-line);
+    font-size: 0.625rem;
+}
+
+.radio-list-card-v2 {
+    padding: 15px;
+    border-radius: 30px;
+    margin-bottom: 14px;
+}
+.radio-section-head-v2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.radio-song-list-v2 { display: grid; gap: 8px; }
+.radio-song-row-v2 {
+    display: grid;
+    grid-template-columns: 22px 50px minmax(0, 1fr) auto auto;
+    gap: 10px;
+    align-items: center;
+    min-height: 68px;
+    padding: 9px 10px;
+    border-radius: 22px;
+    background: color-mix(in srgb, white 52%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 12%, transparent);
+    cursor: pointer;
+    transition: transform .18s ease, background .2s ease, border-color .2s ease;
+}
+.radio-song-row-v2:active { transform: scale(.985); }
+.radio-song-row-v2.active {
+    background: color-mix(in srgb, var(--app-accent) 13%, white 58%);
+    border-color: color-mix(in srgb, var(--app-accent) 34%, transparent);
+}
+.radio-song-row-v2.disabled { opacity: .56; }
+.radio-track-index-v2 {
+    color: var(--app-muted);
+    font-size: 0.6875rem;
+    text-align: center;
+}
+.radio-cover-v2 {
+    width: 50px;
+    height: 50px;
+    border-radius: 17px;
+    font-size: 1.125rem;
+}
+.radio-song-meta-v2 { min-width: 0; }
+.radio-song-meta-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.radio-song-meta-v2 small {
+    display: block;
+    margin-top: 4px;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.radio-detail-btn-v2 {
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 16px;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 62%, transparent);
+    border: 1px solid var(--app-line);
+    font-size: 0.625rem;
+}
+.radio-row-play-v2 {
+    width: 34px;
+    height: 34px;
+    font-size: 0.6875rem;
+}
+
+.radio-detail-page-v2 {
+    display: grid;
+    gap: 13px;
+    padding-top: 8px;
+}
+.radio-detail-back-v2 {
+    justify-self: start;
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 17px;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 58%, transparent);
+    border: 1px solid color-mix(in srgb, white 62%, transparent);
+    font-size: 0.6875rem;
+}
+.radio-detail-hero-v2 {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    padding: 24px 18px 20px;
+    border-radius: 34px;
+}
+.radio-detail-cover-v2 {
+    width: 156px;
+    height: 156px;
+    border-radius: 38px;
+    font-size: 3.25rem;
+    box-shadow: 0 28px 45px -32px color-mix(in srgb, var(--app-accent) 80%, #000);
+}
+.radio-detail-copy-v2 { min-width: 0; margin-top: 16px; }
+.radio-detail-copy-v2 small {
+    color: var(--app-accent);
+    font-size: 0.625rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+.radio-detail-copy-v2 h3 {
+    margin: 7px 0 5px;
+    color: var(--app-text);
+    font-size: 1.375rem;
+    font-weight: 850;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+.radio-detail-copy-v2 p,
+.radio-detail-summary-v2,
+.radio-lyrics-v2 p {
+    color: var(--app-subtext);
+    font-size: 0.75rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+.radio-detail-player-v2,
+.radio-detail-card-v2 {
+    padding: 16px;
+    border-radius: 28px;
+}
+.radio-player-controls-v2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+.radio-round-control-v2 {
+    width: 58px;
+    height: 58px;
+    font-size: 1.125rem;
+}
+.radio-sleep-row-v2 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+.radio-sleep-row-v2 button {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 60%, transparent);
+    border: 1px solid var(--app-line);
+    font-size: 0.625rem;
+}
+.radio-lyrics-v2 { max-height: 260px; overflow-y: auto; padding-right: 4px; scrollbar-width: none; }
+.radio-lyrics-v2::-webkit-scrollbar { display: none; }
+
+/* ===================== Health App ===================== */
+.health-app-shell {
+    overflow: hidden !important;
+}
+.health-app-shell .health-tabs {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 20;
+    display: flex;
+    gap: 7px;
+    padding: 14px 18px 10px !important;
+    margin: 0;
+    overflow-x: auto;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--paper) 94%, transparent), color-mix(in srgb, var(--paper) 76%, transparent));
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-bottom: 1px solid color-mix(in srgb, white 46%, transparent);
+    scrollbar-width: none;
+}
+.health-app-shell .health-tabs::-webkit-scrollbar { display: none; }
+.health-app-shell .health-tabs button {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    min-height: 34px;
+    padding: 0 8px;
+    border-radius: 999px;
+    color: var(--app-subtext);
+    background: color-mix(in srgb, var(--app-panel) 62%, transparent);
+    border: 1px solid color-mix(in srgb, white 54%, transparent);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    box-shadow: none;
+}
+.health-app-shell .health-tabs button.active {
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--app-accent) 70%, #000);
+}
+.health-app-shell .health-scroll {
+    padding: 14px 18px calc(env(safe-area-inset-bottom) + 26px) !important;
+    scroll-padding-top: 12px;
+}
+.health-overview-v2 {
+    display: grid;
+    gap: 14px;
+}
+.health-hero-v2,
+.health-insight-card-v2,
+.health-med-today-v2,
+.health-app-shell .health-card {
+    background: color-mix(in srgb, var(--app-panel) 84%, transparent) !important;
+    border: 1px solid color-mix(in srgb, white 66%, transparent) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 18px 42px -30px color-mix(in srgb, var(--gold) 50%, #000) !important;
+    backdrop-filter: blur(22px) saturate(175%);
+    -webkit-backdrop-filter: blur(22px) saturate(175%);
+}
+.health-hero-v2 {
+    min-height: 172px;
+    padding: 20px;
+    border-radius: 34px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 98px;
+    gap: 16px;
+    align-items: end;
+    background:
+        radial-gradient(circle at 88% 16%, color-mix(in srgb, var(--warm-gold) 28%, transparent), transparent 32%),
+        color-mix(in srgb, var(--app-panel) 84%, transparent) !important;
+}
+.health-hero-copy-v2 span,
+.health-section-head-v2 span {
+    display: block;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.45;
+}
+.health-hero-copy-v2 > span {
+    color: var(--app-accent);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+.health-hero-copy-v2 h3 {
+    margin: 8px 0 7px;
+    color: var(--app-text);
+    font-size: 1.75rem;
+    line-height: 1.08;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+.health-hero-copy-v2 p {
+    color: var(--app-subtext);
+    font-size: 0.75rem;
+    line-height: 1.55;
+}
+.health-hero-badge-v2 {
+    width: 96px;
+    height: 96px;
+    border-radius: 32px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--app-accent) 90%, white), var(--app-accent-2));
+    color: #fff;
+    box-shadow: 0 18px 32px -22px color-mix(in srgb, var(--app-accent) 78%, #000);
+}
+.health-hero-badge-v2 b { font-size: 1.5rem; line-height: 1; }
+.health-hero-badge-v2 small { margin-top: 6px; color: rgba(255,255,255,.78); font-size: 0.5625rem; }
+
+.health-quick-grid-v2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+.health-tile-v2 {
+    min-height: 128px;
+    padding: 15px;
+    border-radius: 28px;
+    text-align: left;
+    display: grid;
+    align-content: space-between;
+    background: color-mix(in srgb, var(--app-panel) 78%, transparent);
+    border: 1px solid color-mix(in srgb, white 64%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 16px 34px -28px color-mix(in srgb, var(--gold) 48%, #000);
+    color: var(--app-text);
+}
+.health-tile-v2 i {
+    width: 40px;
+    height: 40px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-style: normal;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 62%, transparent);
+    border: 1px solid color-mix(in srgb, white 70%, transparent);
+}
+.health-tile-v2 b {
+    display: block;
+    margin-top: 13px;
+    font-size: 1.4375rem;
+    line-height: 1;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+.health-tile-v2 span {
+    display: block;
+    margin-top: 8px;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.45;
+}
+.health-tile-v2.sleep i { color: #9272ed; }
+.health-tile-v2.steps i { color: #df745f; }
+.health-tile-v2.heart i { color: #5bb69d; }
+
+.health-insight-card-v2,
+.health-med-today-v2 {
+    border-radius: 30px;
+    padding: 17px;
+}
+.health-section-head-v2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.health-section-head-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 1.0625rem;
+    line-height: 1.2;
+    font-weight: 850;
+}
+.health-section-head-v2 button {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    font-size: 0.625rem;
+}
+.health-progress-list-v2 {
+    display: grid;
+    gap: 11px;
+}
+.health-progress-row-v2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 21px;
+    background: color-mix(in srgb, white 48%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 12%, transparent);
+}
+.health-progress-row-v2 div { min-width: 0; }
+.health-progress-row-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 0.8125rem;
+}
+.health-progress-row-v2 span {
+    display: block;
+    margin-top: 4px;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.4;
+}
+.health-progress-row-v2 em {
+    color: var(--app-accent);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 800;
+}
+.health-progress-row-v2 i {
+    grid-column: 1 / -1;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--app-accent) 14%, white 72%);
+}
+.health-progress-row-v2 i u {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--app-accent), var(--app-accent-2));
+    text-decoration: none;
+}
+.health-progress-row-v2.purple em { color: #9272ed; }
+.health-progress-row-v2.purple i u { background: linear-gradient(90deg,#9272ed,#c8b8ff); }
+.health-progress-row-v2.green em { color: #5bb69d; }
+.health-progress-row-v2.green i u { background: linear-gradient(90deg,#5bb69d,#9dddc9); }
+
+.health-med-list-v2 { display: grid; gap: 9px; }
+.health-med-row-v2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 21px;
+    background: color-mix(in srgb, white 48%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 12%, transparent);
+}
+.health-med-row-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 0.8125rem;
+}
+.health-med-row-v2 span {
+    display: block;
+    margin-top: 4px;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.4;
+}
+.health-med-row-v2 button {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 17px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    font-size: 0.625rem;
+}
+.health-empty-v2 {
+    margin: 0;
+    padding: 14px;
+    border-radius: 21px;
+    color: var(--app-subtext);
+    background: color-mix(in srgb, white 44%, transparent);
+    border: 1px dashed var(--app-line);
+    font-size: 0.6875rem;
+    line-height: 1.55;
+}
+
+/* 让其他健康分区也更像 App 页面，而不是表格叠表格 */
+.health-app-shell .health-card {
+    border-radius: 30px !important;
+    padding: 17px !important;
+    margin: 0 0 14px !important;
+}
+.health-app-shell .health-calendar-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+.health-app-shell .health-month-nav {
+    width: 100%;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 20px;
+    background: color-mix(in srgb, white 44%, transparent);
+}
+.health-app-shell .health-calendar,
+.health-app-shell .health-med-calendar,
+.health-app-shell .health-weekdays {
+    gap: 5px;
+}
+.health-app-shell .health-day,
+.health-app-shell .health-med-day {
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1;
+    border-radius: 15px;
+    background: color-mix(in srgb, white 46%, transparent);
+    position: relative;
+    overflow: hidden;
+}
+/* 用药日历：今日有计划 → 淡玫瑰底 */
+.health-app-shell .health-med-day.due {
+    background: color-mix(in srgb, #f9a8c9 28%, transparent);
+}
+/* 用药日历：已全部打卡 → 深玫瑰底 + 小花徽章 */
+.health-app-shell .health-med-day.done {
+    background: color-mix(in srgb, #e57ea6 48%, transparent);
+}
+.health-app-shell .health-med-day.done::after {
+    content: "🌸";
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    font-size: 0.55em;
+    line-height: 1;
+    pointer-events: none;
+}
+/* 用药日历：今天边框 */
+.health-app-shell .health-med-day.today {
+    outline: 2px solid color-mix(in srgb, #e57ea6 80%, transparent);
+    outline-offset: -2px;
+}
+/* ── 自定义用药星期选择器 ── */
+.health-app-shell .med-custom-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin: 4px 0 2px;
+}
+.health-app-shell .med-custom-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+.health-app-shell .med-custom-day button {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0;
+    background: color-mix(in srgb, white 30%, transparent);
+    color: var(--app-subtext, #999);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.health-app-shell .med-custom-day button.on {
+    background: color-mix(in srgb, #e57ea6 55%, transparent);
+    color: #fff;
+}
+.health-app-shell .med-custom-dose {
+    width: 100%;
+    font-size: 0.6rem;
+    text-align: center;
+    padding: 2px 2px;
+    border-radius: 6px;
+    border: none;
+    background: color-mix(in srgb, white 40%, transparent);
+    color: inherit;
+    min-width: 0;
+}
+.health-app-shell .health-line-chart {
+    border-radius: 24px;
+    background: color-mix(in srgb, white 48%, transparent);
+}
+
+@container (max-width: 430px) {
+    .radio-music-scroll,
+    .health-app-shell .health-scroll {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+    .radio-song-row-v2 {
+        grid-template-columns: 18px 44px minmax(0, 1fr) auto;
+        gap: 8px;
+    }
+    .radio-detail-btn-v2 { display: none; }
+    .radio-cover-v2 { width: 44px; height: 44px; border-radius: 15px; }
+    .radio-song-meta-v2 b { font-size: 0.75rem; }
+    .radio-now-card-v2 { grid-template-columns: 56px minmax(0,1fr) 44px; border-radius: 26px; }
+    .radio-now-cover-v2 { width: 56px; height: 56px; border-radius: 20px; }
+    .radio-detail-cover-v2 { width: 132px; height: 132px; border-radius: 34px; }
+    .health-hero-v2 {
+        grid-template-columns: minmax(0,1fr);
+        align-items: start;
+        min-height: 0;
+    }
+    .health-hero-badge-v2 { width: 88px; height: 88px; border-radius: 28px; }
+    .health-quick-grid-v2 { gap: 10px; }
+    .health-tile-v2 { min-height: 116px; padding: 13px; border-radius: 24px; }
+    .health-tile-v2 b { font-size: 1.25rem; }
+}
+
+@container (max-width: 340px) {
+    .radio-filter-strip-v2 button,
+    .health-app-shell .health-tabs button { min-height: 31px; padding: 0 10px; font-size: 0.625rem; }
+    .health-quick-grid-v2 { grid-template-columns: 1fr; }
+    .radio-row-play-v2 { width: 32px; height: 32px; }
+    .radio-song-row-v2 { grid-template-columns: 18px 42px minmax(0,1fr) auto; }
+}
+
+body.abyss-mode .radio-app-redesign,
+body.abyss-mode .health-app-shell,
+[data-theme="crepuscolo"] .radio-app-redesign,
+[data-theme="crepuscolo"] .health-app-shell,
+[data-theme="aurora"] .radio-app-redesign,
+[data-theme="aurora"] .health-app-shell,
+[data-theme="notte"] .radio-app-redesign,
+[data-theme="notte"] .health-app-shell {
+    --app-panel: color-mix(in srgb, var(--card-bg) 52%, transparent);
+    --app-panel-strong: color-mix(in srgb, var(--card-bg) 68%, transparent);
+    --app-line: color-mix(in srgb, white 12%, transparent);
+    --app-subtext: color-mix(in srgb, var(--ink) 62%, transparent);
+    --app-muted: color-mix(in srgb, var(--ink) 44%, transparent);
+}
+
+/* v2.1：把睡眠定时放回搜索区，避免用户以为功能消失 */
+.radio-sleep-mini-v2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+    gap: 7px;
+    align-items: center;
+    padding: 8px 9px 8px 12px;
+    border-radius: 23px;
+    background: color-mix(in srgb, var(--app-panel) 72%, transparent);
+    border: 1px solid color-mix(in srgb, white 62%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 14px 30px -25px color-mix(in srgb, var(--gold) 60%, #000);
+}
+.radio-sleep-mini-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 0.6875rem;
+    line-height: 1.1;
+    font-weight: 850;
+}
+.radio-sleep-mini-v2 span {
+    display: block;
+    margin-top: 3px;
+    color: var(--app-subtext);
+    font-size: 0.5625rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.radio-sleep-mini-v2 button {
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 16px;
+    color: var(--app-accent);
+    background: color-mix(in srgb, white 62%, transparent);
+    border: 1px solid var(--app-line);
+    font-size: 0.5625rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.radio-sleep-mini-v2 button:first-of-type {
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    border-color: transparent;
+}
+.radio-sleep-mini-v2 button.danger,
+.radio-sleep-row-v2 button.danger {
+    color: #b3263f;
+    background: color-mix(in srgb, #fff 68%, transparent);
+}
+.radio-sleep-mini-input-v2,
+.radio-sleep-custom {
+    width: 54px;
+    min-height: 32px;
+    padding: 0 8px;
+    border-radius: 16px;
+    color: var(--app-text);
+    background: color-mix(in srgb, white 54%, transparent);
+    border: 1px solid var(--app-line);
+    font-size: 0.625rem;
+    text-align: center;
+}
+.radio-source-note-v2 {
+    padding: 9px 11px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--app-accent) 7%, white 40%);
+    border: 1px solid color-mix(in srgb, var(--app-accent) 13%, transparent);
+}
+@media (max-width: 430px) {
+    .radio-sleep-mini-v2 {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+    }
+    .radio-sleep-mini-v2 .radio-sleep-mini-input-v2,
+    .radio-sleep-mini-v2 button:nth-of-type(2) {
+        display: none;
+    }
+}
+
+/* ===================== Health v3 · real data / 14-day retention ===================== */
+.health-app-shell .health-tabs {
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    scroll-padding-inline: 14px;
+}
+.health-app-shell .health-tabs button {
+    min-width: auto !important;
+    padding: 0 11px !important;
+    white-space: nowrap;
+}
+.health-sync-note-v2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--app-panel) 76%, transparent);
+    border: 1px solid color-mix(in srgb, white 64%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 14px 32px -28px color-mix(in srgb, var(--gold) 55%, #000);
+    backdrop-filter: blur(20px) saturate(175%);
+    -webkit-backdrop-filter: blur(20px) saturate(175%);
+}
+.health-sync-note-v2 b {
+    display: block;
+    color: var(--app-text);
+    font-size: 0.8125rem;
+    margin-bottom: 3px;
+}
+.health-sync-note-v2 span {
+    display: block;
+    color: var(--app-subtext);
+    font-size: 0.625rem;
+    line-height: 1.55;
+}
+.health-sync-note-v2 button {
+    min-height: 34px;
+    padding: 0 13px;
+    border-radius: 17px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    font-size: 0.625rem;
+    font-weight: 800;
+    box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--app-accent) 70%, #000);
+}
+.health-empty-v2 {
+    margin: 12px 0 0;
+    padding: 14px 15px;
+    border-radius: 20px;
+    color: var(--app-subtext);
+    background: color-mix(in srgb, white 46%, transparent);
+    border: 1px dashed color-mix(in srgb, var(--app-accent) 32%, transparent);
+    font-size: 0.6875rem;
+    line-height: 1.7;
+}
+@container (max-width: 430px) {
+    .health-app-shell .health-tabs {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        gap: 5px !important;
+    }
+    .health-app-shell .health-tabs button {
+        padding: 0 9px !important;
+        font-size: 0.625rem !important;
+    }
+}
+@container (max-width: 360px) {
+    .health-app-shell .health-tabs button {
+        padding: 0 8px !important;
+        letter-spacing: 0 !important;
+    }
+}
+
+/* ===================== Radio v2.3 · compact app UI cleanup ===================== */
+.radio-app-redesign .radio-music-hero-v2 {
+    gap: 8px;
+    padding-bottom: 10px;
+}
+.radio-quick-strip-v2 {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 1px 1px 2px;
+    scrollbar-width: none;
+}
+.radio-quick-strip-v2::-webkit-scrollbar { display: none; }
+.radio-quick-strip-v2 button {
+    flex: 0 0 auto;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--app-panel) 70%, transparent);
+    border: 1px solid color-mix(in srgb, white 55%, transparent);
+    color: color-mix(in srgb, var(--ink) 52%, transparent);
+    font-size: 0.625rem;
+    font-weight: 750;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+    white-space: nowrap;
+}
+.radio-quick-strip-v2 button:active {
+    transform: scale(.96);
+    background: color-mix(in srgb, var(--app-accent) 18%, white 55%);
+    color: var(--app-accent);
+}
+.radio-sleep-dock-v2 {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0 14px;
+    padding: 10px 11px;
+    border-radius: 24px;
+    background: color-mix(in srgb, var(--app-panel) 72%, transparent);
+    border: 1px solid color-mix(in srgb, white 62%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.62), 0 14px 32px -26px color-mix(in srgb, var(--gold) 58%, #000);
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+}
+.radio-sleep-copy-v2 b {
+    display: grid;
+    place-items: center;
+    min-width: 54px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 17px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--app-accent), var(--app-accent-2));
+    font-size: 0.6875rem;
+    font-weight: 850;
+    white-space: nowrap;
+    box-shadow: 0 10px 20px -15px color-mix(in srgb, var(--app-accent) 85%, #000);
+}
+.radio-sleep-copy-v2 span { display: none !important; }
+.radio-sleep-row-v2.compact {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.radio-sleep-row-v2.compact::-webkit-scrollbar { display: none; }
+.radio-sleep-row-v2.compact button {
+    flex: 0 0 auto;
+    min-width: 46px;
+    min-height: 34px;
+    padding: 0 10px;
+    border-radius: 17px;
+    font-size: 0.625rem;
+    font-weight: 800;
+    background: color-mix(in srgb, white 62%, transparent);
+    color: var(--app-accent);
+    border: 1px solid var(--app-line);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.48);
+}
+.radio-sleep-row-v2.compact button.danger {
+    min-width: 34px;
+    color: #b3263f;
+}
+.radio-sleep-custom {
+    flex: 0 0 54px;
+    width: 54px;
+    min-height: 34px;
+    padding: 0 6px;
+    border-radius: 17px;
+    text-align: center;
+    border: 1px solid var(--app-line);
+    background: color-mix(in srgb, white 58%, transparent);
+    color: var(--app-text);
+    font-size: 0.625rem;
+}
+.radio-status-v2 {
+    min-height: 0;
+    padding-left: 4px;
+}
+.radio-discovery-card-v2 {
+    grid-template-columns: 48px minmax(0,1fr);
+    min-height: 82px;
+    padding: 14px;
+    border-radius: 26px;
+}
+.radio-discovery-icon-v2 {
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+}
+.radio-discovery-card-v2 b { font-size: 0.9375rem; }
+.radio-discovery-card-v2 span {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.radio-empty-v2 {
+    font-size: 0.6875rem;
+    padding: 16px;
+}
+@media (max-width: 430px) {
+    .radio-music-scroll { padding-left: 16px !important; padding-right: 16px !important; }
+    .radio-sleep-dock-v2 { grid-template-columns: auto minmax(0,1fr); }
+    .radio-sleep-copy-v2 b { min-width: 48px; padding: 0 9px; }
+    .radio-sleep-row-v2.compact button { min-width: 44px; }
+}

@@ -1,0 +1,525 @@
+/* ============================================================
+           ✦ Widget redesign · Top Widgets / polaroid / circle / player
+           ============================================================ */
+        .widget-store-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .phone-widget-preset.rich { border-radius: 20px; padding: 10px; background: rgba(255,255,255,.30); border: 1px solid rgba(255,255,255,.44); }
+        .phone-widget-mini-preview { position: relative; overflow: hidden; }
+        .phone-widget-mini-preview.square { width: 44px; height: 44px; border-radius: 14px; }
+        .phone-widget-mini-preview.circle { width: 44px; height: 44px; border-radius: 999px; }
+        .phone-widget-mini-preview.wide { width: 62px; height: 38px; border-radius: 14px; }
+        .phone-widget-mini-preview.large { width: 62px; height: 52px; border-radius: 16px; }
+        .phone-widget-mini-preview.tall { width: 36px; height: 58px; border-radius: 16px; }
+        .phone-widget-mini-preview::before { content:""; position:absolute; inset:8px; border-radius:inherit; background: rgba(216,141,165,.16); box-shadow: 0 0 0 1px rgba(216,141,165,.12) inset; }
+        .phone-widget-mini-preview.pv-polaroid1::before { inset:6px 9px 12px; background:#fff; transform: rotate(-5deg); box-shadow:0 4px 8px rgba(120,70,85,.10); }
+        .phone-widget-mini-preview.pv-polaroid3::before { inset:7px 14px 12px 8px; background:#fff; transform: rotate(-8deg); box-shadow:14px 2px 0 #fff, 24px 7px 0 rgba(255,255,255,.82); }
+        .phone-widget-mini-preview.pv-music::before { inset:8px; border-radius:999px; background: radial-gradient(circle,#fff 0 26%, rgba(216,141,165,.22) 28% 100%); }
+        .phone-widget-mini-preview.pv-vinyl::before { inset:7px 20px 7px 6px; border-radius:999px; background: radial-gradient(circle,#fff 0 13%, #21181d 15% 100%); box-shadow:22px 4px 0 -14px rgba(216,141,165,.78); }
+        .phone-widget-mini-preview.pv-couple::before { inset:10px auto auto 8px; width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:24px 0 0 #fff, 12px 8px 0 -6px rgba(216,141,165,.8); }
+        .widget-maker { background: rgba(216,141,165,.08); border:1px solid rgba(216,141,165,.12); }
+
+        .phone-free-widget { isolation:isolate; }
+        .phone-free-widget::before { content:""; position:absolute; inset:0; background: radial-gradient(circle at 80% 10%, rgba(255,255,255,.48), transparent 36%); pointer-events:none; z-index:-1; }
+        .phone-free-widget.circle { border-radius: 999px !important; padding: 8px !important; }
+        .phone-free-widget.square { border-radius: 26px !important; }
+        .phone-free-widget.wide { border-radius: 28px !important; }
+        .phone-free-widget.tall { border-radius: 28px !important; }
+        .phone-free-widget.tpl-polaroid1, .phone-free-widget.tpl-polaroid3, .phone-free-widget.tpl-polaroidPoster, .phone-free-widget.tpl-polaroidLandscape { background: rgba(255,250,246,.58) !important; border-color: rgba(255,255,255,.72) !important; }
+        .phone-free-widget.tpl-circlePhoto { background: rgba(255,255,255,.22) !important; box-shadow: none !important; border-color: rgba(255,255,255,.24) !important; }
+        .phone-free-widget.tpl-music { padding:8px 12px !important; background: rgba(255,255,255,.50) !important; }
+        .phone-free-widget.tpl-vinyl { padding:8px 12px !important; background: transparent !important; border-color: transparent !important; box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; overflow:visible !important; }
+        .phone-free-widget.tpl-vinyl::before { display:none !important; }
+        .phone-free-widget.tpl-couple { padding:8px 16px !important; display:flex; flex-direction:column; justify-content:center; }
+        .phone-free-widget .quote { font-size: 0.875rem; line-height: 1.75; color: rgba(64,45,51,.75); }
+        .phone-free-widget .center { text-align:center; }
+        .phone-free-widget .smallnum { text-align:center; margin-top: 4px; font-size: 1.75rem; }
+
+        .wd-polaroid.single { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+        .wd-polaroid .photo { width:76%; aspect-ratio:1/1; background:#fff; padding:6px 6px 18px; border-radius:6px; box-shadow:0 10px 22px -13px rgba(95,55,68,.48); transform: rotate(-4deg); display:flex; align-items:center; justify-content:center; color:rgba(216,141,165,.55); font-size:0.625rem; }
+        .wd-polaroid .photo img { width:100%; height:100%; object-fit:cover; border-radius:3px; }
+        .wd-polaroid p { font-family:"Cormorant Garamond", serif; font-style:italic; font-size:0.75rem; color:rgba(70,50,55,.72); transform: rotate(-2deg); }
+
+        .wd-polaroid-trio { position:relative; height:100%; min-height:0; }
+        .wd-polaroid-trio .mini { position:absolute; width:38%; aspect-ratio:1/1; background:#fff; padding:5px 5px 14px; border-radius:6px; box-shadow:0 12px 22px -14px rgba(95,55,68,.55); }
+        .wd-polaroid-trio .mini img { width:100%; height:100%; object-fit:cover; border-radius:3px; }
+        .wd-polaroid-trio .p0 { left:5%; top:10%; transform:rotate(-8deg); }
+        .wd-polaroid-trio .p1 { left:31%; top:4%; transform:rotate(6deg); z-index:2; }
+        .wd-polaroid-trio .p2 { right:5%; top:16%; transform:rotate(-3deg); }
+        .wd-polaroid-trio .empty { display:flex; align-items:center; justify-content:center; color:rgba(216,141,165,.65); }
+        .wd-polaroid-trio p { position:absolute; left:6%; right:6%; bottom:4px; text-align:center; font-family:"Cormorant Garamond", serif; font-style:italic; font-size:0.875rem; color:rgba(70,50,55,.66); }
+        .wd-polaroid-poster {
+            position:relative;
+            width:100%;
+            height:100%;
+            min-height:0;
+            overflow:visible;
+        }
+        .wd-polaroid-poster .frame {
+            position:absolute;
+            background:#fff;
+            padding:7px 7px 25px;
+            border-radius:7px;
+            box-shadow:0 16px 30px -17px rgba(88,50,64,.42);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:rgba(216,141,165,.55);
+            font-size:0.625rem;
+        }
+        .wd-polaroid-poster .frame img {
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:4px;
+            background:#f8e4ec;
+        }
+        .wd-polaroid-poster .big {
+            left:3%;
+            bottom:7%;
+            width:68%;
+            height:78%;
+            transform:rotate(-8deg);
+            z-index:1;
+        }
+        .wd-polaroid-poster .side1 {
+            right:5%;
+            top:8%;
+            width:38%;
+            height:42%;
+            transform:rotate(9deg);
+            z-index:3;
+        }
+        .wd-polaroid-poster .side2 {
+            right:2%;
+            bottom:13%;
+            width:42%;
+            height:38%;
+            transform:rotate(3deg);
+            z-index:4;
+        }
+        .wd-polaroid-poster p {
+            position:absolute;
+            left:9%;
+            bottom:9%;
+            z-index:5;
+            transform:rotate(-8deg);
+            max-width:55%;
+            color:#32252a;
+            font-family:"Courier New", monospace;
+            font-size:0.8125rem;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+        .wd-polaroid-landscape {
+            position:relative;
+            width:100%;
+            height:100%;
+            overflow:visible;
+        }
+        .wd-polaroid-landscape .frame {
+            position:absolute;
+            background:#fff;
+            padding:7px 7px 22px;
+            border-radius:7px;
+            box-shadow:0 15px 30px -17px rgba(88,50,64,.42);
+            display:grid;
+            place-items:center;
+            color:rgba(216,141,165,.55);
+            font-size:0.625rem;
+        }
+        .wd-polaroid-landscape .frame img {
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            border-radius:4px;
+            background:#f8e4ec;
+        }
+        .wd-polaroid-landscape .main {
+            left:5%;
+            top:16%;
+            width:76%;
+            height:58%;
+            transform:rotate(-5deg);
+            z-index:2;
+        }
+        .wd-polaroid-landscape .main img { aspect-ratio:4/3; }
+        .wd-polaroid-landscape .small1 {
+            right:3%;
+            top:8%;
+            width:34%;
+            height:36%;
+            transform:rotate(8deg);
+            z-index:3;
+        }
+        .wd-polaroid-landscape .small2 {
+            right:8%;
+            bottom:8%;
+            width:32%;
+            height:32%;
+            transform:rotate(-7deg);
+            z-index:4;
+        }
+        .wd-polaroid-landscape p {
+            position:absolute;
+            left:12%;
+            bottom:16%;
+            z-index:5;
+            transform:rotate(-5deg);
+            max-width:56%;
+            color:#32252a;
+            font-family:"Courier New", monospace;
+            font-size:0.75rem;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+
+        .wd-circle-photo { width:100%; height:100%; border-radius:999px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:rgba(255,255,255,.52); border:1px solid rgba(255,255,255,.72); box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 12px 24px -16px rgba(95,55,68,.45); }
+        .wd-circle-photo img { width:100%; height:100%; object-fit:cover; }
+        .wd-circle-caption { position:absolute; left:0; right:0; bottom:-18px; text-align:center; font-size:0.5625rem; color:rgba(70,50,55,.55); }
+
+        .wd-music { height:100%; display:grid; grid-template-columns:56px 1fr; grid-template-rows:auto auto; gap:10px 12px; align-content:center; align-items:center; }
+        .wd-music .disc { width:56px; height:56px; border-radius:20px; background:linear-gradient(145deg,rgba(245,185,204,.76),rgba(255,245,249,.86)); box-shadow:inset 0 1px 0 rgba(255,255,255,.86),0 12px 24px -16px rgba(95,55,68,.45); overflow:hidden; display:flex; align-items:center; justify-content:center; color:rgba(177,93,119,.82); }
+        .wd-music .disc img { width:100%; height:100%; object-fit:cover; }
+        .wd-music .disc span { font-size:1.75rem; font-weight:900; line-height:1; text-shadow:0 2px 10px rgba(177,93,119,.18); }
+        .wd-music .track { min-width:0; }
+        .wd-music .track b { display:block; font-size:0.8125rem; color:rgba(47,37,41,.75); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .wd-music .track span { display:block; margin-top:3px; font-size:0.625rem; color:rgba(47,37,41,.42); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .wd-music-controls {
+            grid-column:1/3; display:grid; grid-template-columns:34px 1fr 38px; gap:9px; align-items:center;
+            min-width:0; padding:7px 9px; border-radius:18px; background:rgba(255,255,255,.36);
+            border:1px solid rgba(255,255,255,.58); box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+            touch-action:manipulation;
+        }
+        .wd-music-play {
+            width:34px; height:34px; border-radius:50%; display:grid; place-items:center;
+            color:#fff; background:linear-gradient(145deg,#e9a9bc,#cf7897);
+            box-shadow:0 8px 18px -10px rgba(154,65,99,.72),inset 0 1px 0 rgba(255,255,255,.48); font-size:0.8125rem;
+        }
+        .wd-music-play:disabled { opacity:.38; }
+        .wd-music-progress {
+            width:100%; min-width:0; height:18px; margin:0; appearance:none; -webkit-appearance:none; background:transparent;
+            touch-action:pan-x;
+        }
+        .wd-music-progress::-webkit-slider-runnable-track {
+            height:4px; border-radius:4px;
+            background:linear-gradient(to right,rgba(205,112,145,.72) 0 var(--music-progress,0%),rgba(216,141,165,.18) var(--music-progress,0%) 100%);
+        }
+        .wd-music-progress::-webkit-slider-thumb {
+            appearance:none; -webkit-appearance:none; width:14px; height:14px; margin-top:-5px; border-radius:50%;
+            background:#fff; border:1px solid rgba(216,141,165,.32); box-shadow:0 3px 9px rgba(122,61,82,.20);
+        }
+        .wd-music-time { font-size:0.5625rem; text-align:right; color:rgba(75,45,55,.46); font-variant-numeric:tabular-nums; }
+        .wd-music audio { display:none !important; }
+
+        @keyframes vinyl-spin { to { transform: rotate(360deg); } }
+        .wd-vinyl { position:relative; height:100%; min-width:0; display:flex; align-items:center; justify-content:center; touch-action:auto; }
+        .wd-vinyl-stage { position:relative; width:min(100%,112px); aspect-ratio:1/1; display:grid; place-items:center; }
+        .phone-free-widget.tpl-vinyl.large .wd-vinyl-stage,
+        .phone-free-widget.tpl-vinyl.tall .wd-vinyl-stage { width:min(100%,188px); }
+        .wd-vinyl-record {
+            position:relative; width:100%; aspect-ratio:1/1; border-radius:999px; overflow:hidden;
+            background:
+                radial-gradient(circle at center, rgba(255,255,255,.96) 0 10%, rgba(246,214,224,.96) 11% 46%, transparent 47%),
+                repeating-radial-gradient(circle, rgba(255,255,255,.10) 0 1px, rgba(255,255,255,0) 1px 6px),
+                radial-gradient(circle at 35% 25%, #262a35, #07080b 72%);
+            box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), inset 0 0 0 12px rgba(0,0,0,.16), 0 20px 34px -16px rgba(28,16,22,.62);
+        }
+        .wd-vinyl.playing .wd-vinyl-record { animation: vinyl-spin 2.8s linear infinite; }
+        .wd-vinyl-center { position:absolute; inset:16%; border-radius:999px; overflow:hidden; display:grid; place-items:center; background:linear-gradient(145deg,#fff,#f1b9ca); color:rgba(120,60,82,.75); font-size:1.5rem; box-shadow:0 0 0 7px rgba(255,255,255,.90), 0 0 0 11px rgba(245,214,225,.62); }
+        .wd-vinyl-center img { width:100%; height:100%; object-fit:cover; }
+        .wd-vinyl-arm {
+            position:absolute; right:-18px; top:-12px; width:82px; height:128px;
+            transform-origin:63px 25px; transform:rotate(-38deg); transition:transform .42s cubic-bezier(.2,.8,.2,1);
+            filter:drop-shadow(0 7px 10px rgba(78,45,55,.20)); cursor:pointer;
+            border:0; padding:0; background:transparent;
+        }
+        .phone-free-widget.tpl-vinyl.large .wd-vinyl-arm,
+        .phone-free-widget.tpl-vinyl.tall .wd-vinyl-arm { right:-18px; top:-12px; width:96px; height:154px; transform-origin:72px 31px; }
+        .wd-vinyl.playing .wd-vinyl-arm { transform:rotate(-9deg); }
+        .wd-vinyl-arm::before {
+            content:""; position:absolute; right:5px; top:4px; width:38px; height:38px; border-radius:999px;
+            background:linear-gradient(145deg,#fff,rgba(231,239,242,.88)); border:1px solid rgba(185,194,197,.55);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 5px 14px -8px rgba(38,30,35,.45);
+        }
+        .wd-vinyl-arm svg { position:absolute; inset:12px 10px 0 4px; width:70px; height:114px; overflow:visible; }
+        .phone-free-widget.tpl-vinyl.large .wd-vinyl-arm svg,
+        .phone-free-widget.tpl-vinyl.tall .wd-vinyl-arm svg { width:82px; height:138px; }
+        .wd-vinyl-arm path { fill:none; stroke:rgba(226,232,234,.98); stroke-width:8; stroke-linecap:round; filter:drop-shadow(0 1px 1px rgba(110,98,104,.18)); }
+        .wd-vinyl-arm i {
+            position:absolute; right:28px; bottom:16px; width:27px; height:24px; border-radius:8px;
+            background:linear-gradient(145deg,#f9fbfb,#dfe8ea); border:1px solid rgba(186,195,198,.55);
+            transform:rotate(34deg); box-shadow:0 5px 12px -9px rgba(38,30,35,.5);
+        }
+        .phone-free-widget.tpl-vinyl.large .wd-vinyl-arm i,
+        .phone-free-widget.tpl-vinyl.tall .wd-vinyl-arm i { right:34px; bottom:18px; width:32px; height:28px; }
+        .wd-vinyl-arm i::after { content:""; position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:999px; background:#ff4b38; }
+        .wd-vinyl-hint {
+            position:absolute; left:50%; bottom:-12px; transform:translateX(-50%);
+            min-width:72px; text-align:center; padding:4px 8px; border-radius:999px;
+            background:rgba(255,255,255,.76); color:rgba(80,58,66,.48); font-size:0.5625rem; letter-spacing:.08em;
+            opacity:0; transition:opacity .22s ease; pointer-events:none;
+        }
+        .wd-vinyl.no-music .wd-vinyl-hint { opacity:1; }
+        .wd-vinyl-info { min-width:0; display:flex; flex-direction:column; gap:6px; }
+        .phone-free-widget.tpl-vinyl.large .wd-vinyl-info,
+        .phone-free-widget.tpl-vinyl.tall .wd-vinyl-info { display:none; }
+        .wd-vinyl-info b { font-size:0.9375rem; color:rgba(47,37,41,.78); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .wd-vinyl-info span { font-size:0.625rem; line-height:1.45; color:rgba(47,37,41,.46); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .wd-vinyl-info .wd-music-play { margin-top:2px; background:rgba(255,255,255,.88); color:rgba(38,28,32,.80); box-shadow:0 8px 18px -10px rgba(20,12,16,.55),inset 0 1px 0 rgba(255,255,255,.82); }
+        .wd-vinyl audio { display:none !important; }
+
+        .wd-couple { display:grid; grid-template-columns:48px minmax(58px,1fr) 48px; align-items:center; gap:15px; padding:0 4px; margin-top:0; }
+        .wd-couple .avatar { width:48px; height:48px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.62); border:2px solid rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; color:rgba(216,141,165,.7); font-family:"Cormorant Garamond", serif; box-shadow:0 12px 26px -16px rgba(95,55,68,.50); }
+        .wd-couple .avatar img { width:100%; height:100%; object-fit:cover; }
+        .wd-couple .heartbeat { width:100%; height:22px; overflow:visible; color:rgba(216,141,165,.72); filter:drop-shadow(0 3px 6px rgba(216,141,165,.16)); }
+        .wd-couple .heartbeat path { fill:none; stroke:currentColor; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+        .wd-couple .heartbeat circle { fill:rgba(216,141,165,.44); }
+        .wd-couple-days { text-align:center; margin-top:-1px; font-size:1.875rem !important; line-height:.86 !important; }
+        .wd-couple-copy { display:block !important; -webkit-line-clamp:unset !important; -webkit-box-orient:unset !important; overflow:visible !important; text-align:center; margin-top:1px; font-size:0.6875rem !important; line-height:1.12 !important; letter-spacing:.10em; color:rgba(47,37,41,.54) !important; }
+        .wd-couple-date { margin-top:1px; text-align:center; font-size:0.5rem; line-height:1.1; color:rgba(70,50,55,.42); letter-spacing:.06em; }
+        .wd-calendar { box-sizing:border-box; height:100%; display:flex; flex-direction:column; justify-content:space-between; align-items:center; gap:0; padding:4px 2px; }
+        .wd-calendar span { font-size:0.625rem; letter-spacing:.24em; color:rgba(47,37,41,.38); }
+        .wd-calendar b { font-size:3.5rem; line-height:.88; color:rgba(70,50,55,.84); font-family:"Cormorant Garamond",serif; }
+        .wd-calendar em { font-size:0.8125rem; color:rgba(216,141,165,.88); font-style:normal; letter-spacing:.1em; }
+        .wd-banner { height:100%; display:flex; flex-direction:column; justify-content:center; }
+        .wd-banner p { margin-top:5px; font-size:0.875rem; line-height:1.7; color:rgba(47,37,41,.72); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
+        @font-face {
+            font-family: 'UserCute';
+            src: url('/fonts/user-cute.ttf') format('truetype');
+            font-display: swap;
+        }
+        /* iOS 26 Liquid Glass：和全局 .liquid-glass 同一套配方，但调得更透 */
+        .phone-free-widget.tpl-textInput {
+            padding: 0 !important;
+            border: 1px solid color-mix(in srgb, white 38%, transparent) !important;
+            box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,.55),
+                inset 0 0 0 0.5px color-mix(in srgb, var(--gold) 16%, transparent),
+                0 10px 26px -16px rgba(95,55,68,.40) !important;
+            background: color-mix(in srgb, var(--card-bg) 28%, transparent) !important;
+            backdrop-filter: blur(26px) saturate(190%) !important;
+            -webkit-backdrop-filter: blur(26px) saturate(190%) !important;
+            border-radius: 999px !important;
+            overflow: hidden !important;
+            display: flex !important; align-items: center !important;
+        }
+        body.abyss-mode .phone-free-widget.tpl-textInput,
+        [data-theme="crepuscolo"] .phone-free-widget.tpl-textInput,
+        [data-theme="aurora"] .phone-free-widget.tpl-textInput,
+        [data-theme="notte"] .phone-free-widget.tpl-textInput {
+            background: color-mix(in srgb, var(--card-bg) 22%, transparent) !important;
+            border-color: color-mix(in srgb, white 14%, transparent) !important;
+        }
+        .phone-free-widget.tpl-textInput::before { display:none !important; }
+        .wd-text-input {
+            width:100%; height:auto; max-height:100%; min-height:1.6em; resize:none; border:0; outline:0;
+            margin:auto 0; padding:0 22px; border-radius:999px;
+            background:transparent; color:rgba(60,40,46,.92);
+            font: 400 1.0625rem/1.5 'UserCute', "ZCOOL KuaiLe", "Noto Serif SC", serif;
+            letter-spacing:.02em;
+            caret-color:#cf7897;
+            text-align:center;
+            overflow-y:auto;
+        }
+        .wd-text-input::placeholder { color:rgba(91,59,68,.42); font-family:'UserCute',"ZCOOL KuaiLe","Noto Serif SC", serif; }
+        /* 编辑模式下输入框不再吞掉指针事件，长按和拖动才能正常生效 */
+        .phone-editing .wd-text-input { pointer-events:none; }
+        .wd-clock { height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        .wd-clock b { font:italic 2.375rem/.9 "Cormorant Garamond",serif; letter-spacing:-.04em; color:rgba(61,43,49,.82); }
+        .wd-clock span { margin-top:8px; font-size:0.5625rem; letter-spacing:.18em; color:rgba(205,112,145,.72); text-transform:uppercase; }
+        .wd-countdown { height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        .wd-countdown span { font-size:0.5625rem; letter-spacing:.16em; color:rgba(177,93,119,.62); }
+        .wd-countdown b { margin:2px 0; font:italic 2.5rem/.9 "Cormorant Garamond",serif; color:rgba(207,106,139,.88); }
+        .wd-countdown em { font-size:0.5625rem; color:rgba(75,45,55,.38); font-style:normal; }
+        .wd-progress { height:100%; display:flex; flex-direction:column; justify-content:center; }
+        .wd-progress-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+        .wd-progress-head b { font-size:0.6875rem; color:rgba(68,44,51,.72); font-weight:500; }
+        .wd-progress-head span { font:italic 1.25rem/1 "Cormorant Garamond",serif; color:rgba(207,106,139,.86); }
+        .wd-progress-track { height:9px; margin-top:12px; border-radius:999px; overflow:hidden; background:rgba(216,141,165,.14); }
+        .wd-progress-track i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#f1b1c4,#cd7896); }
+        .wd-progress p { margin-top:7px; font-size:0.5rem; color:rgba(75,45,55,.34); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .phone-free-widget.tpl-photoDate { padding:0 !important; border:4px solid #fff !important; background:#fff !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+        .phone-free-widget.tpl-photoDate::before { display:none !important; }
+        .wd-photo-date { position:relative; width:100%; height:100%; overflow:hidden; border-radius:inherit; background:#f4dfe6; }
+        .wd-photo-date img { width:100%; height:100%; object-fit:cover; display:block; }
+        .wd-photo-date::after { content:""; position:absolute; inset:35% 0 0; background:linear-gradient(transparent,rgba(38,25,30,.62)); }
+        .wd-photo-date-copy { position:absolute; z-index:1; left:12px; right:12px; bottom:10px; color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.28); }
+        .wd-photo-date-copy b { display:block; font:italic 1.875rem/.9 "Cormorant Garamond",serif; }
+        .wd-photo-date-copy span { display:block; margin-top:4px; font-size:0.5rem; letter-spacing:.12em; }
+        .wd-quote-card { height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:2px; }
+        .wd-quote-card i { font:italic 1.75rem/1 "Cormorant Garamond",serif; color:rgba(216,141,165,.52); }
+        .wd-quote-card p { font-size:0.8125rem; line-height:1.65; color:rgba(58,40,46,.74); display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+        .wd-quote-card span { font-size:0.5rem; letter-spacing:.14em; color:rgba(75,45,55,.34); text-transform:uppercase; }
+
+        .widget-size-sliders { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0 12px; }
+        .widget-size-sliders label { font-size:0.5625rem; color:rgba(75,45,55,.48); }
+        .widget-size-sliders input { width:100%; margin-top:5px; accent-color:#d986a3; }
+        .widget-layer-actions { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:10px; }
+        .widget-layer-actions button {
+            min-height:34px; border-radius:14px; border:1px solid rgba(211,127,155,.18);
+            background:rgba(255,255,255,.58); color:rgba(75,45,55,.58); font-size:0.5625rem;
+        }
+
+        @media (pointer: coarse) {
+            .warm-glow { animation:none !important; transform:none !important; }
+            .dust-particle { animation:none !important; opacity:.12 !important; }
+            .phone-layout-item.dragging { filter:none !important; }
+            .phone-mini-btn,
+            .phone-app-topbar { backdrop-filter:blur(12px) saturate(150%) !important; -webkit-backdrop-filter:blur(12px) saturate(150%) !important; }
+            .phone-dock { backdrop-filter:blur(16px) saturate(170%) !important; -webkit-backdrop-filter:blur(16px) saturate(170%) !important; }
+            .phone-widget-panel { backdrop-filter:blur(18px) saturate(160%) !important; -webkit-backdrop-filter:blur(18px) saturate(160%) !important; }
+        }
+        @media (max-width:380px) {
+            .wd-music { grid-template-columns:46px 1fr; gap:9px; }
+            .wd-music .disc { width:46px; height:46px; }
+            .wd-music .disc span { font-size:1.5625rem; }
+            .wd-vinyl { grid-template-columns:84px 1fr; gap:9px; }
+            .wd-vinyl-arm { transform:rotate(-34deg) scale(.9); }
+            .wd-vinyl.playing .wd-vinyl-arm { transform:rotate(-8deg) scale(.9); }
+            .wd-couple { grid-template-columns:48px minmax(48px,1fr) 48px; gap:10px; padding:0 2px; }
+            .wd-couple .avatar { width:48px; height:48px; }
+            .wd-couple-days { font-size:1.875rem !important; }
+            .wd-couple-copy { font-size:0.6875rem !important; }
+            .wd-calendar b { font-size:3.125rem; }
+        }
+
+        /* ============================================================
+           App isolation + Widget Studio v2
+           ============================================================ */
+        .phone-app-content .legacy-subnav,
+        .phone-app-content .app-sibling-tabs { display: none !important; }
+        .phone-app-content > .fade-enter-active,
+        .phone-app-content .px-8 { padding-top: 8px !important; }
+
+        .phone-widget-panel {
+            left: 12px !important; right: 12px !important;
+            bottom: calc(env(safe-area-inset-bottom) + 84px) !important;
+            max-height: min(78vh, 650px) !important;
+            padding: 18px !important;
+            border-radius: 30px !important;
+            background:
+                linear-gradient(150deg, rgba(255,255,255,.86), rgba(255,239,245,.72)) !important;
+            border: 1px solid rgba(255,255,255,.92) !important;
+            box-shadow: 0 28px 70px -28px rgba(141,72,96,.52), inset 0 1px 0 #fff !important;
+        }
+        .widget-studio-head { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+        .widget-studio-mark {
+            width:42px; height:42px; border-radius:15px; display:grid; place-items:center;
+            background:linear-gradient(145deg,#f5a8bf,#d881a0); color:#fff; font-size:1.1875rem;
+            box-shadow:0 10px 22px -10px rgba(175,80,113,.55), inset 0 1px 0 rgba(255,255,255,.55);
+        }
+        .widget-studio-title { flex:1; min-width:0; }
+        .widget-studio-title b { display:block; font-size:0.9375rem; color:rgba(75,45,55,.88); }
+        .widget-studio-title span { display:block; margin-top:2px; font-size:0.625rem; color:rgba(92,60,70,.44); }
+        .widget-section-label {
+            margin:16px 2px 9px; font-size:0.5625rem; letter-spacing:.20em; text-transform:uppercase;
+            color:rgba(181,94,123,.68);
+        }
+        .widget-template-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+        .widget-template-card {
+            position:relative; min-height:90px; padding:10px; border-radius:20px; text-align:left;
+            background:rgba(255,255,255,.62); border:1px solid rgba(222,144,169,.17);
+            color:rgba(75,45,55,.72); overflow:hidden; transition:.18s ease;
+        }
+        .widget-template-card.active {
+            border-color:rgba(207,106,139,.56); background:rgba(255,240,246,.92);
+            box-shadow:0 10px 25px -18px rgba(174,72,109,.7);
+        }
+        .widget-template-card:active { transform:scale(.98); }
+        .widget-template-card .mini-art {
+            height:48px; margin-bottom:7px; border-radius:14px; display:grid; place-items:center;
+            background:linear-gradient(145deg,rgba(255,255,255,.95),rgba(255,221,232,.62));
+            color:rgba(201,108,139,.78); font-family:"Cormorant Garamond",serif; font-size:1.375rem;
+            overflow:hidden;
+        }
+        .widget-template-card .mini-art.circle { width:48px; border-radius:50%; margin-left:auto; margin-right:auto; }
+        .widget-template-card .mini-art.polaroid { margin:2px auto 9px; width:52px; height:44px; padding:4px 4px 10px; border-radius:3px; background:#fff; transform:rotate(-4deg); box-shadow:0 5px 12px rgba(116,64,82,.16); }
+        .widget-template-card .mini-art.music { display:flex; gap:7px; justify-content:center; font-size:1rem; }
+        .widget-template-card b { display:block; font-size:0.6875rem; font-weight:500; }
+        .widget-template-card small { display:block; margin-top:2px; font-size:0.5rem; color:rgba(75,45,55,.38); line-height:1.35; }
+        .widget-smart-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+        .widget-smart-card {
+            min-height:58px; padding:10px 11px; border-radius:18px; text-align:left;
+            display:grid; grid-template-columns:30px 1fr auto; align-items:center; gap:8px;
+            background:rgba(255,255,255,.58); border:1px solid rgba(211,127,155,.16);
+            color:rgba(75,45,55,.72);
+        }
+        .widget-smart-card:active { transform:scale(.98); }
+        .widget-smart-icon {
+            width:30px; height:30px; border-radius:11px; display:grid; place-items:center;
+            background:linear-gradient(145deg,#fff,#f8dce6); color:rgba(190,87,122,.78);
+            font-family:"Cormorant Garamond",serif; font-size:1.0625rem;
+        }
+        .widget-smart-card b { display:block; font-size:0.625rem; font-weight:500; }
+        .widget-smart-card small { display:block; margin-top:2px; font-size:0.4375rem; line-height:1.3; color:rgba(75,45,55,.38); }
+        .widget-smart-add { font-size:0.9375rem; color:rgba(198,91,127,.62); }
+        .widget-date-note { margin:-2px 2px 8px; font-size:0.5rem; line-height:1.5; color:rgba(92,60,70,.42); }
+        .widget-shape-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+        .widget-shape-row::-webkit-scrollbar { display:none; }
+        .widget-shape-chip {
+            flex:0 0 auto; min-width:62px; height:34px; padding:0 12px; border-radius:17px;
+            border:1px solid rgba(211,127,155,.18); background:rgba(255,255,255,.54);
+            color:rgba(75,45,55,.52); font-size:0.625rem;
+        }
+        .widget-shape-chip.active { background:rgba(216,141,165,.82); border-color:transparent; color:#fff; }
+        .widget-field {
+            width:100%; padding:10px 12px !important; margin:0 0 8px !important;
+            border-radius:15px !important; border:1px solid rgba(213,131,158,.16) !important;
+            background:rgba(255,255,255,.64) !important; color:rgba(63,39,47,.80) !important;
+            font-size:0.75rem !important;
+        }
+        .widget-upload-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+        .widget-upload-btn {
+            min-height:42px; padding:8px 10px; border-radius:15px; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:7px;
+            border:1px dashed rgba(202,105,138,.34); background:rgba(255,245,249,.82);
+            color:rgba(176,76,112,.78); font-size:0.625rem; text-align:center;
+        }
+        .widget-upload-btn strong { font-size:1rem; line-height:1; }
+        .widget-photo-strip { display:flex; gap:7px; overflow-x:auto; margin:0 0 9px; scrollbar-width:none; }
+        .widget-photo-strip::-webkit-scrollbar { display:none; }
+        .widget-photo-thumb {
+            position:relative; flex:0 0 52px; width:52px; height:52px; border-radius:14px; overflow:hidden;
+            border:1px solid rgba(255,255,255,.9); box-shadow:0 7px 16px -10px rgba(112,54,75,.55);
+        }
+        .widget-photo-thumb img { width:100%; height:100%; object-fit:cover; }
+        .widget-photo-thumb button {
+            position:absolute; top:2px; right:2px; width:17px; height:17px; border-radius:50%;
+            background:rgba(49,31,38,.72); color:#fff; font-size:0.625rem;
+        }
+        .widget-create-btn {
+            width:100%; min-height:44px; border-radius:18px; color:#fff; font-size:0.6875rem; letter-spacing:.12em;
+            background:linear-gradient(135deg,#e49ab2,#cb7293);
+            box-shadow:0 13px 24px -15px rgba(151,55,91,.76), inset 0 1px 0 rgba(255,255,255,.5);
+        }
+        .widget-editor-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .widget-danger-btn { min-height:40px; border-radius:16px; color:rgba(167,65,88,.72); background:rgba(167,65,88,.07); font-size:0.625rem; }
+
+        /* Photo widgets stay crisp. Only the surrounding phone may use glass. */
+        .phone-free-widget.tpl-polaroid1,
+        .phone-free-widget.tpl-polaroid3,
+        .phone-free-widget.tpl-polaroidPoster,
+        .phone-free-widget.tpl-polaroidLandscape {
+            background:transparent !important; border-color:transparent !important; box-shadow:none !important;
+            backdrop-filter:none !important; -webkit-backdrop-filter:none !important; overflow:visible !important;
+        }
+        .phone-free-widget.tpl-polaroid1::before,
+        .phone-free-widget.tpl-polaroid3::before,
+        .phone-free-widget.tpl-polaroidPoster::before,
+        .phone-free-widget.tpl-polaroidLandscape::before,
+        .phone-free-widget.tpl-squarePhoto::before,
+        .phone-free-widget.tpl-archPhoto::before { display:none !important; }
+        .phone-free-widget.tpl-squarePhoto,
+        .phone-free-widget.tpl-archPhoto { padding:0 !important; background:#fff !important; border:5px solid #fff !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+        .phone-free-widget.tpl-archPhoto { border-radius:999px 999px 24px 24px !important; }
+        .wd-full-photo { width:100%; height:100%; position:relative; overflow:hidden; border-radius:inherit; background:#fbe8ef; display:grid; place-items:center; color:rgba(191,91,125,.58); }
+        .wd-full-photo img { width:100%; height:100%; object-fit:cover; }
+        .wd-full-photo.multi { grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:minmax(0,1fr); gap:2px; padding:2px; }
+        .wd-full-photo.multi img { min-width:0; min-height:0; }
+        .wd-full-photo span { font-size:0.625rem; }
+        .wd-full-photo .caption {
+            position:absolute; left:7px; right:7px; bottom:7px; padding:5px 7px; border-radius:10px;
+            background:rgba(50,31,38,.44); color:#fff; font-size:0.5625rem; text-align:center;
+        }

@@ -1,0 +1,15 @@
+{
+  "name": "rifugio-community",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Clean-room community edition of Rifugio",
+  "scripts": {
+    "privacy:scan": "node scripts/privacy-scan.mjs",
+    "test:api": "npm --prefix apps/api test",
+    "setup": "node scripts/setup.mjs",
+    "test:mcp": "python3 -m unittest discover -s packages/mcp/tests",
+    "test:web": "node --test apps/web/tests/*.test.js",
+    "test": "npm run test:api && npm run test:web && npm run test:mcp && npm run privacy:scan"
+  },
+  "license": "Apache-2.0"
+}

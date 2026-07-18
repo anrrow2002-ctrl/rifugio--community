@@ -1,0 +1,136 @@
+/* Pet diary is a full-screen reading mode inside the Room app. */
+.phone-app-content.phone-room-app {
+    position: relative;
+}
+.phone-room-app:has(.crab-diary-overlay) {
+    overflow: hidden !important;
+}
+.phone-room-app:has(.crab-diary-overlay) > .phone-app-topbar {
+    display: none !important;
+}
+.phone-room-app:has(.crab-diary-overlay) > .crab-room-app {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 700;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden !important;
+}
+
+.crab-diary-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 720 !important;
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch !important;
+    justify-content: stretch;
+    padding: 0 !important;
+    background: #fff9ed !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.crab-diary-shell,
+.crab-diary-shell.view-cover,
+.crab-diary-shell.view-pages {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff9ed;
+    box-shadow: none !important;
+}
+
+.crab-diary-shell .crab-diary-head {
+    position: relative;
+    z-index: 20;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    min-height: calc(env(safe-area-inset-top) + 64px) !important;
+    padding:
+        calc(env(safe-area-inset-top) + 8px)
+        max(14px, env(safe-area-inset-right))
+        8px
+        max(14px, env(safe-area-inset-left)) !important;
+    border-bottom: 1px solid rgba(128, 82, 62, .12);
+    background: rgba(255, 252, 242, .98);
+    box-shadow: 0 7px 22px rgba(88, 55, 43, .07);
+}
+.crab-diary-shell .crab-diary-head > button {
+    position: relative;
+    z-index: 21;
+    flex: 0 0 auto;
+    width: 42px !important;
+    height: 42px !important;
+    touch-action: manipulation;
+}
+/* One clear navigation path: Room → cover → pages. */
+.crab-diary-shell.view-cover .crab-diary-head > button:last-child {
+    order: -1;
+    width: 42px !important;
+    min-width: 42px;
+    padding: 0 !important;
+    border: 1px solid rgba(151, 99, 79, .08);
+    border-radius: 15px !important;
+    background: rgba(244, 229, 216, .78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72), 0 7px 18px rgba(103, 65, 51, .07);
+    font-size: 0 !important;
+}
+.crab-diary-shell.view-cover .crab-diary-head > button:last-child::after {
+    content: "‹";
+    color: #9a6b5b;
+    font: 400 24px/1 serif;
+    letter-spacing: 0;
+    transform: translateY(-1px);
+}
+.crab-diary-shell.view-pages .crab-diary-head > button:last-child {
+    display: none !important;
+}
+.crab-diary-shell.view-pages .crab-diary-head > button:first-child {
+    border: 1px solid rgba(151, 99, 79, .08);
+    border-radius: 15px;
+    background: rgba(244, 229, 216, .78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .72), 0 7px 18px rgba(103, 65, 51, .07);
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.crab-diary-shell.view-pages .crab-diary-pages {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.crab-diary-shell.view-cover .crab-diary-cover {
+    flex: 0 0 auto;
+    margin: auto;
+    max-height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 96px);
+}
+
+@media (min-width: 760px) {
+    .crab-diary-overlay {
+        padding: 28px !important;
+        background: rgba(65, 43, 35, .48) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+    }
+    .crab-diary-shell,
+    .crab-diary-shell.view-cover,
+    .crab-diary-shell.view-pages {
+        width: min(100%, 760px) !important;
+        height: min(100%, 920px) !important;
+        margin: auto;
+        border: 1px solid rgba(121, 77, 58, .17) !important;
+        border-radius: 24px !important;
+        box-shadow: 0 28px 72px rgba(49, 31, 25, .34) !important;
+    }
+}

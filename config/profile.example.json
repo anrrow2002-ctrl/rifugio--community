@@ -1,0 +1,25 @@
+{
+  "user": {
+    "name": "User",
+    "displayName": "User",
+    "preferredNickname": "",
+    "timezone": "Asia/Shanghai"
+  },
+  "companion": {
+    "name": "Companion",
+    "displayName": "Companion",
+    "personaFile": "persona.md"
+  },
+  "relationship": {
+    "homeName": "Our Rifugio",
+    "coupleTitle": "",
+    "startedAt": ""
+  },
+  "pet": {
+    "name": "Clawd",
+    "birthday": "",
+    "species": "pixel crab",
+    "personality": "",
+    "bio": ""
+  }
+}

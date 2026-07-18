@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "memory": {
+      "command": "node",
+      "args": ["./mcp-memory.js"]
+    },
+    "health": {
+      "command": "node",
+      "args": ["./mcp-health.js"]
+    },
+    "radio": {
+      "command": "node",
+      "args": ["./mcp-radio.js"]
+    },
+    "toy": {
+      "command": "node",
+      "args": ["./mcp-toy.js"]
+    },
+    "image": {
+      "command": "node",
+      "args": ["./mcp-image.js"]
+    }
+  }
+}

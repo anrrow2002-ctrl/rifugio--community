@@ -1,0 +1,5 @@
+# Copy this file to private/privacy-terms.txt.
+# Add one private name, domain, identifier, or phrase per line.
+# The privacy scanner will fail if any listed term appears in public files.
+your-private-name
+your-private-domain.example

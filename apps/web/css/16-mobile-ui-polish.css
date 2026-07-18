@@ -1,0 +1,840 @@
+/* Rifugio mobile UI polish · 2026-07-13
+   Loaded last so these are deliberate component-level overrides. */
+
+/* ------------------------------------------------------------------
+   Widget editor + software keyboard
+   Keep the phone shell at its stable height. Only the editor follows
+   the visual viewport, so the dock never "floats" above the keyboard.
+   ------------------------------------------------------------------ */
+.keyboard-open .phone-widget-panel {
+    position: fixed !important;
+    z-index: 1400 !important;
+    top: calc(var(--visual-top, 0px) + max(8px, env(safe-area-inset-top))) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    bottom: calc(var(--keyboard-h, 0px) + 10px) !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    max-height: none !important;
+    overscroll-behavior: contain;
+}
+
+.keyboard-open .phone-home,
+.keyboard-open .phone-home-scroll {
+    transform: none !important;
+}
+
+/* ------------------------------------------------------------------
+   Bellezza: a real full-screen pink-white app with its own safe areas.
+   ------------------------------------------------------------------ */
+.beauty-app-shell {
+    position: absolute;
+    inset: 0;
+    z-index: 1300;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    color: #44343b;
+    background:
+        radial-gradient(circle at 12% 8%, rgba(226, 148, 180, .19), transparent 27%),
+        radial-gradient(circle at 88% 28%, rgba(245, 194, 213, .20), transparent 30%),
+        linear-gradient(145deg, #fffafd 0%, #fff5f9 48%, #faedf3 100%);
+}
+
+.beauty-panel,
+body.glass-mode .beauty-panel,
+body.glass-mode.abyss-mode .beauty-panel {
+    --paper: #fffafc;
+    --card-bg: #ffffff;
+    --ink: #33262b;
+    --warm-ink: #5d414a;
+    --gold: #c67a96;
+    --warm-gold: #d889a5;
+    flex: 1 1 auto;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 max(18px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    color: #33262b !important;
+    color-scheme: light;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    isolation: isolate;
+    overscroll-behavior: contain;
+}
+
+.beauty-panel > :first-child {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin: 0 -18px 18px !important;
+    padding:
+        calc(env(safe-area-inset-top) + 14px)
+        max(18px, env(safe-area-inset-right))
+        13px
+        max(18px, env(safe-area-inset-left));
+    justify-content: flex-start !important;
+    gap: 12px;
+    background: rgba(255, 249, 252, .96);
+    border-bottom: 1px solid rgba(202, 105, 143, .17) !important;
+    box-shadow: 0 9px 24px -22px rgba(151, 54, 92, .34);
+    backdrop-filter: blur(18px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+}
+
+.beauty-panel > :first-child h3 {
+    flex: 1 1 auto;
+    margin: 0;
+    color: #a64f73 !important;
+    font-family: "Noto Serif SC", Georgia, serif;
+    font-style: normal !important;
+    font-size: 1.15rem !important;
+    font-weight: 650;
+    letter-spacing: .03em;
+}
+
+.beauty-panel > :first-child h3 small {
+    margin-left: .35em;
+    color: #c884a0;
+    font-size: .66em;
+    font-weight: 550;
+    letter-spacing: .08em;
+}
+
+.beauty-panel > :first-child button {
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    order: -1;
+    border: 1px solid rgba(197, 94, 135, .20);
+    border-radius: 50% !important;
+    color: #a64f73 !important;
+    background: rgba(255, 255, 255, .82) !important;
+    box-shadow: 0 5px 18px rgba(151, 54, 92, .10);
+}
+
+body.glass-mode .beauty-panel .bg-cardBg,
+body.glass-mode .beauty-panel .bg-altBg,
+body.glass-mode .beauty-panel input,
+body.glass-mode .beauty-panel textarea,
+body.glass-mode .beauty-panel select {
+    color: #33262b !important;
+    background-color: #fff9fb !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+body.glass-mode .beauty-panel button:not(.theme-dot) {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+@media (min-width: 700px) {
+    .beauty-panel {
+        padding-right: max(24px, calc((100% - 720px) / 2)) !important;
+        padding-left: max(24px, calc((100% - 720px) / 2)) !important;
+    }
+}
+
+/* ------------------------------------------------------------------
+   Talk · iMessage
+   ------------------------------------------------------------------ */
+.talk-qq-shell.avatar-circle { --talk-chat-avatar-radius: 999px; }
+.talk-qq-shell.avatar-rounded { --talk-chat-avatar-radius: 15px; }
+.talk-qq-shell.avatar-square { --talk-chat-avatar-radius: 6px; }
+
+.talk-qq-shell.theme-imessage .talk-chat-detail,
+.talk-imessage-detail {
+    background: #f2f2f7 !important;
+    color: #1c1c1e;
+}
+
+/* A chosen chat background always outranks the built-in theme surface. */
+.talk-qq-shell .talk-chat-detail.has-user-background {
+    background-image:
+        linear-gradient(180deg, rgba(245, 245, 249, .50), rgba(245, 245, 249, .68)),
+        var(--talk-chat-bg-image, none) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
+    background-repeat: no-repeat !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail.has-user-background {
+    background-image:
+        linear-gradient(180deg, rgba(237, 237, 237, .48), rgba(237, 237, 237, .66)),
+        var(--talk-chat-bg-image, none) !important;
+}
+
+.talk-qq-shell .talk-chat-detail.has-user-background .talk-message-scroller,
+#app.has-wallpaper .talk-qq-shell .talk-chat-detail:not(.has-user-background),
+#app.has-wallpaper .talk-qq-shell .talk-chat-detail:not(.has-user-background) .talk-message-scroller {
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail .talk-detail-head,
+.talk-imessage-detail .talk-detail-head {
+    position: relative;
+    min-height: 66px;
+    padding: calc(env(safe-area-inset-top) + 5px) 12px 8px;
+    background: rgba(249, 249, 249, .94) !important;
+    border-bottom: .5px solid rgba(60, 60, 67, .18) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head {
+    position: relative;
+    display: flex !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-back-btn,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-back-btn {
+    display: flex !important;
+    flex: 0 0 86px !important;
+    width: 86px !important;
+    margin: 0 !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity {
+    position: static;
+    z-index: 1;
+    top: auto;
+    left: auto;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    transform: none;
+    pointer-events: auto;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity > div,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity > div {
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity b,
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity span,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity b,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity span {
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-engine-status-btn,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-engine-status-btn {
+    position: static;
+    z-index: 2;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity {
+    justify-content: center !important;
+    text-align: center;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity b {
+    color: #1c1c1e;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-detail-identity span {
+    max-width: 180px !important;
+    color: #8e8e93 !important;
+    font-size: .54rem !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-back-btn,
+.talk-qq-shell.theme-imessage .talk-chat-detail > .talk-detail-head .talk-engine-status-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    color: #007aff !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-message-scroller {
+    padding: 14px 11px 12px !important;
+    background: #f2f2f7;
+}
+
+.talk-qq-shell.theme-imessage .chat-row {
+    gap: 7px !important;
+    align-items: flex-end !important;
+    margin: 7px 0 !important;
+}
+
+.talk-qq-shell.theme-imessage .chat-row .crab-avatar-wrap,
+.talk-qq-shell.theme-imessage .chat-row > .talk-avatar-img,
+.talk-qq-shell.theme-imessage .chat-row .user-side-avatar,
+.talk-qq-shell.theme-imessage .chat-row .talk-user-avatar-fallback {
+    display: grid !important;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    place-items: center;
+    overflow: hidden;
+    color: #fff;
+    background: linear-gradient(145deg, #d987a9, #ae5f82);
+    border: 1px solid rgba(255, 255, 255, .88) !important;
+    border-radius: var(--talk-chat-avatar-radius, 999px) !important;
+    box-shadow: 0 2px 7px rgba(38, 38, 44, .12) !important;
+    object-fit: cover;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.talk-qq-shell.theme-imessage .chat-row .crab-avatar-wrap .talk-avatar-img,
+.talk-qq-shell.theme-imessage .chat-row .crab-avatar-wrap svg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+.talk-qq-shell.theme-imessage .chat-row .msg-col {
+    max-width: min(74%, 318px) !important;
+}
+
+.talk-qq-shell.theme-imessage .chat-meta {
+    margin: 3px 8px 4px !important;
+    color: #8e8e93 !important;
+    font-size: .48rem !important;
+    font-weight: 400;
+}
+
+.talk-qq-shell.theme-imessage .chat-bubble {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    padding: 9px 12px !important;
+    color: rgba(57, 36, 44, .82) !important;
+    background: #fff !important;
+    border-color: rgba(60, 60, 67, .08) !important;
+    border-radius: 19px 19px 19px 7px !important;
+    box-shadow: 0 2px 8px rgba(42, 42, 48, .10) !important;
+    font-size: var(--talk-message-font-size, .82rem) !important;
+    line-height: 1.55 !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail .chat-meta {
+    display: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail .chat-row.claude .chat-bubble {
+    color: rgba(57, 36, 44, .82) !important;
+    background: #fff !important;
+    background-image: none !important;
+}
+
+.talk-qq-shell.theme-imessage .chat-row.claude .chat-bubble::after {
+    display: none !important;
+    content: none !important;
+}
+
+.talk-qq-shell.theme-imessage .chat-row.user .chat-bubble {
+    color: #fff !important;
+    background: linear-gradient(180deg, #5ba7ff, #1684ff) !important;
+    border-color: rgba(255, 255, 255, .42) !important;
+    border-radius: 19px 19px 7px 19px !important;
+    box-shadow: 0 8px 18px -13px rgba(10, 132, 255, .88) !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-chat-detail .chat-row.user .chat-bubble {
+    color: #fff !important;
+    background: linear-gradient(180deg, #5ba7ff, #1684ff) !important;
+}
+
+.talk-qq-shell.theme-imessage .chat-row.user .chat-bubble::after {
+    display: none !important;
+    content: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-composer-wrap {
+    padding: 6px 8px calc(env(safe-area-inset-bottom) + 7px) !important;
+    background: rgba(249, 249, 249, .96);
+    border-top: .5px solid rgba(60, 60, 67, .18);
+}
+
+.talk-qq-shell.theme-imessage .talk-composer {
+    min-height: 40px;
+    padding: 3px 4px !important;
+    gap: 5px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-composer textarea {
+    min-height: 34px;
+    padding: 7px 11px 6px !important;
+    color: #1c1c1e !important;
+    background: #fff !important;
+    border: 1px solid #c7c7cc !important;
+    border-radius: 18px !important;
+    font-size: .82rem !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-composer .tool-button,
+.talk-qq-shell.theme-imessage .talk-composer .voice-button,
+.talk-qq-shell.theme-imessage .talk-composer .chat-send {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 50% !important;
+}
+
+.chat-send-label {
+    display: none;
+}
+
+.talk-qq-shell.theme-imessage .talk-composer .tool-button,
+.talk-qq-shell.theme-imessage .talk-composer .voice-button {
+    color: #007aff !important;
+    background: #e5e5ea !important;
+}
+
+.talk-qq-shell.theme-imessage .talk-composer .chat-send {
+    color: #fff !important;
+    background: #0b84fe !important;
+    box-shadow: none !important;
+}
+
+/* ------------------------------------------------------------------
+   Talk · WeChat
+   ------------------------------------------------------------------ */
+.talk-qq-shell.theme-wechat .talk-chat-detail {
+    background: #ededed !important;
+    color: #191919;
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head {
+    min-height: 57px;
+    padding: calc(env(safe-area-inset-top) + 6px) 12px 7px;
+    background: rgba(237, 237, 237, .96) !important;
+    border-bottom: 1px solid #d6d6d6 !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity {
+    justify-content: center !important;
+    text-align: center;
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity b {
+    color: #191919;
+    font-size: .88rem;
+    font-weight: 600;
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-detail-identity span {
+    display: none !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-back-btn,
+.talk-qq-shell.theme-wechat .talk-chat-detail > .talk-detail-head .talk-engine-status-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    color: #191919 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-message-scroller {
+    padding: 12px 11px 12px !important;
+    background: #ededed;
+}
+
+.talk-qq-shell.theme-wechat .chat-row {
+    gap: 10px !important;
+    align-items: flex-start !important;
+    margin: 12px 0 !important;
+}
+
+.talk-qq-shell.theme-wechat .chat-row .crab-avatar-wrap,
+.talk-qq-shell.theme-wechat .chat-row .talk-avatar-img,
+.talk-qq-shell.theme-wechat .chat-row .user-side-avatar,
+.talk-qq-shell.theme-wechat .chat-row .talk-user-avatar-fallback {
+    display: grid !important;
+    place-items: center;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    border-radius: var(--talk-chat-avatar-radius, 6px) !important;
+    overflow: hidden;
+    background: #fff;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #fff;
+    background-color: #9c7183;
+    font-size: .78rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.talk-qq-shell.theme-wechat .chat-row .msg-col {
+    max-width: min(72%, 310px) !important;
+}
+
+.talk-qq-shell.theme-wechat .chat-meta {
+    display: none !important;
+}
+
+.talk-qq-shell.theme-wechat .chat-bubble {
+    position: relative;
+    padding: 10px 12px !important;
+    color: #191919 !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04) !important;
+    font-size: var(--talk-message-font-size, .8rem) !important;
+    line-height: 1.55 !important;
+}
+
+.talk-qq-shell.theme-wechat .chat-row.claude .chat-bubble::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: 14px;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 2px;
+    transform: rotate(45deg);
+}
+
+.talk-qq-shell.theme-wechat .chat-row.user .chat-bubble {
+    color: #10250b !important;
+    background: #95ec69 !important;
+}
+
+.talk-qq-shell.theme-wechat .chat-row.user .chat-bubble::before {
+    content: "";
+    position: absolute;
+    right: -5px;
+    top: 14px;
+    width: 10px;
+    height: 10px;
+    background: #95ec69;
+    border-radius: 2px;
+    transform: rotate(45deg);
+}
+
+.talk-qq-shell.theme-wechat .talk-system-message,
+.talk-qq-shell.theme-wechat .talk-load-more-row,
+.talk-qq-shell.theme-wechat .talk-mini-note {
+    color: #999 !important;
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer-wrap {
+    padding: 7px 8px calc(env(safe-area-inset-bottom) + 8px) !important;
+    background: #f7f7f7 !important;
+    border-top: 1px solid #d8d8d8;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer {
+    min-height: 42px;
+    padding: 0 !important;
+    gap: 8px !important;
+    align-items: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer textarea {
+    order: 1;
+    flex: 1 1 auto;
+    min-height: 38px;
+    padding: 9px 10px 7px !important;
+    color: #191919 !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 7px !important;
+    box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .05) !important;
+    font-size: .8rem !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .tool-button,
+.talk-qq-shell.theme-wechat .talk-composer .voice-button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    color: #333 !important;
+    background: transparent !important;
+    border: 1.5px solid #333 !important;
+    border-radius: 50% !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .voice-button {
+    order: 0;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .tool-button {
+    order: 2;
+    font-size: 0 !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .tool-button::before {
+    content: "+";
+    font: 400 24px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+    transform: translateY(-1px);
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .chat-send {
+    order: 3;
+    min-width: 52px;
+    width: 52px;
+    height: 36px;
+    color: #fff !important;
+    background: #07c160 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .chat-send:disabled {
+    display: grid !important;
+    color: rgba(255, 255, 255, .82) !important;
+    background: #8fd8ad !important;
+    opacity: 1 !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .chat-send-icon {
+    display: none !important;
+}
+
+.talk-qq-shell.theme-wechat .talk-composer .chat-send-label {
+    display: inline !important;
+    font-size: .78rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+/* SpringBoard gestures: native horizontal paging when idle, cheap dragging when active. */
+.phone-home-scroll,
+.phone-home.phone-editing .phone-home-scroll {
+    touch-action: pan-x !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-snap-stop: always;
+    overscroll-behavior-x: contain;
+}
+
+.phone-home.phone-editing .phone-layout-item {
+    touch-action: none !important;
+}
+
+.phone-home.phone-drag-active .phone-layout-item,
+.phone-home.phone-drag-active .phone-layout-item *,
+.phone-home.phone-drag-active .phone-dock,
+.phone-home.phone-drag-active .phone-dock * {
+    animation: none !important;
+    transition: none !important;
+}
+
+.phone-home.phone-drag-active .phone-widget,
+.phone-home.phone-drag-active .phone-dock {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.phone-home.phone-drag-active .phone-layout-item.dragging {
+    contain: layout style paint;
+    will-change: left, top, transform;
+}
+
+/* ------------------------------------------------------------------
+   Segreti / Abisso: isolated black-red NSFW surface.
+   ------------------------------------------------------------------ */
+#app.phone-secret-app {
+    --abyss: #080304;
+    --secret-red: #8e1b2b;
+    --secret-red-bright: #c7394d;
+    --secret-ink: #f0dfe1;
+    color: var(--secret-ink) !important;
+    color-scheme: dark;
+    background:
+        radial-gradient(circle at 74% 8%, rgba(137, 20, 40, .23), transparent 34%),
+        radial-gradient(circle at 8% 78%, rgba(92, 8, 24, .20), transparent 40%),
+        linear-gradient(180deg, #100507 0%, #050203 62%, #090204 100%) !important;
+}
+
+#app.phone-secret-app .wallpaper-tint {
+    background: rgba(17, 1, 5, .76) !important;
+}
+
+#app.phone-secret-app .phone-app-content {
+    position: relative;
+    background:
+        linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.01) 1px, transparent 1px) !important;
+    background-size: 28px 28px !important;
+    color: #eadadd !important;
+}
+
+#app.phone-secret-app .phone-app-content::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 18%, rgba(155, 22, 44, .15), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.018), transparent 18%);
+}
+
+#app.phone-secret-app .phone-app-content > * {
+    position: relative;
+    z-index: 1;
+}
+
+#app.phone-secret-app .phone-app-topbar {
+    background: rgba(11, 3, 5, .94) !important;
+    border-bottom: 1px solid rgba(179, 39, 63, .24) !important;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, .34);
+    backdrop-filter: blur(20px) saturate(135%);
+    -webkit-backdrop-filter: blur(20px) saturate(135%);
+}
+
+#app.phone-secret-app .phone-back,
+#app.phone-secret-app .phone-mini-btn {
+    color: #db5065 !important;
+    background: rgba(131, 17, 37, .13) !important;
+    border-color: rgba(196, 49, 74, .23) !important;
+    box-shadow: none !important;
+}
+
+#app.phone-secret-app .phone-app-heading .title {
+    color: #f0dfe1 !important;
+}
+
+#app.phone-secret-app .phone-app-heading .sub {
+    color: #9f3b4c !important;
+}
+
+#app.phone-secret-app .content-scroll > .px-8.pt-8 {
+    padding: 22px 20px max(34px, env(safe-area-inset-bottom)) !important;
+}
+
+#app.phone-secret-app .content-scroll > .px-8.pt-8 > :first-child {
+    margin-bottom: 30px !important;
+    border-bottom-color: rgba(171, 39, 61, .24) !important;
+}
+
+#app.phone-secret-app .content-scroll > .px-8.pt-8 button {
+    text-shadow: none;
+}
+
+#app.phone-secret-app .text-gold,
+#app.phone-secret-app .text-gold\/90,
+#app.phone-secret-app .text-gold\/80,
+#app.phone-secret-app .text-gold\/70,
+#app.phone-secret-app .text-gold\/60,
+#app.phone-secret-app .text-gold\/30 {
+    color: #c94a60 !important;
+}
+
+#app.phone-secret-app .border-gold,
+#app.phone-secret-app .border-gold\/50,
+#app.phone-secret-app .border-gold\/30 {
+    border-color: rgba(194, 48, 73, .42) !important;
+}
+
+#app.phone-secret-app textarea,
+#app.phone-secret-app input {
+    color: #ecdde0 !important;
+    background: rgba(10, 3, 5, .78) !important;
+    border-color: rgba(171, 39, 61, .30) !important;
+    border-radius: 10px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 12px 28px rgba(0,0,0,.18);
+}
+
+#app.phone-secret-app textarea::placeholder,
+#app.phone-secret-app input::placeholder {
+    color: rgba(224, 184, 192, .58) !important;
+}
+
+#app.phone-secret-app .bg-white\/5,
+#app.phone-secret-app .bg-gold\/5,
+#app.phone-secret-app .bg-gold\/10 {
+    background: rgba(76, 9, 22, .18) !important;
+}
+
+#app.phone-secret-app .border-white\/10 {
+    border-color: rgba(226, 108, 129, .28) !important;
+}
+
+#app.phone-secret-app .opacity-30 { opacity: .68 !important; }
+#app.phone-secret-app .opacity-40 { opacity: .74 !important; }
+#app.phone-secret-app .opacity-50 { opacity: .78 !important; }
+#app.phone-secret-app .opacity-60 { opacity: .82 !important; }
+
+#app.phone-secret-app .text-white\/20,
+#app.phone-secret-app .text-white\/30,
+#app.phone-secret-app .text-white\/40,
+#app.phone-secret-app .text-white\/50 {
+    color: rgba(244, 222, 227, .76) !important;
+}
+
+#app.phone-secret-app .text-white\/70 {
+    color: rgba(250, 235, 239, .90) !important;
+}
+
+#app.phone-secret-app .text-red-900,
+#app.phone-secret-app .text-red-900\/60,
+#app.phone-secret-app .text-red-900\/80 {
+    color: #e2687c !important;
+}
+
+#app.phone-secret-app .hold-btn {
+    color: #ef7c8f !important;
+    border-color: rgba(226, 80, 105, .46) !important;
+    background: rgba(104, 12, 30, .20) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #app.phone-secret-app *,
+    .talk-qq-shell.theme-imessage *,
+    .talk-qq-shell.theme-wechat * {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

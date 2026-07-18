@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rifugio">
+  <rect width="512" height="512" rx="112" fill="#f5eee4"/>
+  <path d="M112 252 256 124l144 128v152a28 28 0 0 1-28 28H140a28 28 0 0 1-28-28Z" fill="#b25f4a"/>
+  <path d="M196 432V300a60 60 0 0 1 120 0v132Z" fill="#f9f7f2"/>
+  <circle cx="256" cy="300" r="18" fill="#b25f4a"/>
+</svg>

@@ -1,0 +1,565 @@
+/* ============================================================
+           ✦ iOS Phone Launcher Rebuild · App 化主屏 / 小组件 / 拖动排序
+           ============================================================ */
+        :root, [data-theme], [data-theme="avorio"], [data-theme="limone"], [data-theme="menta"], [data-theme="nebbia"], [data-theme="petalo"], [data-theme="crepuscolo"], [data-theme="aurora"], [data-theme="notte"], [data-theme="rosa"], [data-theme="salvia"] {
+            --paper: #FFF6F9;
+            --card-bg: rgba(255, 255, 255, 0.58);
+            --alt-bg: rgba(255, 246, 249, 0.50);
+            --ink: #2F2529;
+            --warm-ink: #463237;
+            --gold: #D88DA5;
+            --warm-gold: #E9AFC0;
+            --abyss: #1D1118;
+            --paper-texture: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+            --dust-color: #E9AFC0;
+            --glow-color: rgba(233, 175, 192, 0.14);
+            --ios-pink: rgba(255, 219, 229, 0.58);
+            --ios-pink-strong: rgba(232, 151, 174, 0.72);
+            --ios-card: rgba(255, 255, 255, 0.54);
+            --ios-card-strong: rgba(255, 255, 255, 0.72);
+            --ios-line: rgba(255, 255, 255, 0.54);
+        }
+        body { background-color: #FFF8FB !important; }
+        body::before {
+            content: ""; position: absolute; inset: 0; pointer-events: none; z-index: -1;
+            background:
+                radial-gradient(circle at 18% 8%, rgba(255,196,211,0.46), transparent 30%),
+                radial-gradient(circle at 86% 18%, rgba(255,229,237,0.72), transparent 32%),
+                linear-gradient(180deg, #fff8fb 0%, #fff1f6 56%, #fff8fb 100%);
+        }
+        .app-container {
+            background:
+                radial-gradient(circle at 18% 8%, rgba(255,196,211,0.46), transparent 30%),
+                radial-gradient(circle at 86% 18%, rgba(255,229,237,0.72), transparent 32%),
+                linear-gradient(180deg, #fff8fb 0%, #fff1f6 56%, #fff8fb 100%) !important;
+            border: 0;
+            box-shadow: none !important;
+        }
+        .glass-dock { display: none !important; }
+        .app-header { display: none !important; }
+        .phone-statusbar {
+            display: none !important;
+        }
+        .phone-statusbar .signal { display: flex; align-items: center; gap: 6px; font-size: 0.6875rem; opacity: .70; }
+        .phone-home {
+            position: relative; z-index: 2; flex: 1; min-height: 0;
+            display: flex; flex-direction: column; overflow: hidden;
+            padding-bottom: 0;
+        }
+        .phone-home-top {
+            padding: calc(env(safe-area-inset-top) + 12px) 22px 10px;
+            display: flex; align-items: flex-end; justify-content: space-between;
+        }
+        .phone-home-title { line-height: 1; }
+        .phone-home-title .date { font-size: 0.625rem; color: rgba(47,37,41,0.45); letter-spacing: .18em; text-transform: uppercase; }
+        .phone-home-title .hello { font-family: "Pinyon Script", cursive; font-size: 2.625rem; color: rgba(70,50,55,0.86); }
+        .phone-mini-actions { display: flex; gap: 8px; align-items: center; }
+        .phone-mini-btn {
+            min-width: 34px; height: 34px; padding: 0 10px; border-radius: 17px;
+            border: 1px solid rgba(255,255,255,0.60);
+            background: rgba(255,255,255,0.42); backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.58), 0 8px 18px rgba(172, 92, 116, 0.10);
+            color: rgba(92,65,72,0.74); font-size: 0.8125rem;
+        }
+        .phone-mini-btn.done { padding: 0 14px; color: #fff; background: rgba(216,141,165,0.72); }
+        .phone-home-scroll {
+            flex: 1; display: flex; overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: auto;
+            scroll-snap-stop: normal;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-inline: contain;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .phone-home-scroll::-webkit-scrollbar { display:none; }
+        .phone-page {
+            scroll-snap-align: start; flex: 0 0 100%; height: 100%;
+            padding: 0 22px 6px; overflow-y: auto; scrollbar-width: none;
+        }
+        .phone-page::-webkit-scrollbar { display:none; }
+        .phone-widget-stack {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;
+        }
+        .phone-widget {
+            border-radius: 26px; padding: 16px; min-height: 112px; position: relative; overflow: hidden;
+            background: rgba(255,255,255,0.58); backdrop-filter: blur(16px) saturate(165%);
+            -webkit-backdrop-filter: blur(16px) saturate(165%);
+            border: 1px solid rgba(255,255,255,0.62);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.66), 0 15px 36px -18px rgba(154, 83, 105, .30);
+        }
+        .phone-widget.large { grid-column: span 2; min-height: 148px; }
+        .phone-widget .cap { font-size: 0.5625rem; text-transform: uppercase; letter-spacing: .22em; color: rgba(216,141,165,0.88); margin-bottom: 8px; }
+        .phone-widget .script { font-family: "Pinyon Script", cursive; font-size: 2.375rem; line-height: .95; color: rgba(70,50,55,0.82); }
+        .phone-widget .body { font-size: 0.75rem; line-height: 1.7; color: rgba(47,37,41,0.68); }
+        .phone-widget .number { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 2.125rem; line-height: 1; color: rgba(216,141,165,0.92); }
+        .phone-app-grid {
+            display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+            column-gap: 12px; row-gap: 18px; padding-bottom: 24px;
+        }
+        .phone-app-icon {
+            touch-action: none; user-select: none; -webkit-user-select: none;
+            display: flex; flex-direction: column; align-items: center; gap: 7px;
+            color: rgba(47,37,41,0.72); position: relative;
+        }
+        .phone-icon-tile {
+            width: 58px; height: 58px; border-radius: 17px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6875rem;
+            background: linear-gradient(145deg, rgba(255,255,255,0.72), rgba(255,220,230,0.40));
+            border: 1px solid rgba(255,255,255,0.66);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 10px 20px -10px rgba(159,83,106,.38);
+        }
+        .phone-icon-tile img { width: 100%; height: 100%; object-fit: cover; display:block; }
+        .phone-app-label { font-size: 0.625rem; line-height: 1.15; text-align: center; max-width: 70px; color: rgba(47,37,41,0.72); text-shadow: 0 1px 8px rgba(255,255,255,.85); }
+        .phone-editing .phone-app-icon .phone-icon-tile { animation: ios-wiggle .22s ease-in-out infinite alternate; }
+        .phone-app-icon.dragging { opacity: .58; transform: scale(.96); }
+        .phone-delete-dot {
+            position: absolute; top: -6px; left: calc(50% - 34px); width: 18px; height: 18px; border-radius: 50%;
+            background: rgba(47,37,41,0.72); color:#fff; font-size: 0.75rem; line-height:1.125rem; text-align:center;
+            box-shadow: 0 3px 10px rgba(0,0,0,.16);
+        }
+        @keyframes ios-wiggle { from { transform: rotate(-1.2deg) translateY(0); } to { transform: rotate(1.2deg) translateY(-1px); } }
+        .phone-page-dots { height: 18px; display:flex; justify-content:center; align-items:center; gap: 6px; margin-bottom: 4px; }
+        .phone-page-dots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(216,141,165,0.26); }
+        .phone-page-dots span.active { width: 18px; border-radius: 9px; background: rgba(216,141,165,0.62); }
+        .phone-dock {
+            position: relative;
+            z-index: 45;
+            min-height: 86px;
+            margin: 0 16px max(4px, env(safe-area-inset-bottom));
+            padding: 9px 10px 7px;
+            display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; align-items: end;
+            border-radius: 30px; background: rgba(255,255,255,0.38); border: 1px solid rgba(255,255,255,.62);
+            backdrop-filter: blur(28px) saturate(200%); -webkit-backdrop-filter: blur(28px) saturate(200%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.66), 0 20px 44px -22px rgba(141,72,96,.36);
+            touch-action: none;
+        }
+        .phone-dock::before {
+            content: "";
+            position: absolute;
+            inset: 5px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,.28);
+            pointer-events: none;
+        }
+        .phone-dock .phone-app-icon { min-width: 0; gap: 3px; z-index: 1; }
+        .phone-dock .phone-icon-tile { width: 50px; height: 50px; border-radius: 15px; margin: 0 auto; }
+        .phone-dock .phone-app-label { font-size: 0.5625rem; max-width: 62px; }
+        .phone-dock .dock-slot-empty {
+            width: 50px; height: 50px; margin: 0 auto 14px; border-radius: 15px;
+            display: grid; place-items: center; border: 1px dashed rgba(216,141,165,.34);
+            color: rgba(177,93,119,.50); background: rgba(255,255,255,.18); font-size: 1.125rem;
+        }
+        .phone-dock .phone-app-icon.dragging { opacity: .58; transition:none !important; pointer-events:auto; }
+        .phone-editing .phone-dock {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 0 0 2px rgba(216,141,165,.14), 0 20px 44px -22px rgba(141,72,96,.36);
+        }
+        .phone-app-content { padding-bottom: 0 !important; }
+        .phone-app-topbar {
+            position: sticky; top: 0; z-index: 35;
+            padding: calc(env(safe-area-inset-top) + 8px) 18px 10px;
+            display: flex; align-items: center; gap: 10px;
+            background: linear-gradient(to bottom, rgba(255,246,249,.92), rgba(255,246,249,.72));
+            backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid rgba(255,255,255,.52);
+        }
+        .phone-back {
+            height: 34px; min-width: 64px; padding: 0 12px; border-radius: 17px;
+            display:flex; align-items:center; justify-content:center; gap: 4px;
+            color: rgba(216,141,165,.95); background: rgba(255,255,255,.42); border: 1px solid rgba(255,255,255,.62);
+            font-size: 0.75rem; letter-spacing: .04em;
+        }
+        .phone-app-heading { flex:1; min-width: 0; }
+        .phone-app-heading .title { font-size: 0.875rem; color: rgba(47,37,41,.82); font-weight: 600; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
+        .phone-app-heading .sub { font-size: 0.5625rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(216,141,165,.68); }
+        .legacy-subnav {
+            display:flex !important; overflow-x:auto; justify-content:flex-start !important; gap:8px !important;
+            padding: 8px !important; margin: 0 0 18px !important; border:1px solid rgba(216,141,165,.14) !important;
+            border-radius: 18px; background: rgba(255,255,255,.32); backdrop-filter: blur(16px) saturate(170%);
+            -webkit-backdrop-filter: blur(16px) saturate(170%); opacity:1 !important; scrollbar-width:none;
+        }
+        .legacy-subnav::-webkit-scrollbar { display:none; }
+        .legacy-subnav button {
+            flex: 0 0 auto; border-radius: 14px; padding: 7px 10px !important; border: 0 !important;
+            background: rgba(255,255,255,.24); color: rgba(92,65,72,.58); font-size: 0.625rem;
+        }
+        .legacy-subnav button[class*='text-gold'], .legacy-subnav button[class*='text-red'] {
+            background: rgba(216,141,165,.16); color: rgba(216,141,165,.95) !important;
+        }
+        .phone-app-content > .fade-enter-active,
+        .phone-app-content .px-8 { padding-left: 20px !important; padding-right: 20px !important; }
+        .phone-app-content .pt-8 { padding-top: 18px !important; }
+        .phone-settings-app { padding: 18px 20px 40px; }
+        .phone-settings-card {
+            background: rgba(255,255,255,.48); border: 1px solid rgba(255,255,255,.62); border-radius: 24px;
+            padding: 16px; margin-bottom: 14px; backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.65), 0 14px 34px -22px rgba(141,72,96,.34);
+        }
+        .phone-settings-card label { display:block; font-size: 0.5625rem; text-transform: uppercase; letter-spacing:.18em; color: rgba(216,141,165,.82); margin-bottom: 5px; }
+        .phone-settings-card input, .phone-settings-card select, .phone-settings-card textarea {
+            width:100%; border: 1px solid rgba(216,141,165,.18); border-radius: 14px; padding: 9px 11px;
+            background: rgba(255,255,255,.42); color: rgba(47,37,41,.78); font-size: 0.75rem; margin-bottom: 12px;
+        }
+        .phone-widget-panel {
+            position: absolute; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 94px); z-index: 80;
+            border-radius: 26px; padding: 16px; background: rgba(255,255,255,.64); border: 1px solid rgba(255,255,255,.70);
+            backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
+            box-shadow: 0 18px 50px -24px rgba(119,50,74,.50);
+        }
+        .phone-widget-row { display:flex; align-items:center; justify-content:space-between; padding: 11px 0; border-bottom: 1px solid rgba(216,141,165,.12); }
+        .phone-widget-row:last-child { border-bottom: 0; }
+        .ios-switch { width: 48px; height: 28px; border-radius: 20px; background: rgba(0,0,0,.12); position:relative; transition:.2s; }
+        .ios-switch::after { content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.16); transition:.2s; }
+        .ios-switch.on { background: rgba(216,141,165,.72); }
+        .ios-switch.on::after { transform: translateX(20px); }
+        .bellezza-no-theme .theme-popover, .bellezza-no-theme .theme-dot { display:none !important; }
+        .modal-backdrop { z-index: 1000 !important; }
+        .modal-card { border-radius: 26px !important; }
+        @media (max-width: 380px) {
+            .phone-icon-tile { width: 52px; height: 52px; border-radius: 15px; font-size: 1.5rem; }
+            .phone-app-grid { column-gap: 8px; row-gap: 15px; }
+            .phone-widget { padding: 14px; }
+        }
+
+
+        /* ============================================================
+           ✦ iOS SpringBoard v2 · 自由摆放 / 小组件编辑 / 页面不纵向滚动
+           ============================================================ */
+        .phone-home-scroll { height: 100%; touch-action: pan-x; }
+        .phone-editing .phone-home-scroll { overflow-x: auto; touch-action: none; scroll-snap-type: x mandatory; }
+        .phone-page {
+            position: relative;
+            overflow: hidden !important;
+            padding: 0 16px 6px !important;
+        }
+        .phone-layout-plane {
+            position: relative;
+            width: 100%; height: 100%;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 26px;
+        }
+        .phone-editing .phone-layout-plane::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            background:
+                repeating-linear-gradient(to bottom, transparent 0 93px, rgba(216,141,165,.11) 93px 94px),
+                linear-gradient(to right,
+                    transparent 0 23.5%, rgba(216,141,165,.12) 23.5% 24%,
+                    transparent 24% 47.5%, rgba(216,141,165,.12) 47.5% 48%,
+                    transparent 48% 71.5%, rgba(216,141,165,.12) 71.5% 72%,
+                    transparent 72%);
+            opacity: .72;
+            display:none;
+        }
+        .phone-layout-item {
+            position: absolute;
+            z-index: 1;
+            transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            contain: layout style;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            -webkit-user-drag: none;
+        }
+        .phone-layout-item *,
+        .phone-layout-item img {
+            user-select:none;
+            -webkit-user-select:none;
+            -webkit-user-drag:none;
+        }
+        .phone-layout-item img { pointer-events:none; }
+        .phone-layout-item.dragging {
+            z-index: 30;
+            transform: scale(1.04);
+            opacity: .92;
+            filter: drop-shadow(0 16px 28px rgba(149,75,101,.24));
+            will-change: transform, left, top;
+            transition: none !important;
+        }
+        .phone-editing .phone-layout-item { transition: none; }
+        .phone-editing .phone-widget,
+        .phone-layout-item.dragging .phone-widget {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background-color: rgba(255,250,252,.88);
+        }
+        /* Pointer gestures are assigned on pointerdown. App/widget touches must
+           never start native paging; swipe between pages from the empty plane. */
+        .phone-home:not(.phone-editing) .phone-layout-plane { touch-action: pan-x; }
+        .phone-home .phone-layout-item,
+        .phone-home .phone-layout-item .phone-app-icon,
+        .phone-home .phone-layout-item .phone-free-widget { touch-action: none !important; }
+        /* Lock native/inertial scrolling only while an item is being dragged.
+           Edge switching remains programmatic through focusHomePage(). */
+        .phone-home.phone-drag-active .phone-home-scroll,
+        .phone-home.phone-editing.phone-drag-active .phone-home-scroll {
+            overflow-x: hidden !important;
+            touch-action: none !important;
+            -webkit-overflow-scrolling: auto;
+        }
+        .phone-layout-item .phone-app-icon { width: 100%; height: 100%; justify-content: flex-start; }
+        .phone-layout-item .phone-icon-tile { margin: 0 auto; }
+        .phone-layout-item .phone-app-label { margin: 0 auto; }
+        .phone-free-widget {
+            width: 100%; height: 100%;
+            cursor: pointer;
+            min-height: 0 !important;
+        }
+        .phone-free-widget.small .script { font-size: 1.875rem; }
+        .phone-free-widget.medium .script { font-size: 2.125rem; }
+        .phone-free-widget.large .script { font-size: 2.375rem; }
+        .phone-free-widget .body {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .phone-free-widget.large .body { -webkit-line-clamp: 5; }
+        .phone-free-widget.paper {
+            background: rgba(255,252,245,.70);
+            border-color: rgba(220,185,145,.34);
+        }
+        .phone-free-widget.blush {
+            background: linear-gradient(145deg, rgba(255,225,233,.72), rgba(255,255,255,.38));
+            border-color: rgba(232,151,174,.30);
+        }
+        .phone-free-widget.clear {
+            background: rgba(255,255,255,.26);
+            border-color: rgba(255,255,255,.45);
+        }
+        .phone-widget-edit-dot,
+        .phone-widget-remove-dot {
+            position: absolute; top: -7px; width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; line-height: 1; z-index: 4;
+            color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        }
+        .phone-widget-remove-dot { left: -7px; background: rgba(47,37,41,.68); }
+        .phone-widget-edit-dot { right: -7px; background: rgba(216,141,165,.86); }
+        .phone-empty-page-hint {
+            position:absolute; inset: 0; display:flex; align-items:center; justify-content:center;
+            color: rgba(47,37,41,.28); font-size: 0.6875rem; letter-spacing:.18em; text-transform: uppercase;
+            pointer-events:none;
+        }
+        .phone-page-dots button {
+            width: 18px; height: 18px; padding: 0; display:grid; place-items:center;
+            border-radius: 9px; color: rgba(177,93,119,.66); font-size: 0.8125rem; line-height: 1;
+            background: rgba(255,255,255,.36); border: 1px solid rgba(255,255,255,.52);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .phone-page-dots button.page-dot {
+            width: 8px; height: 8px; border: 0; border-radius: 50%;
+            background: rgba(216,141,165,.28);
+        }
+        .phone-page-dots button.page-dot.active {
+            width: 20px; border-radius: 10px; background: rgba(216,141,165,.68);
+        }
+        .phone-page-dots button.page-remove { color: rgba(190,73,87,.74); }
+        .phone-page-dots button.page-remove-mini {
+            width: 18px; height: 18px; border-radius: 9px;
+            color: rgba(190,73,87,.82);
+            background: rgba(255,242,246,.82);
+            border: 1px solid rgba(190,73,87,.18);
+        }
+        .phone-page-edge-hint {
+            position:absolute; top:50%; z-index:42; width:24px; height:58px;
+            display:grid; place-items:center; transform:translateY(-50%);
+            border-radius:14px; color:#fff; background:rgba(216,141,165,.72);
+            box-shadow:0 10px 24px rgba(149,75,101,.22); pointer-events:none;
+            opacity:0; transition:opacity .15s ease;
+        }
+        .phone-page-edge-hint.left { left:4px; }
+        .phone-page-edge-hint.right { right:4px; }
+        .phone-page-edge-hint.show { opacity:1; }
+        .phone-widget-panel {
+            max-height: min(72vh, 560px);
+            overflow-y: auto;
+        }
+        .phone-widget-panel::-webkit-scrollbar { display:none; }
+        .phone-widget-preset {
+            display:flex; gap: 12px; align-items:center; justify-content:space-between;
+            padding: 12px 0; border-bottom: 1px solid rgba(216,141,165,.12);
+        }
+        .phone-widget-preset:last-child { border-bottom:0; }
+        .phone-widget-mini-preview {
+            width: 54px; height: 42px; border-radius: 14px;
+            background: rgba(255,255,255,.50); border: 1px solid rgba(255,255,255,.70);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 8px 18px rgba(172,92,116,.08);
+            flex-shrink: 0;
+        }
+        .phone-form-row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .phone-form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+        .phone-settings-tabs { display:flex; gap:8px; margin-bottom: 12px; overflow-x:auto; scrollbar-width:none; }
+        .phone-settings-tabs::-webkit-scrollbar { display:none; }
+        .phone-settings-tabs button {
+            white-space: nowrap; height: 34px; padding: 0 12px; border-radius: 17px;
+            border: 1px solid rgba(216,141,165,.18); background: rgba(255,255,255,.34);
+            color: rgba(47,37,41,.52); font-size: 0.625rem; letter-spacing:.12em;
+        }
+        .phone-settings-tabs button.active { background: rgba(216,141,165,.72); color:#fff; border-color: transparent; }
+        /* 热修复：主屏固定为一整屏，内容层永远可见，防止只剩粉色背景 */
+        .phone-statusbar { display: none !important; }
+        .phone-home { height: 100%; max-height: 100%; }
+        .phone-home-top { flex: 0 0 auto; }
+        .phone-home-scroll { flex: 1 1 auto; min-height: 0; }
+        .phone-page { height: 100% !important; min-height: 0 !important; }
+        .phone-layout-plane { background: rgba(255,255,255,.08); }
+        .phone-layout-item { pointer-events: auto; }
+        .phone-app-content {
+            height: 100%; min-height: 0; overflow-y: auto; background: transparent !important; color: rgba(47,37,41,.82);
+            -webkit-overflow-scrolling: touch; overscroll-behavior: contain; scroll-behavior: auto;
+        }
+        .phone-log-app {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden !important;
+        }
+        .phone-log-app .phone-app-topbar { flex: 0 0 auto; }
+        .phone-log-app > .phone-log-page {
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto !important;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .phone-log-app .phone-log-view {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* WebKit 推荐结构：背景铺满视口，安全区只应用到重要交互内容。 */
+        .app-container {
+            position: relative !important;
+            inset: auto !important;
+            height: var(--app-h, 100dvh) !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+        }
+        .phone-home-top {
+            padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        }
+        .phone-app-topbar {
+            padding-top: calc(env(safe-area-inset-top) + 8px) !important;
+        }
+        .call-screen {
+            padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        }
+        #lock-screen {
+            top: 0 !important;
+            right: 0 !important;
+            bottom: auto !important;
+            left: 0 !important;
+            width: auto !important;
+            height: var(--lock-full-height, 100lvh) !important;
+            min-height: var(--lock-full-height, 100lvh) !important;
+            padding-top: max(24px, env(safe-area-inset-top)) !important;
+        }
+        .phone-log-app .log-data-shell {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .phone-log-app .log-chat-thread {
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto !important;
+            padding: 6px 5px max(28px, env(safe-area-inset-bottom)) !important;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .phone-settings-card .soft-btn {
+            min-height: 34px; border-radius: 17px; padding: 0 12px;
+            border: 1px solid rgba(216,141,165,.26); color: rgba(216,141,165,.95);
+            background: rgba(255,255,255,.36); font-size: 0.625rem; letter-spacing:.14em; text-transform: uppercase;
+        }
+        .phone-settings-app {
+            height: calc(100% - 1px); overflow-y: auto; scrollbar-width: none;
+            -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+        }
+        .phone-settings-app::-webkit-scrollbar { display:none; }
+        .phone-app-content { overflow-y: auto; }
+        @media (max-width: 380px) {
+            .phone-page { padding-left: 12px !important; padding-right: 12px !important; }
+            .phone-form-row, .phone-form-row.three { grid-template-columns: 1fr; }
+        }
+
+
+        /* ============================================================
+           ✦ Final repair · readable pink phone / widget store / chat color
+           ============================================================ */
+        :root {
+            --chat-accent: rgba(216,141,165,.86);
+            --chat-accent-deep: rgba(177,93,119,.90);
+            --chat-accent-soft: rgba(216,141,165,.13);
+        }
+        .phone-page { overflow: hidden !important; }
+        .phone-layout-plane { overflow: hidden !important; }
+        .phone-mini-btn.edit { min-width: 46px; font-size: 0.6875rem; letter-spacing: .08em; }
+        .phone-edit-tip {
+            position: absolute; left: 50%; transform: translateX(-50%); bottom: 4px;
+            font-size: 0.5625rem; letter-spacing: .12em; color: rgba(121,75,88,.42);
+            pointer-events: none; white-space: nowrap;
+        }
+        .phone-editing .phone-layout-item .phone-icon-tile,
+        .phone-editing .phone-layout-item .phone-free-widget { animation: ios-wiggle .22s ease-in-out infinite alternate; }
+        .phone-layout-item.dragging .phone-icon-tile,
+        .phone-layout-item.dragging .phone-free-widget { animation: none !important; }
+
+        /* 对话 App 可单独换色，不影响全局淡粉主题 */
+        .phone-talk-app .chat-row.user .chat-bubble {
+            background: var(--chat-accent) !important;
+            border-color: rgba(255,255,255,.44) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.46), 0 8px 24px -12px var(--chat-accent-deep) !important;
+        }
+        .phone-talk-app .chat-send {
+            background: var(--chat-accent) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 4px 14px -3px var(--chat-accent-deep) !important;
+        }
+        .phone-talk-app .chat-thinking,
+        .phone-talk-app .chat-input-wrap {
+            border-color: var(--chat-accent-soft) !important;
+        }
+
+        /* 秘密 App 在淡粉手机壳里不能再用大面积白字，否则看不见 */
+        .phone-secret-app .phone-app-topbar .title,
+        .phone-secret-app .phone-app-heading .title { color: rgba(82,39,50,.88) !important; }
+        .phone-secret-app .phone-app-topbar .sub,
+        .phone-secret-app .phone-app-heading .sub { color: rgba(164,65,86,.58) !important; }
+        .phone-secret-app .content-scroll .text-white,
+        .phone-secret-app .content-scroll .text-white\/70,
+        .phone-secret-app .content-scroll .text-white\/50,
+        .phone-secret-app .content-scroll .text-white\/40,
+        .phone-secret-app .content-scroll .text-white\/30,
+        .phone-secret-app .content-scroll .text-white\/20 {
+            color: rgba(88,45,55,.66) !important;
+        }
+        .phone-secret-app .content-scroll .hover\:text-white:hover { color: rgba(164,65,86,.86) !important; }
+        .phone-secret-app .content-scroll .border-white\/10,
+        .phone-secret-app .content-scroll .border-white\/20 { border-color: rgba(164,65,86,.18) !important; }
+        .phone-secret-app .content-scroll .bg-white\/5,
+        .phone-secret-app .content-scroll .bg-white\/15 { background-color: rgba(255,255,255,.34) !important; }
+        .phone-secret-app .content-scroll input.placeholder-white\/20::placeholder,
+        .phone-secret-app .content-scroll textarea.placeholder-white\/20::placeholder { color: rgba(88,45,55,.32) !important; }
+        .phone-secret-app .content-scroll textarea.bg-black {
+            background: #050505 !important;
+            color: rgba(177,38,58,.88) !important;
+            border-color: rgba(177,38,58,.34) !important;
+        }
+        .phone-secret-app .content-scroll .opacity-50 { opacity: .95 !important; }
+
+        .phone-widget-panel .soft-btn { cursor: pointer; }

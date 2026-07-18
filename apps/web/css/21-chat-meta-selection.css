@@ -1,0 +1,42 @@
+/* Restore message time metadata in all Talk visual themes. */
+.talk-qq-shell:is(.theme-imessage,.theme-wechat,.theme-companion) .talk-chat-detail .chat-meta {
+    display: block !important;
+    max-width: 100%;
+    color: #8e8e93 !important;
+    font-size: .52rem !important;
+    line-height: 1.35;
+    white-space: normal;
+}
+.talk-qq-shell:is(.theme-imessage,.theme-wechat,.theme-companion) .chat-row.user .chat-meta {
+    display: block !important;
+    align-self: flex-end;
+    text-align: right;
+}
+.talk-qq-shell:is(.theme-imessage,.theme-wechat,.theme-companion) .chat-row.claude .chat-meta {
+    align-self: flex-start;
+    text-align: left;
+}
+/* Range anchors need room for their labels; start stays blue and end stays green. */
+.talk-select-dot {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 44px;
+    height: 28px !important;
+    padding: 0 10px !important;
+    border-radius: 999px !important;
+    color: #8b6071;
+    font-size: .62rem;
+    font-weight: 700;
+    line-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+.talk-select-dot.on,
+.talk-select-dot.start { color:#fff; background:#0a84ff !important; border-color:#0a84ff !important; }
+.talk-select-dot.end { color:#fff; background:#30b96b !important; border-color:#30b96b !important; }
+.talk-select-dot.on::after { display:none !important; content:none !important; }
+.talk-selection-bar { flex-wrap:wrap; }
+.talk-selection-bar > span { min-width:120px; }
+.talk-selection-bar button { flex:0 0 auto; white-space:nowrap; }

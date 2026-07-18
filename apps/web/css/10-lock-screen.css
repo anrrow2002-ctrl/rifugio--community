@@ -1,0 +1,227 @@
+body.lock-active::after {
+        content: "";
+        position: fixed;
+        inset: -20vh 0;
+        z-index: 99998;
+        pointer-events: none;
+        background-color: #F9F7F2;
+        background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+    }
+
+    /* 锁屏整体 */
+    #lock-screen {
+        position: fixed; inset: 0; z-index: 99999;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        background-color: #F9F7F2;
+        background-image: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+        display: flex; align-items: center; justify-content: flex-start;
+        flex-direction: column;
+        padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+        font-family: "Noto Serif SC", serif;
+        color: #2C2A29;
+        transition: opacity 0.35s ease, visibility 0.35s ease;
+        overflow: hidden;
+        overscroll-behavior: none;
+    }
+    #lock-screen.unlocked {
+        opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    /* 装饰性细金边 */
+    #lock-screen::before, #lock-screen::after {
+        content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+        width: min(420px, 78vw); height: 1px;
+        background: linear-gradient(to right, transparent, #A68B5B 50%, transparent);
+        opacity: 0.45;
+    }
+    #lock-screen::before { top: 22%; }
+    #lock-screen::after  { bottom: 22%; }
+
+    /* 内容盒 */
+    .lock-card {
+        width: 100%; text-align: center; padding: 0 8px; max-width: 380px;
+        position: relative;
+        margin-top: clamp(64px, 16svh, 150px);
+    }
+    /* 小钥匙图标 */
+    .lock-key {
+        width: 38px; height: 38px; margin: 0 auto 18px;
+        color: #A68B5B; opacity: 0.85;
+        animation: lockBreath 4s ease-in-out infinite;
+    }
+    @keyframes lockBreath {
+        0%,100% { transform: translateY(0) rotate(-4deg); }
+        50%     { transform: translateY(-2px) rotate(4deg); }
+    }
+
+    .lock-script {
+        font-family: "Pinyon Script", cursive;
+        font-size: 2.75rem; line-height: 1; color: #A68B5B;
+        margin-bottom: 6px; letter-spacing: 0.5px;
+    }
+    .lock-ital {
+        font-family: "Cormorant Garamond", serif; font-style: italic;
+        font-size: 0.8125rem; letter-spacing: 0.18em; text-transform: uppercase;
+        color: #4A3B32; opacity: 0.7; margin-bottom: 32px;
+    }
+    .lock-hint {
+        font-size: 0.75rem; color: #4A3B32; opacity: 0.6;
+        margin-bottom: 14px; letter-spacing: 0.08em;
+    }
+
+    /* 一个真实输入框控制四个显示格，输入时不再逐格切焦点 */
+        .lock-pin-control {
+            position: relative;
+            width: min(260px, 78vw);
+            height: 44px;
+            margin: 0 auto 22px;
+        }
+        .lock-pin-row {
+            position: absolute; inset: 0;
+            display: none; gap: 12px; align-items: stretch; justify-content: center;
+            pointer-events: none;
+        }
+    .lock-pin-control.shake { animation: pinShake 0.45s ease; }
+    @keyframes pinShake {
+        0%,100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+    }
+    .lock-pin-slot {
+        width: 44px; height: 54px;
+        display: grid; place-items: center;
+        color: #A68B5B; background: rgba(255,255,255,0.5);
+        border-bottom: 1px solid rgba(166,139,91,0.5);
+        transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    }
+    .lock-pin-slot::after {
+        content: "";
+        width: 8px; height: 8px; border-radius: 50%;
+        background: currentColor;
+        opacity: 0;
+        transform: scale(0.6);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .lock-pin-slot.filled::after { opacity: 1; transform: scale(1); }
+    .lock-pin-slot.active {
+        border-bottom-color: #A68B5B;
+        background: rgba(255,255,255,0.85);
+    }
+        .lock-pin-input {
+            position: absolute; inset: 0; z-index: 2;
+            width: 100%; height: 100%;
+            margin: 0; padding: 0 16px;
+            border: 1px solid rgba(166,139,91,0.28);
+            border-radius: 999px;
+            outline: 0;
+            opacity: 1;
+            color: #4A3B32;
+            caret-color: #A68B5B;
+            background: rgba(255,255,255,0.72);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 14px 28px -22px rgba(99,70,45,.42);
+            font-size: 0.9375rem;
+            letter-spacing: .04em;
+            text-align: center;
+        }
+
+    .lock-err {
+        font-family: "Cormorant Garamond", serif; font-style: italic;
+        color: #B0584B; font-size: 0.8125rem; min-height: 18px;
+        letter-spacing: 0.04em; opacity: 0; transition: opacity 0.3s;
+    }
+    .lock-err.show { opacity: 1; }
+    .lock-submit-btn {
+        min-width: 116px;
+        height: 36px;
+        margin: -4px auto 14px;
+        padding: 0 22px;
+        border: 1px solid rgba(166,139,91,0.38);
+        border-radius: 999px;
+        background: rgba(252,250,245,0.8);
+        color: #7A633A;
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+    }
+    .lock-submit-btn:active { transform: scale(0.98); }
+
+    .lock-foot {
+        position: absolute; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center;
+        font-family: "Cormorant Garamond", serif; font-style: italic;
+        font-size: 0.6875rem; letter-spacing: 0.22em; color: #A68B5B; opacity: 0.55;
+    }
+
+    /* 解锁后右上角的小钥匙按钮 —— 让宝宝可以「重新上锁」 */
+    .relock-btn {
+        position: fixed;
+        top: calc(env(safe-area-inset-top) + 10px);
+        right: calc(env(safe-area-inset-right) + 14px);
+        z-index: 80;
+        width: 32px; height: 32px; border-radius: 50%;
+        background: rgba(252,250,245,0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(166,139,91,0.35);
+        display: none; align-items: center; justify-content: center;
+        color: #A68B5B; cursor: pointer;
+        transition: background 0.25s, transform 0.25s, opacity 0.25s;
+        opacity: 0.6;
+    }
+    .relock-btn:hover { opacity: 1; transform: rotate(-12deg); background: rgba(252,250,245,0.95); }
+    .relock-btn.show { display: none !important; }
+
+    @media (max-width: 380px) {
+        .lock-pin-control { width: 204px; height: 52px; }
+        .lock-pin-slot { width: 38px; height: 50px; }
+    }
+    @media (max-height: 620px) {
+        .lock-card { margin-top: 28px; }
+        .lock-key { margin-bottom: 10px; }
+        .lock-ital { margin-bottom: 20px; }
+        .lock-foot { display: none; }
+    }
+
+    /* Desktop preview stays an iPhone 15 Pro canvas instead of stretching wide. */
+    @media (min-width: 700px) {
+        :root {
+            --desktop-phone-h: min(852px, calc(100dvh - 12px));
+            --desktop-phone-w: min(393px, calc(46.1268dvh - 5.5352px));
+            --desktop-phone-half-h: min(426px, calc(50dvh - 6px));
+            --desktop-phone-half-w: min(196.5px, calc(23.0634dvh - 2.7676px));
+        }
+        html, body {
+            width: 100%;
+            height: 100dvh;
+        }
+        body {
+            display: grid;
+            place-items: center;
+            background:
+                radial-gradient(circle at 50% 20%, rgba(255,225,235,.88), transparent 34%),
+                #f7edf1 !important;
+        }
+        .app-container {
+            width: var(--desktop-phone-w) !important;
+            height: var(--desktop-phone-h) !important;
+            max-width: 393px;
+            max-height: 852px;
+            border-radius: 48px;
+            box-shadow: 0 30px 90px rgba(88, 49, 62, .22), 0 0 0 1px rgba(255,255,255,.82) !important;
+            overflow: hidden;
+        }
+        #lock-screen {
+            inset: auto !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: var(--desktop-phone-w) !important;
+            height: var(--desktop-phone-h) !important;
+            min-height: var(--desktop-phone-h) !important;
+            transform: translate(-50%, -50%);
+            border-radius: 48px;
+            box-shadow: 0 30px 90px rgba(88, 49, 62, .22), 0 0 0 1px rgba(255,255,255,.82);
+        }
+        .relock-btn {
+            top: calc(50% - var(--desktop-phone-half-h) + 14px);
+            right: calc(50% - var(--desktop-phone-half-w) + 14px);
+        }
+    }

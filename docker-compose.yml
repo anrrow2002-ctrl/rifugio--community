@@ -1,0 +1,78 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+    ports:
+      - "127.0.0.1:${RIFUGIO_WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    user: "${RIFUGIO_UID:-1000}:${RIFUGIO_GID:-1000}"
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3457
+      RIFUGIO_ROOT: /app
+      RIFUGIO_DATA_DIR: /app/data
+      RIFUGIO_PRIVATE_DIR: /app/private
+      RIFUGIO_PUBLIC_URL: ${RIFUGIO_PUBLIC_URL:-http://localhost:8080}
+      RIFUGIO_CORS_ORIGINS: ${RIFUGIO_CORS_ORIGINS:-http://localhost:8080}
+      RIFUGIO_DOMAIN: ${RIFUGIO_DOMAIN:-localhost}
+      PASSKEY_RP_ID: ${PASSKEY_RP_ID:-localhost}
+      PASSKEY_ORIGINS: ${PASSKEY_ORIGINS:-http://localhost:8080}
+      AUTH_SECRET: ${AUTH_SECRET:?Run node scripts/setup.mjs first}
+      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:?Run node scripts/setup.mjs first}
+      RIFUGIO_SECRET: ${RIFUGIO_SECRET:?Run node scripts/setup.mjs first}
+      RIFUGIO_MCP_LOOPBACK: http://mcp:3456
+      RIFUGIO_MCP_TOKEN: ${RIFUGIO_MCP_TOKEN:?Run node scripts/setup.mjs first}
+      RIFUGIO_ENABLE_HEALTH: ${RIFUGIO_ENABLE_HEALTH:-false}
+      RIFUGIO_ENABLE_RADIO: ${RIFUGIO_ENABLE_RADIO:-false}
+      RIFUGIO_ENABLE_IMAGE: ${RIFUGIO_ENABLE_IMAGE:-false}
+      RIFUGIO_ENABLE_VOICE: ${RIFUGIO_ENABLE_VOICE:-false}
+      RIFUGIO_ENABLE_TOY: ${RIFUGIO_ENABLE_TOY:-false}
+      RIFUGIO_ENABLE_CLI_BRIDGE: ${RIFUGIO_ENABLE_CLI_BRIDGE:-false}
+    volumes:
+      - ./data:/app/data
+      - ./private:/app/private
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3457/api/community/health').then(r=>{if(!r.ok)process.exit(1)})"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+    depends_on:
+      mcp:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mcp:
+    user: "${RIFUGIO_UID:-1000}:${RIFUGIO_GID:-1000}"
+    build:
+      context: .
+      dockerfile: packages/mcp/Dockerfile
+    environment:
+      RIFUGIO_ROOT: /app
+      RIFUGIO_DATA_DIR: /app/data
+      RIFUGIO_PRIVATE_DIR: /app/private
+      MCP_TOKEN: ${RIFUGIO_MCP_TOKEN:?Run node scripts/setup.mjs first}
+      RIFUGIO_ENABLE_HEALTH: ${RIFUGIO_ENABLE_HEALTH:-false}
+      RIFUGIO_ENABLE_RADIO: ${RIFUGIO_ENABLE_RADIO:-false}
+      RIFUGIO_ENABLE_IMAGE: ${RIFUGIO_ENABLE_IMAGE:-false}
+      RIFUGIO_ENABLE_VOICE: ${RIFUGIO_ENABLE_VOICE:-false}
+      RIFUGIO_ENABLE_TOY: ${RIFUGIO_ENABLE_TOY:-false}
+    volumes:
+      - ./data:/app/data
+      - ./private:/app/private
+    ports:
+      - "127.0.0.1:${RIFUGIO_MCP_PORT:-3456}:3456"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.create_connection(('127.0.0.1',3456),2); s.close()"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+    restart: unless-stopped

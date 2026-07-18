@@ -1,0 +1,10 @@
+
+.talk-load-more {
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  color: var(--text-muted, #aaa);
+  cursor: pointer;
+  opacity: 0.6;
+}
+.talk-load-more:active { opacity: 1; }

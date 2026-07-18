@@ -1,0 +1,71 @@
+/* Modal */
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(5,5,5,0.6); backdrop-filter: blur(6px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: var(--card-bg); border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .modal-card.dark { background: #0a0a0a; border-color: color-mix(in srgb, var(--gold) 25%, transparent); color: rgba(255,255,255,0.7); }
+        .beauty-panel {
+            width:min(100%, 520px) !important;
+            max-width:520px !important;
+            height:calc(100dvh - 24px) !important;
+            max-height:calc(100dvh - 24px) !important;
+            border-radius:28px !important;
+            background:#fff !important;
+            color:var(--ink);
+            border:1px solid rgba(216,141,165,.16) !important;
+            box-shadow:0 24px 70px -32px rgba(64,35,45,.45) !important;
+            backdrop-filter:none !important;
+            -webkit-backdrop-filter:none !important;
+        }
+        .beauty-talk-settings label {
+            display:block;
+            margin:12px 0 6px;
+            color:rgba(174,75,111,.74);
+            font-size:0.625rem;
+        }
+        .beauty-talk-settings input,
+        .beauty-talk-settings select,
+        .beauty-talk-settings textarea {
+            width:100%;
+            border:1px solid rgba(216,141,165,.18);
+            border-radius:16px;
+            background:#fff9fb;
+            color:rgba(54,35,42,.84);
+            font-size:0.75rem;
+            padding:10px 12px;
+            outline:none;
+            resize:none;
+        }
+        .app-name-row {
+            display:grid;
+            grid-template-columns:minmax(80px,.8fr) minmax(0,1.2fr) auto;
+            gap:8px;
+            align-items:center;
+            padding:9px 0;
+            border-bottom:1px solid rgba(216,141,165,.10);
+        }
+        .app-name-row b {
+            display:block;
+            color:rgba(54,35,42,.78);
+            font-size:0.75rem;
+        }
+        .app-name-row span {
+            display:block;
+            margin-top:2px;
+            color:rgba(116,72,88,.38);
+            font-size:0.5625rem;
+        }
+        .app-name-row button {
+            min-height:34px;
+            padding:0 10px;
+            border-radius:14px;
+            color:rgba(177,75,111,.76);
+            background:rgba(216,141,165,.12);
+            font-size:0.625rem;
+        }
+        .pin-badge { background: var(--gold); color: var(--card-bg); font-size: 0.5rem; padding: 2px 6px; letter-spacing: 0.18em; }
+
+        /* Theme picker */
+        .theme-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .theme-dot:hover { transform: scale(1.15); }
+        .theme-dot.active { border-color: var(--ink); transform: scale(1.1); }
+        .theme-popover { position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--card-bg); border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent); padding: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 60; display: flex; gap: 10px; align-items: center; }
+        .theme-popover::before { content: ""; position: absolute; top: -6px; right: 14px; width: 10px; height: 10px; background: var(--card-bg); border-left: 1px solid color-mix(in srgb, var(--gold) 25%, transparent); border-top: 1px solid color-mix(in srgb, var(--gold) 25%, transparent); transform: rotate(45deg); }

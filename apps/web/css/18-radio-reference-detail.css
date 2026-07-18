@@ -1,0 +1,732 @@
+/* Rifugio song detail · reference-inspired pink player · 2026-07-14 */
+.radio-native-player.detail-open {
+    --preview-pink: #e56ca3;
+    --preview-pink-deep: #c94c86;
+    --preview-ink: #3b3035;
+    --preview-muted: rgba(75, 60, 67, .56);
+    background:
+        radial-gradient(circle at 50% 5%, rgba(255, 216, 233, .92), transparent 38%),
+        linear-gradient(180deg, #fff0f7 0%, #fff8fb 52%, #f7fbfd 100%) !important;
+}
+
+.radio-native-player.detail-open .radio-native-bg {
+    opacity: .3 !important;
+    background: radial-gradient(circle at 50% 25%, rgba(255,255,255,.78), transparent 46%) !important;
+}
+
+.radio-native-player.detail-open .radio-player-screen.radio-reference-player {
+    box-sizing: border-box !important;
+    height: var(--app-h, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(210px, 1fr) auto !important;
+    gap: 0 !important;
+    padding: calc(env(safe-area-inset-top) + 14px) clamp(18px, 5vw, 30px) calc(env(safe-area-inset-bottom) + 14px) !important;
+}
+
+.radio-native-player.detail-open .radio-player-header {
+    position: relative !important;
+    z-index: 20 !important;
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 1fr) 48px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+}
+
+.radio-native-player.detail-open .radio-player-header button {
+    box-sizing: border-box !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+    color: rgba(72, 56, 64, .82) !important;
+    background: rgba(255, 255, 255, .58) !important;
+    border: 1px solid rgba(255, 255, 255, .84) !important;
+    box-shadow: 0 12px 30px -22px rgba(119, 65, 88, .48), inset 0 1px 0 rgba(255,255,255,.86) !important;
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+}
+
+.radio-native-player.detail-open .radio-player-heading {
+    min-width: 0;
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    text-align: center;
+}
+
+.radio-native-player.detail-open .radio-player-heading b {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--preview-ink) !important;
+    font-size: clamp(.94rem, 3.8vw, 1.14rem) !important;
+    font-weight: 850 !important;
+    letter-spacing: -.015em !important;
+}
+
+.radio-native-player.detail-open .radio-player-heading span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--preview-muted);
+    font-size: .72rem;
+    font-weight: 650;
+}
+
+.radio-native-player.detail-open .radio-player-header .radio-player-sleep-button.active {
+    color: var(--preview-pink-deep) !important;
+    border-color: rgba(229, 108, 163, .38) !important;
+    background: rgba(255, 239, 246, .84) !important;
+    outline: none !important;
+}
+
+.radio-native-player.detail-open .radio-vinyl-stage {
+    position: relative !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 10px 0 4px !important;
+    display: grid !important;
+    place-items: center !important;
+}
+
+.radio-native-player.detail-open .radio-vinyl-disc {
+    position: relative !important;
+    width: min(64vmin, 330px) !important;
+    max-width: none !important;
+    aspect-ratio: 1 !important;
+    overflow: visible !important;
+    border: 1px solid rgba(240, 147, 187, .26) !important;
+    background:
+        radial-gradient(circle at center, rgba(226,165,191,.37) 0 30%, transparent 30.5%),
+        repeating-radial-gradient(circle at center, rgba(255,255,255,.72) 0 5px, rgba(228,185,204,.24) 6px 11px, rgba(255,255,255,.55) 12px 16px) !important;
+    box-shadow:
+        0 30px 65px -45px rgba(147, 73, 106, .6),
+        inset 0 0 34px rgba(255,255,255,.86),
+        0 0 0 12px rgba(255,255,255,.18) !important;
+}
+
+.radio-native-player.detail-open .radio-vinyl-disc::before,
+.radio-native-player.detail-open .radio-vinyl-disc::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.radio-native-player.detail-open .radio-vinyl-disc::before {
+    inset: 7%;
+    border: 1px solid rgba(255,255,255,.72);
+    box-shadow: inset 0 0 0 9px rgba(255,255,255,.08), 0 0 24px rgba(255,255,255,.72);
+}
+
+.radio-native-player.detail-open .radio-vinyl-disc::after {
+    inset: 15%;
+    border: 1px solid rgba(214, 139, 173, .22);
+}
+
+.radio-native-player.detail-open .radio-vinyl-glow {
+    position: absolute;
+    inset: 3%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: .72;
+    background-image:
+        radial-gradient(circle at 22% 25%, rgba(255,255,255,.95) 0 1px, transparent 1.7px),
+        radial-gradient(circle at 64% 35%, rgba(255,242,190,.9) 0 1px, transparent 1.8px),
+        radial-gradient(circle at 45% 78%, rgba(255,255,255,.9) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 80% 70%, rgba(244,202,235,.95) 0 1px, transparent 1.8px);
+    background-size: 21px 19px, 29px 27px, 33px 24px, 25px 31px;
+    filter: drop-shadow(0 0 3px rgba(255,255,255,.9));
+}
+
+.radio-native-player.detail-open .radio-vinyl-cover {
+    position: relative !important;
+    z-index: 2 !important;
+    width: 51% !important;
+    aspect-ratio: 1 !important;
+    border: 7px solid rgba(255, 239, 246, .9) !important;
+    box-shadow: 0 10px 30px -18px rgba(73, 43, 55, .52), 0 0 0 9px rgba(213,153,179,.18) !important;
+}
+
+.radio-native-player.detail-open .radio-tonearm {
+    z-index: 5 !important;
+    left: calc(50% + min(18vmin, 86px)) !important;
+    top: 12% !important;
+    width: min(12vmin, 57px) !important;
+    height: min(28vmin, 135px) !important;
+    border-left: 5px solid rgba(255,255,255,.86) !important;
+    border-bottom: 5px solid rgba(255,255,255,.86) !important;
+    border-radius: 70px 0 0 22px !important;
+    opacity: .86 !important;
+    transform: rotate(17deg) !important;
+    filter: drop-shadow(0 4px 8px rgba(156,91,119,.22)) !important;
+}
+
+.radio-native-player.detail-open .radio-tonearm::before {
+    left: -15px !important;
+    top: -15px !important;
+    width: 29px !important;
+    height: 29px !important;
+    background: rgba(255,255,255,.9) !important;
+    box-shadow: 0 0 0 10px rgba(255,255,255,.34) !important;
+}
+
+.radio-native-player.detail-open .radio-tonearm::after {
+    right: -14px !important;
+    bottom: -18px !important;
+    width: 26px !important;
+    height: 34px !important;
+    border: 4px solid rgba(255,255,255,.9) !important;
+    background: rgba(255,255,255,.26) !important;
+}
+
+.radio-native-player.detail-open .radio-player-info {
+    min-width: 0;
+    padding: 0 !important;
+}
+
+.radio-native-player.detail-open .radio-player-title-row {
+    display: block !important;
+    margin: 2px 0 10px !important;
+    text-align: center;
+}
+
+.radio-native-player.detail-open .radio-player-title-row h2 {
+    display: block !important;
+    margin: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    color: var(--preview-pink) !important;
+    font-size: clamp(1.28rem, 5.2vw, 1.72rem) !important;
+    line-height: 1.2 !important;
+    font-weight: 850 !important;
+    letter-spacing: -.025em !important;
+}
+
+.radio-native-player.detail-open .radio-player-title-row p {
+    margin: 5px 0 0 !important;
+    color: rgba(69, 57, 63, .52) !important;
+    font-size: .86rem !important;
+    line-height: 1.25 !important;
+    font-weight: 650 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.radio-native-player.detail-open .radio-reference-actions {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    margin: 8px 0 6px;
+}
+
+.radio-native-player.detail-open .radio-reference-actions button {
+    min-width: 0;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: rgba(77, 67, 72, .62);
+    background: transparent;
+}
+
+.radio-native-player.detail-open .radio-reference-actions svg,
+.radio-native-player.detail-open .radio-player-controls svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.radio-native-player.detail-open .radio-reference-actions small {
+    font-size: .58rem;
+    font-weight: 750;
+}
+
+.radio-native-player.detail-open .radio-quality-glyph {
+    color: var(--preview-pink);
+    font-size: 1.05rem;
+}
+
+.radio-native-player.detail-open .radio-native-progress {
+    display: block;
+    width: 100% !important;
+    height: 20px !important;
+    margin: 2px 0 0 !important;
+    accent-color: var(--preview-pink) !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: transparent !important;
+    cursor: pointer;
+}
+
+.radio-native-player.detail-open .radio-native-progress::-webkit-slider-runnable-track {
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--preview-pink) 0 var(--radio-progress), rgba(101, 94, 98, .18) var(--radio-progress) 100%);
+}
+
+.radio-native-player.detail-open .radio-native-progress::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    margin-top: -8px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid rgba(132, 91, 109, .12);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(83, 55, 67, .22);
+}
+
+.radio-native-player.detail-open .radio-native-progress::-moz-range-track {
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(101, 94, 98, .18);
+}
+
+.radio-native-player.detail-open .radio-native-progress::-moz-range-progress {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--preview-pink);
+}
+
+.radio-native-player.detail-open .radio-native-progress::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(132, 91, 109, .12);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(83, 55, 67, .22);
+}
+
+.radio-native-player.detail-open .radio-native-time {
+    margin: -2px 0 0 !important;
+    color: rgba(78, 66, 72, .4) !important;
+    font-size: .68rem !important;
+}
+
+.radio-native-player.detail-open .radio-lyric-line {
+    min-height: 1.35em !important;
+    margin: 5px 0 7px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    color: rgba(77, 66, 72, .58) !important;
+    font-size: .76rem !important;
+    line-height: 1.35 !important;
+    font-weight: 650 !important;
+}
+
+.radio-native-player.detail-open .radio-player-controls {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 7px !important;
+    align-items: center !important;
+    justify-items: center !important;
+    padding: 0 !important;
+}
+
+.radio-native-player.detail-open .radio-player-controls button,
+.radio-native-player.detail-open .radio-player-controls button.main {
+    box-sizing: border-box !important;
+    width: 46px !important;
+    height: 46px !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    color: rgba(55, 48, 52, .86) !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.radio-native-player.detail-open .radio-player-controls button.main {
+    width: 58px !important;
+    height: 58px !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    background: linear-gradient(145deg, #ee83b5, #db5895) !important;
+    box-shadow: 0 14px 28px -15px rgba(183, 55, 113, .62) !important;
+}
+
+.radio-native-player.detail-open .radio-player-controls button.main:disabled { opacity: 1 !important; }
+.radio-native-player.detail-open .radio-player-controls .radio-control-secondary { color: rgba(55, 48, 52, .68) !important; }
+.radio-native-player.detail-open .radio-player-controls .radio-control-secondary svg { width: 25px; height: 25px; }
+.radio-native-player.detail-open .radio-native-error { display: none !important; }
+
+.radio-native-player.detail-open .radio-sleep-popover-header {
+    box-sizing: border-box !important;
+    top: calc(env(safe-area-inset-top) + 70px) !important;
+    right: clamp(18px, 5vw, 30px) !important;
+    width: min(310px, calc(100% - 36px)) !important;
+    max-height: calc(100% - 92px) !important;
+    overflow: auto !important;
+    padding: 15px !important;
+    border-radius: 22px !important;
+    background: rgba(255, 250, 252, .97) !important;
+    box-shadow: 0 22px 58px -24px rgba(92, 49, 67, .42) !important;
+}
+
+@media (max-height: 740px) {
+    .radio-native-player.detail-open .radio-player-screen.radio-reference-player {
+        grid-template-rows: auto minmax(180px, 1fr) auto !important;
+        padding-top: calc(env(safe-area-inset-top) + 10px) !important;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 10px) !important;
+    }
+    .radio-native-player.detail-open .radio-vinyl-disc { width: min(58vmin, 300px) !important; }
+    .radio-native-player.detail-open .radio-vinyl-stage { padding-top: 4px !important; }
+    .radio-native-player.detail-open .radio-player-title-row { margin-bottom: 5px !important; }
+    .radio-native-player.detail-open .radio-reference-actions { margin: 3px 0 1px; }
+    .radio-native-player.detail-open .radio-reference-actions button { height: 34px; }
+    .radio-native-player.detail-open .radio-lyric-line { margin: 2px 0 3px !important; }
+    .radio-native-player.detail-open .radio-player-controls button,
+    .radio-native-player.detail-open .radio-player-controls button.main { width: 42px !important; height: 42px !important; }
+    .radio-native-player.detail-open .radio-player-controls button.main { width: 54px !important; height: 54px !important; }
+}
+
+@media (max-width: 390px) {
+    .radio-native-player.detail-open .radio-player-screen.radio-reference-player { padding-left: 16px !important; padding-right: 16px !important; }
+    .radio-native-player.detail-open .radio-player-header { grid-template-columns: 46px minmax(0, 1fr) 46px !important; gap: 9px !important; }
+    .radio-native-player.detail-open .radio-player-header button { width: 46px !important; height: 46px !important; }
+    .radio-native-player.detail-open .radio-vinyl-disc { width: min(78vw, 300px) !important; }
+    .radio-native-player.detail-open .radio-player-controls { gap: 2px !important; }
+    .radio-native-player.detail-open .radio-sleep-popover-header { right: 16px !important; width: calc(100% - 32px) !important; }
+}
+
+/* Song detail interactions: favorites, playback mode and queue sheet. */
+.radio-native-player.detail-open .radio-player-screen.radio-reference-player {
+    position: relative !important;
+}
+
+.radio-native-player.detail-open .radio-reference-actions button,
+.radio-native-player.detail-open .radio-player-controls button {
+    -webkit-tap-highlight-color: transparent;
+    transition: color .18s ease, transform .18s ease, background .18s ease;
+}
+
+.radio-native-player.detail-open .radio-reference-actions button:active,
+.radio-native-player.detail-open .radio-player-controls button:active {
+    transform: scale(.9);
+}
+
+.radio-native-player.detail-open .radio-reference-actions .radio-favorite-button.active {
+    color: var(--preview-pink-deep) !important;
+}
+
+.radio-native-player.detail-open .radio-reference-actions .radio-favorite-button.active svg {
+    fill: rgba(229, 108, 163, .92);
+    stroke: var(--preview-pink-deep);
+    filter: drop-shadow(0 4px 7px rgba(201, 76, 134, .22));
+}
+
+.radio-native-player.detail-open .radio-player-controls .radio-control-secondary.active {
+    color: var(--preview-pink-deep) !important;
+}
+
+.radio-native-player.detail-open .radio-player-controls .radio-mode-button {
+    position: relative;
+}
+
+.radio-native-player.detail-open .radio-player-controls .radio-mode-button svg text {
+    fill: currentColor;
+    stroke: none;
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.radio-native-player.detail-open .radio-player-controls .radio-mode-button > small {
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    transform: translateX(-50%);
+    width: 58px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    color: currentColor;
+    font-size: .5rem;
+    font-weight: 780;
+    line-height: 1;
+}
+
+.radio-native-player.detail-open .radio-detail-toast {
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    top: calc(env(safe-area-inset-top) + 76px);
+    transform: translateX(-50%);
+    max-width: calc(100% - 48px);
+    padding: 9px 15px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 999px;
+    color: rgba(78, 50, 64, .88);
+    background: rgba(255, 247, 251, .92);
+    box-shadow: 0 10px 30px -16px rgba(116, 50, 79, .48);
+    backdrop-filter: blur(15px) saturate(145%);
+    -webkit-backdrop-filter: blur(15px) saturate(145%);
+    font-size: .72rem;
+    font-weight: 760;
+    pointer-events: none;
+}
+
+.radio-native-player.detail-open .radio-detail-overlay {
+    position: absolute;
+    z-index: 90;
+    inset: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(76, 44, 59, .13);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.radio-native-player.detail-open .radio-detail-sheet {
+    box-sizing: border-box;
+    width: min(100%, 430px);
+    max-height: min(68%, 520px);
+    overflow: hidden;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.86);
+    border-radius: 25px;
+    color: var(--preview-ink);
+    background: rgba(255, 249, 252, .97);
+    box-shadow: 0 26px 65px -24px rgba(88, 43, 62, .52);
+}
+
+.radio-native-player.detail-open .radio-detail-sheet-head {
+    min-height: 42px;
+    padding: 1px 3px 9px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.radio-native-player.detail-open .radio-detail-sheet-head > div {
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+}
+
+.radio-native-player.detail-open .radio-detail-sheet-head b {
+    font-size: .98rem;
+    font-weight: 850;
+}
+
+.radio-native-player.detail-open .radio-detail-sheet-head small {
+    color: var(--preview-muted);
+    font-size: .64rem;
+    font-weight: 650;
+}
+
+.radio-native-player.detail-open .radio-detail-sheet-head > button {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    color: rgba(66,52,59,.62);
+    background: rgba(225, 203, 213, .3);
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.radio-native-player.detail-open .radio-mode-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.radio-native-player.detail-open .radio-mode-options button {
+    min-width: 0;
+    min-height: 84px;
+    padding: 11px 9px;
+    display: grid;
+    grid-template-columns: 32px minmax(0,1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    column-gap: 7px;
+    border: 1px solid rgba(220, 180, 198, .3);
+    border-radius: 18px;
+    color: rgba(63, 52, 57, .76);
+    background: rgba(255,255,255,.56);
+    text-align: left;
+}
+
+.radio-native-player.detail-open .radio-mode-options button.active {
+    color: var(--preview-pink-deep);
+    border-color: rgba(229, 108, 163, .45);
+    background: rgba(255, 231, 242, .78);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.72);
+}
+
+.radio-native-player.detail-open .radio-mode-options button > span {
+    grid-row: 1 / 3;
+    display: grid;
+    place-items: center;
+    font-size: 1.45rem;
+}
+
+.radio-native-player.detail-open .radio-mode-options button > b {
+    align-self: end;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: .78rem;
+    font-weight: 820;
+}
+
+.radio-native-player.detail-open .radio-mode-options button > small {
+    align-self: start;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: rgba(76, 62, 69, .46);
+    font-size: .57rem;
+}
+
+.radio-native-player.detail-open .radio-queue-sheet {
+    display: flex;
+    flex-direction: column;
+}
+
+.radio-native-player.detail-open .radio-queue-list {
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.radio-native-player.detail-open .radio-queue-list::-webkit-scrollbar {
+    display: none;
+}
+
+.radio-native-player.detail-open .radio-queue-row {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 57px;
+    padding: 6px 6px 6px 3px;
+    display: grid;
+    grid-template-columns: 24px 42px minmax(0,1fr) auto;
+    align-items: center;
+    gap: 8px;
+    border-radius: 15px;
+    color: rgba(67, 56, 61, .74);
+    background: transparent;
+    text-align: left;
+}
+
+.radio-native-player.detail-open .radio-queue-row + .radio-queue-row {
+    border-top: 1px solid rgba(205, 178, 190, .16);
+}
+
+.radio-native-player.detail-open .radio-queue-row.active {
+    color: var(--preview-pink-deep);
+    background: rgba(255, 231, 242, .64);
+}
+
+.radio-native-player.detail-open .radio-queue-index {
+    text-align: center;
+    color: inherit;
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+.radio-native-player.detail-open .radio-queue-cover {
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: rgba(93, 67, 79, .42);
+    background: linear-gradient(145deg, #ffe6f1, #f8f1f5);
+}
+
+.radio-native-player.detail-open .radio-queue-cover img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.radio-native-player.detail-open .radio-queue-cover i {
+    font-style: normal;
+}
+
+.radio-native-player.detail-open .radio-queue-meta {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+}
+
+.radio-native-player.detail-open .radio-queue-meta b,
+.radio-native-player.detail-open .radio-queue-meta small {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.radio-native-player.detail-open .radio-queue-meta b {
+    font-size: .76rem;
+    font-weight: 790;
+}
+
+.radio-native-player.detail-open .radio-queue-meta small {
+    color: rgba(73, 62, 67, .48);
+    font-size: .59rem;
+}
+
+.radio-native-player.detail-open .radio-queue-playing {
+    color: inherit;
+    font-size: .55rem;
+    font-weight: 750;
+}
+
+.radio-native-player.detail-open .radio-queue-empty {
+    margin: 24px 0 30px;
+    color: var(--preview-muted);
+    text-align: center;
+    font-size: .74rem;
+}
+
+.radio-detail-fade-enter-active,
+.radio-detail-fade-leave-active {
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.radio-detail-fade-enter-from,
+.radio-detail-fade-leave-to {
+    opacity: 0;
+    transform: translate(-50%, -7px);
+}
+
+@media (max-height: 740px) {
+    .radio-native-player.detail-open .radio-detail-sheet { max-height: 76%; }
+    .radio-native-player.detail-open .radio-detail-overlay { padding: 10px; }
+    .radio-native-player.detail-open .radio-player-controls .radio-mode-button > small { bottom: -3px; }
+}

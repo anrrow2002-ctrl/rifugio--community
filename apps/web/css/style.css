@@ -1,0 +1,173 @@
+/* Rifugio split stylesheet. Keep this import order; later files override earlier ones. */
+@import url("./01-theme-vars.css");
+@import url("./02-base-layout.css");
+@import url("./03-modals-theme-picker.css");
+@import url("./04-dashboard-breath-dark.css");
+@import url("./05-liquid-glass-wallpaper-chat.css");
+@import url("./06-crab-mascot.css");
+@import url("./07-phone-launcher.css?v=drag-scroll-v1-20260714");
+@import url("./08-widgets-studio.css");
+@import url("./09-standalone-talk-terminal.css?v=call-halo-fix-20260717b");
+@import url("./10-lock-screen.css");
+@import url("./11-radio-health-redesign.css");
+@import url("./12-radio-native-player.css?v=music-listening-v1-20260714");
+@import url("./13-responsive-adaptive.css");
+@import url("./14-self-cognition.css");
+@import url("./15-app-ui-redesign.css?v=biblio-safearea-20260707");
+@import url("./16-mobile-ui-polish.css?v=20260713-10");
+@import url("./16-crab-room.css?v=crab-pet-chat-v11-20260714");
+@import url("./19-pet-diary-layout.css?v=pet-diary-v2-20260715");
+@import url("./20-biblioteca.css?v=biblioteca-v1-20260715");
+@import url("./21-chat-meta-selection.css?v=chat-meta-v1-20260715");
+
+/* 消息懒加载：顶部「加载更早」触发按钮 */
+.talk-load-more-row {
+    text-align: center;
+    padding: 6px 0 2px;
+    font-size: 11px;
+    color: rgba(100,80,60,.45);
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: .3px;
+}
+.talk-load-more-row:active { opacity: .6; }
+
+/* Talk layout guard: keep chat inside the phone screen, even with long poke/system text. */
+.phone-app-content.phone-talk-app {
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+}
+.phone-app-content.phone-talk-app > .phone-app-topbar {
+    display: none !important;
+    flex: 0 0 auto;
+}
+.phone-app-content.phone-talk-app > .px-8.pt-8 {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+.phone-app-content.phone-talk-app > .px-8.pt-8 > .talk-qq-shell,
+.phone-app-content.phone-talk-app > .px-8.pt-8 > .fade-enter-active {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+.phone-app-content.phone-talk-app .talk-qq-shell,
+.phone-app-content.phone-talk-app .talk-main-pane,
+.phone-app-content.phone-talk-app .talk-pane-content,
+.phone-app-content.phone-talk-app .talk-chat-detail {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+.phone-app-content.phone-talk-app .talk-message-scroller {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.phone-app-content.phone-talk-app .talk-composer-wrap {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+.phone-app-content.phone-talk-app .chat-row,
+.phone-app-content.phone-talk-app .msg-col,
+.phone-app-content.phone-talk-app .chat-bubble,
+.phone-app-content.phone-talk-app .talk-system-message,
+.phone-app-content.phone-talk-app .talk-poke-system-stack,
+.phone-app-content.phone-talk-app .talk-poke-system-message,
+.phone-app-content.phone-talk-app .chat-poke-bubble,
+.phone-app-content.phone-talk-app .pending-poke-bar,
+.phone-app-content.phone-talk-app .talk-quota-banner,
+.phone-app-content.phone-talk-app .terminal-status-panel,
+.phone-app-content.phone-talk-app .talk-permission-card {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.phone-app-content.phone-talk-app .chat-bubble,
+.phone-app-content.phone-talk-app .talk-system-message,
+.phone-app-content.phone-talk-app .talk-mini-note,
+.phone-app-content.phone-talk-app .radio-status,
+.phone-app-content.phone-talk-app .terminal-tool-pill {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.phone-app-content.phone-talk-app .talk-qq-shell.theme-imessage .talk-chat-detail .chat-bubble,
+.phone-app-content.phone-talk-app .talk-imessage-detail .chat-bubble,
+.phone-app-content.phone-talk-app .talk-qq-shell.theme-companion .chat-row.user .chat-bubble {
+    width: fit-content;
+}
+.phone-app-content.phone-talk-app .talk-poke-system-message,
+.phone-app-content.phone-talk-app .chat-poke-bubble {
+    flex-wrap: wrap;
+    align-items: center;
+    border-radius: 18px;
+    overflow: hidden;
+}
+.phone-app-content.phone-talk-app .talk-system-message,
+.phone-app-content.phone-talk-app .talk-poke-system-message {
+    max-width: min(100%, 84%);
+}
+.phone-app-content.phone-talk-app .chat-poke-bubble {
+    max-width: min(100%, 230px);
+}
+.phone-app-content.phone-talk-app .pending-poke-bar {
+    max-width: calc(100% - 28px);
+}
+.phone-app-content.phone-talk-app .talk-poke-system-message b,
+.phone-app-content.phone-talk-app .chat-poke-bubble b,
+.phone-app-content.phone-talk-app .pending-poke-bar span {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: clip;
+}
+.phone-app-content.phone-talk-app .talk-poke-system-message b,
+.phone-app-content.phone-talk-app .chat-poke-bubble b {
+    flex: 1 1 120px;
+}
+.phone-app-content.phone-talk-app .pending-poke-bar {
+    align-items: flex-start;
+}
+.phone-app-content.phone-talk-app .pending-poke-bar span {
+    flex: 1 1 auto;
+}
+.phone-app-content.phone-talk-app .terminal-message-statuses {
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    overflow: hidden;
+}
+.phone-app-content.phone-talk-app .terminal-tool-pill,
+.phone-app-content.phone-talk-app .talk-session-monitor b,
+.phone-app-content.phone-talk-app .talk-session-monitor small {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.phone-app-content.phone-talk-app .terminal-tool-pill {
+    flex: 0 1 auto;
+    line-height: 1.3;
+}
