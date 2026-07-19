@@ -24,3 +24,12 @@ Stop writes or use SQLite's online backup mechanism, then back up `data/` and `p
 ## Managed hosting
 
 A container host with a persistent volume can run the same services. Static GitHub Pages alone cannot run this backend. Serverless edge workers are not a drop-in target because this edition uses native Node modules, Python, and SQLite.
+
+## 设置登录密码与 AUTH_SECRET
+
+```bash
+bash scripts/set-auth-password.sh
+```
+
+脚本会交互式设置访问密码（写入 `.env` 的 `AUTH_PASSWORD_HASH`），并在缺失时自动生成 `AUTH_SECRET`。
+Passkey（指纹/FaceID）在首次登录后于设置页自行注册，存于你自己的数据库，与他人无关。

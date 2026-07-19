@@ -15,7 +15,7 @@ function createAuthPasskey({ IS_PROD = process.env.NODE_ENV === 'production', cl
   }
   const AUTH_PASSWORD_HASH = process.env.AUTH_PASSWORD_HASH || '';
   if (!AUTH_PASSWORD_HASH && IS_PROD) {
-    throw new Error('[server] AUTH_PASSWORD_HASH 未配置。请先运行 /usr/local/sbin/rifugio-set-auth-password 设置强密码。');
+    throw new Error('[server] AUTH_PASSWORD_HASH 未配置。请先运行 scripts/set-auth-password.sh 设置强密码。');
   }
   const AUTH_COOKIE = 'refuge_auth';
   const TERMINAL_AUTH_COOKIE = 'refuge_terminal_auth';
