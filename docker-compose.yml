@@ -32,7 +32,7 @@ services:
       RIFUGIO_SECRET: ${RIFUGIO_SECRET:?Run node scripts/setup.mjs first}
       RIFUGIO_MCP_LOOPBACK: http://mcp:3456
       RIFUGIO_MCP_TOKEN: ${RIFUGIO_MCP_TOKEN:?Run node scripts/setup.mjs first}
-      CHAT_TOKEN: ${CHAT_TOKEN:?Run node scripts/setup.mjs first}
+      CHAT_TOKEN: ${CHAT_TOKEN:-${RIFUGIO_MCP_TOKEN}}
       USER_NAME: ${USER_NAME:-User}
       COMPANION_NAME: ${COMPANION_NAME:-Companion}
       RIFUGIO_ENABLE_HEALTH: ${RIFUGIO_ENABLE_HEALTH:-false}
@@ -64,7 +64,7 @@ services:
       RIFUGIO_DATA_DIR: /app/data
       RIFUGIO_PRIVATE_DIR: /app/private
       MCP_TOKEN: ${RIFUGIO_MCP_TOKEN:?Run node scripts/setup.mjs first}
-      CHAT_TOKEN: ${CHAT_TOKEN:?Run node scripts/setup.mjs first}
+      CHAT_TOKEN: ${CHAT_TOKEN:-${RIFUGIO_MCP_TOKEN}}
       RIFUGIO_API: http://api:3457
       RIFUGIO_MCP_HOST: 0.0.0.0
       RIFUGIO_ENABLE_HEALTH: ${RIFUGIO_ENABLE_HEALTH:-false}
