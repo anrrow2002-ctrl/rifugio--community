@@ -10,7 +10,6 @@
   "description": "HTTP API for Rifugio Community",
   "dependencies": {
     "@simplewebauthn/server": "^13.0.0",
-    "better-sqlite3": "^12.9.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -20,5 +19,8 @@
     "web-push": "^3.6.7",
     "ws": "^8.21.0"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22.18.0"
+  }
 }

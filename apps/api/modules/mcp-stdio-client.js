@@ -31,6 +31,7 @@ const SAFE_CAPABILITIES = Object.freeze({
       'get_health', 'radio_play', 'speak',
       'toy_status', 'toy_set', 'toy_sequence', 'toy_flow', 'toy_wild', 'toy_stop',
       'generate_image', 'list_image_presets',
+      'read', 'write', 'view_pyq', 'post_pyq',
     ]),
   },
 });

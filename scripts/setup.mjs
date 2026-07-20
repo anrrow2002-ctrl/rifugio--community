@@ -33,6 +33,7 @@ const values = {
   AUTH_PASSWORD_HASH: ['scrypt', N, r, p, keylen, salt.toString('base64'), hash.toString('base64')].join('$'),
   RIFUGIO_SECRET: crypto.randomBytes(32).toString('hex'),
   RIFUGIO_MCP_TOKEN: crypto.randomBytes(32).toString('hex'),
+  CHAT_TOKEN: crypto.randomBytes(32).toString('hex'),
 };
 
 let text = fs.readFileSync(envFile, 'utf8');

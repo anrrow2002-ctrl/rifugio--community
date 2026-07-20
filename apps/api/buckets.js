@@ -122,7 +122,7 @@ let _dbPath = null;
 
 function initBuckets(dbPath) {
   _dbPath = dbPath;
-  const Database = require('better-sqlite3');
+  const Database = require('./modules/sqlite');
   const db = new Database(dbPath);
   db.exec(SCHEMA);
   migrateBucketSchema(db);
@@ -133,7 +133,7 @@ function initBuckets(dbPath) {
 }
 
 function openDb(readonly = false) {
-  const Database = require('better-sqlite3');
+  const Database = require('./modules/sqlite');
   return new Database(_dbPath, readonly ? { readonly: true } : {});
 }
 

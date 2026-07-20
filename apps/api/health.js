@@ -3,7 +3,7 @@
 //   · 月经/吃药/目标：用户在前端记录 → PUT /api/health/menstrual-records 同步（存 health_user JSON）
 //   · 步数/睡眠/心率：iPhone 快捷指令 POST /api/health/ingest（带 x-health-token）→ 存 health_days/health_heart
 //   · 前端 GET /api/health/summary?days=14 读取展示（只保留最近 N 天）
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 
 function initHealth(dbPath) {
   const db = new Database(dbPath);

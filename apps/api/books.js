@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 const iconv = require('iconv-lite');
 
 const CHAPTER_RE = /^\s*(?:第[0-9一二三四五六七八九十百千万零两]{1,10}[章卷回节部集]|Chapter\s{0,3}\d{1,4}|CHAPTER\s{0,3}\d{1,4}|序章|序言|楔子|引子|前言|尾声|终章|后记|番外[^\n]{0,20})[^\n]{0,40}$/;

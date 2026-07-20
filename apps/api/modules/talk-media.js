@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const dns = require('node:dns').promises;
 const net = require('node:net');
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 const PRIVATE_NETS = new net.BlockList();
 for (const [network, prefix, family] of [

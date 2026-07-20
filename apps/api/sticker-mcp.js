@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 
 const DB_PATH = process.env.RIFUGIO_DB || require('./modules/community-config').dataPath('rifugio-memory.db');
 

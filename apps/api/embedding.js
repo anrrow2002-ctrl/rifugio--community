@@ -36,7 +36,7 @@ let _queueTimer = null;
 
 function initEmbedding(dbPath) {
   _dbPath = dbPath;
-  const Database = require('better-sqlite3');
+  const Database = require('./modules/sqlite');
   const db = new Database(dbPath);
   db.exec(SCHEMA);
   migrateEmbeddingSchema(db);
@@ -46,7 +46,7 @@ function initEmbedding(dbPath) {
 
 function openDb(readonly = false) {
   if (!_dbPath) throw new Error('embedding dbPath is not initialized');
-  const Database = require('better-sqlite3');
+  const Database = require('./modules/sqlite');
   return new Database(_dbPath, readonly ? { readonly: true } : {});
 }
 

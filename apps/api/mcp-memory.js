@@ -2,7 +2,7 @@
 // ============================================================
 // mcp-memory.js — Rifugio stdio MCP server
 // ============================================================
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 const DB_PATH = process.env.RIFUGIO_DB || require('./modules/community-config').dataPath('rifugio-memory.db');
 
 const { initBuckets, calcScore, insertBucket, parseBucket, statusToPatch } = require('./buckets');

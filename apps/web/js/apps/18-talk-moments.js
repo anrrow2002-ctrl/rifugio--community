@@ -55,12 +55,10 @@ window.Rifugio.useTalkMoments = function(ctx) {
             const removeTalkMomentImage = (index) => { talk.momentImages.splice(index, 1); };
 
             const momentCommentInstruction = [
-                '这是我发到动态/朋友圈的一条内容，会同步到聊天区让你真的看到。',
-                '如果你想把一句话放到这条动态的评论区，请单独输出一行 [[评论：你的评论内容]]。',
-                '评论要像真实朋友圈评论区：短、自然、贴着动态内容或图片感受说，不要写成总结、通知、系统提示或客服语气。',
-                '评论一般 1 句，最多 2 句；不要复述整条动态，不要解释你为什么这样评论。',
-                '只有 [[评论：...]] 里的文字会进入动态评论区；不要把终端状态、粘贴提示、工具状态当评论。',
-                '你也可以在同一条回复里正常聊天；评论 token 会被前端捕捉后从聊天气泡里隐藏。',
+                '聊天区只收到动态轻通知，不包含动态正文或图片。',
+                '想看动态时调用 view_pyq；想评论或回复时优先调用 post_pyq。',
+                '评论要短、自然、贴着动态内容，不要写成总结、通知或客服语气。',
+                '旧的 [[评论：...]] 仍会被前端捕捉作为过渡，但新流程优先使用 MCP。',
             ].join('\n');
 
             const appendAiMomentCommentsFromMessage = (moment, assistantMsg) => {
@@ -107,10 +105,21 @@ window.Rifugio.useTalkMoments = function(ctx) {
                 talk.momentText = '';
                 talk.momentImages.splice(0);
                 talk.momentComposerOpen = false;
-                await saveTalkMoments({ immediate:true });
-                const displayText = `我发了一条动态：${text || '（只有图片）'}`;
-                const prompt = `${momentCommentInstruction}\n\n动态文字：${text || '（只有图片）'}`;
-                const reply = await sendTalkMessage(prompt, images.map(img => ({ id:img.id, dataUrl:img.dataUrl, name:img.name || '动态图片', kind:'moment' })), { displayText });
+                try {
+                    const r = await fetch('/api/talk/moments', {
+                        method:'POST', credentials:'include', headers:{ 'Content-Type':'application/json' },
+                        body:JSON.stringify(moment),
+                    });
+                    const j = await r.json().catch(() => ({}));
+                    if (!r.ok || j.ok === false) throw new Error(j.error || ('HTTP ' + r.status));
+                    try { writeTalkMomentsLocal(); } catch(_) {}
+                } catch (e) {
+                    talk.error = '动态还没单独存到 VPS：' + (e.message || 'unknown');
+                    await saveTalkMoments({ immediate:true });
+                }
+                const notification = `系统：用户发了一条新动态（id=${moment.id}）`;
+                const prompt = `${notification}\n${momentCommentInstruction}`;
+                const reply = await sendTalkMessage(prompt, [], { displayText:notification });
                 appendAiMomentCommentsFromMessage(moment, reply);
             };
 
@@ -130,6 +139,7 @@ window.Rifugio.useTalkMoments = function(ctx) {
             const prepareMomentReply = (moment, comment) => {
                 if (!moment || !comment) return;
                 moment.replyTarget = comment.author || '';
+                moment.replyTargetId = comment.id || '';
                 moment.replyToAi = moment.replyTarget && moment.replyTarget !== (talkProfile.userName || 'User');
                 moment.replyDraft = moment.replyDraft || '';
             };
@@ -138,24 +148,42 @@ window.Rifugio.useTalkMoments = function(ctx) {
                 const text = String(moment?.replyDraft || '').trim();
                 if (!moment || !text) return;
                 const target = String(moment.replyTarget || '').trim();
-                const askClaude = !!moment.replyToAi;
+                const parentCommentId = String(moment.replyTargetId || '').trim();
+                const userName = talkProfile.userName || 'User';
+                const askClaude = !!moment.replyToAi || (!!moment.author && moment.author !== userName);
                 moment.comments = Array.isArray(moment.comments) ? moment.comments : [];
-                moment.comments.push({
+                const comment = {
                     id:'comment-user-' + Date.now(),
-                    author: talkProfile.userName || 'User',
-                    avatar: talkProfile.userAvatar || '',
-                    text: target ? `回复 ${target}：${text}` : text,
-                    time: nowHM(),
-                });
+                    author:userName,
+                    avatar:talkProfile.userAvatar || '',
+                    text:target ? `回复 ${target}：${text}` : text,
+                    time:nowHM(),
+                    parentCommentId,
+                };
+                moment.comments.push(comment);
                 moment.replyDraft = '';
                 moment.replyTarget = '';
+                moment.replyTargetId = '';
                 moment.replyToAi = false;
                 moment.updatedAt = new Date().toISOString();
-                await saveTalkMoments({ immediate:true });
+                try {
+                    const r = await fetch('/api/talk/moments/' + encodeURIComponent(moment.id) + '/comments', {
+                        method:'POST', credentials:'include', headers:{ 'Content-Type':'application/json' },
+                        body:JSON.stringify({ id:comment.id, content:text, author:comment.author, avatar:comment.avatar, parent_comment_id:parentCommentId }),
+                    });
+                    const j = await r.json().catch(() => ({}));
+                    if (!r.ok || j.ok === false) throw new Error(j.error || ('HTTP ' + r.status));
+                    try { writeTalkMomentsLocal(); } catch(_) {}
+                } catch (e) {
+                    talk.error = '评论还没单独存到 VPS：' + (e.message || 'unknown');
+                    await saveTalkMoments({ immediate:true });
+                }
                 if (!askClaude) return;
-                const displayText = `我在动态下回复了${target ? ' ' + target : ''}：${text}`;
-                const prompt = `${momentCommentInstruction}\n\n我在自己的动态下面回复了你/评论了一句。请你像朋友圈评论区一样自然接话，不要太长；如果要进评论区，请用 [[评论：...]]。\n动态：${moment.text || '（只有图片）'}\n我的回复：${text}`;
-                const reply = await sendTalkMessage(prompt, (moment.images || []).map(img => ({ id:img.id, dataUrl:img.dataUrl, name:img.name || '动态图片', kind:'moment' })), { displayText });
+                const notification = target
+                    ? `系统：用户回复了你在动态 #${moment.id} 下的评论`
+                    : `系统：用户评论了你的动态 #${moment.id}`;
+                const prompt = `${notification}\n请先调用 view_pyq(id="${moment.id}") 查看，再决定是否用 post_pyq 回复。不要猜测或复述未查看的内容。`;
+                const reply = await sendTalkMessage(prompt, [], { displayText:notification });
                 appendAiMomentCommentsFromMessage(moment, reply);
             };
 

@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 // Three-database layout (2026-07-03):
 //   rifugio-chat.db    — all chat/Claude conversation tables (the big one)

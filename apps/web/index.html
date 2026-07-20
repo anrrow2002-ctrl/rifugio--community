@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<link rel="apple-touch-icon" sizes="any" href="/icon.svg">
-<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.jpg">
+<link rel="icon" type="image/jpeg" href="/icon-512.jpg">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rifugio">
@@ -2106,7 +2106,7 @@
                                     </div>
                                     <p v-if="m.text">{{ m.text }}</p>
                                     <div v-if="m.images && m.images.length" class="moment-grid" :class="'count-' + Math.min(9,m.images.length)">
-                                        <img v-for="img in m.images" :key="img.id || img.dataUrl" :src="img.dataUrl" :alt="img.name || '动态图片'">
+                                        <img v-for="img in m.images" :key="img.id || img.dataUrl || img.url" :src="img.dataUrl || img.url" :alt="img.name || '动态图片'">
                                     </div>
                                     <div v-if="m.comments && m.comments.length" class="moment-comments">
                                         <div v-for="comment in m.comments" :key="comment.id" class="moment-comment" @click="prepareMomentReply(m, comment)">
@@ -2808,7 +2808,7 @@
 
                     <nav v-if="talk.appView === 'chats' && talk.chatView !== 'chat'" class="talk-bottom-nav profile-tab-nav">
                         <button :class="{active:talk.appView==='chats'}" @click="openTalkSection('chats')"><span>聊天</span></button>
-                        <button :class="{active:talk.appView==='moments'}" @click="openTalkSection('moments')"><span>动态</span></button>
+                        <button :class="{active:talk.appView==='moments'}" @click="openTalkSection('moments')"><span>动态</span><i v-if="talk.momentUnread" class="talk-nav-moment-badge" aria-label="有新动态"></i></button>
                         <button class="profile-heart-tab" :class="{active:talk.appView==='profile'}" @click="openTalkSection('profile')" aria-label="我们的资料"><span>♥</span></button>
                         <button :class="{active:talk.appView==='terminal'}" @click="openTalkSection('terminal')"><span>终端</span></button>
                         <button :class="{active:talk.appView==='settings'}" @click="openTalkSection('settings')"><span>设置</span></button>
@@ -5059,13 +5059,13 @@
 <script src="./js/apps/15-memoria.js?v=self-i-v1"></script>
 <script src="./js/apps/18-terminal.js?v=white-screen-restore-20260713"></script>
 <script src="./js/apps/18-talk-profile-context.js?v=profile-contract-v3-20260716"></script>
-<script src="./js/apps/18-talk.js?v=message-pages-v1-20260716"></script>
+<script src="./js/apps/18-talk.js?v=community-ai-moments-v1-20260720"></script>
 <script src="./js/apps/18-talk-image.js?v=split-20260707"></script>
 <script src="./js/apps/18-talk-stickers.js?v=sticker-resident-20260712"></script>
 <script src="./js/apps/18-talk-voice.js?v=voice-affect-20260711e"></script>
 <script src="./js/apps/18-talk-call-tts-stream.js?v=three-provider-stream-20260716a"></script>
 <script src="./js/apps/18-talk-call.js?v=three-provider-stream-20260716a"></script>
-<script src="./js/apps/18-talk-moments.js?v=split-20260707"></script>
+<script src="./js/apps/18-talk-moments.js?v=community-ai-moments-v1-20260720"></script>
 <script src="./js/apps/18-talk-stream.js?v=wss-turn-isolation-v3-20260716"></script>
 <script src="./js/apps/18-talk-export.js?v=quote-swipe-v1-20260716"></script>
 <script src="./js/apps/19-chat.js"></script>

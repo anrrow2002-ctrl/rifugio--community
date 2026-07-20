@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 const crypto = require('crypto');
 
 const CHAT_DB = process.env.RIFUGIO_CHAT_DB || require('./modules/community-config').dataPath('rifugio-chat.db');

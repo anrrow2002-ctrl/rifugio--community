@@ -25,7 +25,7 @@ docker compose up -d --build
 
 Open `http://localhost:8080`. The API creates empty databases and schemas on first start. Its health endpoint performs a rolled-back SQLite read/write probe, so it verifies storage without leaving test data.
 
-See [deployment](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), and the [safe publishing checklist](docs/PUBLISHING.md).
+Android phone-only hosting is documented in [Termux deployment](docs/TERMUX.md). See [deployment](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), and the [safe publishing checklist](docs/PUBLISHING.md).
 
 ## Layout
 

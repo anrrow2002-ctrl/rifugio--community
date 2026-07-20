@@ -4,11 +4,11 @@
 
 The supported default is Docker Compose on a computer or NAS you control. The database stays in `./data`; identity and secrets stay in `./private` and `.env`. GitHub contains code only.
 
-A phone can install the PWA and use it on the same network, but the current Community backend is Node + Python + SQLite and does not run purely inside a normal mobile browser. For phone-only storage, a separate local-first browser database adapter would be required.
+Android can also host the backend and keep its databases on the phone through Termux; see [Android / Termux](TERMUX.md). A normal mobile browser alone still cannot host the Node + Python backend. On iOS, use a computer, NAS, VPS, or container host and install the PWA as the client.
 
 ## Local computer or NAS
 
-1. Install Docker and Node.js 20 or newer.
+1. Install Docker and Node.js 22.18 or newer.
 2. Run `node scripts/setup.mjs`.
 3. Edit `private/profile.json`.
 4. Run `npm run privacy:scan`.
@@ -23,7 +23,7 @@ Stop writes or use SQLite's online backup mechanism, then back up `data/` and `p
 
 ## Managed hosting
 
-A container host with a persistent volume can run the same services. Static GitHub Pages alone cannot run this backend. Serverless edge workers are not a drop-in target because this edition uses native Node modules, Python, and SQLite.
+A container host with a persistent volume can run the same services. Static GitHub Pages alone cannot run this backend. Serverless edge workers are not a drop-in target because this edition uses a long-running Node API, Python MCP service, and persistent SQLite files.
 
 ## 设置登录密码与 AUTH_SECRET
 

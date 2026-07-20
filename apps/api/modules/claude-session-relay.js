@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 function createClaudeSessionRelay(deps = {}) {
   const {

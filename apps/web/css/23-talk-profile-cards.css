@@ -518,6 +518,7 @@
 .profile-card-pager button.active { width: 23px; background: rgba(197,91,130,.76); }
 .talk-bottom-nav.profile-tab-nav { grid-template-columns: repeat(5, 1fr); gap: 3px; }
 .talk-bottom-nav.profile-tab-nav > button {
+    position: relative;
     border: 0;
     outline: 0;
     box-shadow: none;
@@ -562,3 +563,5 @@
     .profile-cards-stage { scroll-behavior: auto; }
     .profile-card-pager button { transition: none; }
 }
+
+.talk-nav-moment-badge { position:absolute; top:5px; left:calc(50% + 15px); width:8px; height:8px; border:2px solid rgba(255,255,255,.92); border-radius:50%; background:#e65378; box-shadow:0 2px 7px rgba(169,51,87,.36); }

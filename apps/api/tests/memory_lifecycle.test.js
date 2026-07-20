@@ -8,7 +8,7 @@ let express, Database, buckets, embedding, dedup;
 let depsError = null;
 try {
   express = require('express');
-  Database = require('better-sqlite3');
+  Database = require('../modules/sqlite');
   buckets = require('../buckets');
   embedding = require('../embedding');
   dedup = require('../dedup');

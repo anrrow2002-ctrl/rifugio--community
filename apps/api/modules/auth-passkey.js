@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 function createAuthPasskey({ IS_PROD = process.env.NODE_ENV === 'production', clientIp }) {
   // ============================================================

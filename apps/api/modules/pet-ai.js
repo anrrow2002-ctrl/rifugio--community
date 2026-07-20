@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 const { USER_NAME, COMPANION_NAME, PET_PROFILE } = require('./community-config');
 
 const PET_AI_SETTING_KEY = 'pet_ai';

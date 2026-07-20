@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 const ALLOWED_TABLES = [
   'memories','facts','conversations','log_conversations','log_messages',

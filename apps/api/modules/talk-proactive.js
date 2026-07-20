@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 const { spawn } = require('child_process');
 
 function createTalkProactive(ctx = {}) {
@@ -360,6 +360,7 @@ function createTalkProactive(ctx = {}) {
           'Bark URL 格式等价于：curl "https://api.day.app/key/Title/Content?icon=https://example.com/icon.png"。',
           '不要自己调用工具或 curl 发送 Bark，避免重复推送。你可以单独输出一行 [[bark:标题|正文]] 来自定义推送标题和正文；如果不输出，后端会用对话名和你的主动消息正文发送。不要把 Title/Content/title/content 当成真实内容。',
         ].join('\n') : 'Bark：用户没有提供 Bark URL，不要输出 bark 指令。',
+        '动态/朋友圈：你可以自行判断是否调用 post_pyq 发一条动态，不强制。想配图时先调用 generate_image，再把返回的相对图片链接传给 post_pyq；不要把动态全文重复发进聊天。',
         settings.prompt ? `用户给你的主动消息风格补充：${settings.prompt}` : '',
       ].filter(Boolean).join('\n');
       const rawContent = (await sendProactiveIntoTerminalChat(prompt, {
@@ -474,6 +475,7 @@ function createTalkProactive(ctx = {}) {
     markTalkActivityFromMessages,
     maybeRunTalkProactive,
     mountTalkProactiveRoutes,
+    pushTalkProactiveEvent,
   };
 }
 

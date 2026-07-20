@@ -110,20 +110,27 @@ const { mountChatroomApiRoutes, mountTalkApiRoutes } = require('./modules/chatro
 mountChatroomApiRoutes(app);
 mountTalkApiRoutes(app);
 
-const talkConvos = createTalkConvos({ DB_PATH: CHAT_DB_PATH, isClaudeSessionId, syncClaudeTalkConversation });
-sanitizeTalkMessages = talkConvos.sanitizeTalkMessages;
 const talkProactive = createTalkProactive({
   DB_PATH: CHAT_DB_PATH,
   readJsonSetting,
   writeJsonSetting,
-  sanitizeTalkMessages,
+  sanitizeTalkMessages: value => sanitizeTalkMessages(value),
   sendWebPushNotification,
 });
 const {
   TALK_PROACTIVE_POLL_MS,
   markTalkActivityFromMessages,
   maybeRunTalkProactive,
+  pushTalkProactiveEvent,
 } = talkProactive;
+const talkConvos = createTalkConvos({
+  DB_PATH: CHAT_DB_PATH,
+  isClaudeSessionId,
+  syncClaudeTalkConversation,
+  onMomentEvent: pushTalkProactiveEvent,
+  sendWebPushNotification,
+});
+sanitizeTalkMessages = talkConvos.sanitizeTalkMessages;
 talkConvos.mountTalkConvoRoutes(app, { markTalkActivityFromMessages });
 talkProactive.mountTalkProactiveRoutes(app);
 

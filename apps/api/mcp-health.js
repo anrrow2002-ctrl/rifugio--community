@@ -5,7 +5,7 @@
 // 把用户的步数/睡眠/心率/月经/吃药/目标拿过来，便于关心身体、回答健康问题。
 // 数据由 iPhone 快捷指令(/api/health/ingest) + 前端记录(/api/health/menstrual-records) 写入。
 // ============================================================
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 const DB_PATH = process.env.RIFUGIO_DB || require('./modules/community-config').dataPath('rifugio-memory.db');
 
 // 前端枚举码 → 中文标签（让报告可读；未知码原样返回）

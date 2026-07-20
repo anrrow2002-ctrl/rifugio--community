@@ -6,7 +6,7 @@ const path = require('path');
 const { dataPath, features } = require('./community-config');
 
 // 工具白名单：允许读记忆、Dream 自省，以及在确有沉淀时写入 feel；不允许聊天里直接 quiet/digest/archive。
-const CHAT_ALLOWED_TOOLS = `Read(${dataPath('chat-images')}/**),WebSearch,WebFetch,mcp__rifugio__search_memory,mcp__rifugio__breath,mcp__rifugio__dream,mcp__rifugio__dream_seen,mcp__rifugio__hold,mcp__rifugio__get_health,mcp__rifugio__speak,mcp__rifugio__radio_play,mcp__rifugio__toy_status,mcp__rifugio__toy_set,mcp__rifugio__toy_sequence,mcp__rifugio__toy_flow,mcp__rifugio__toy_wild,mcp__rifugio__toy_stop,mcp__rifugio__generate_image,mcp__rifugio__list_image_presets`;
+const CHAT_ALLOWED_TOOLS = `Read(${dataPath('chat-images')}/**),WebSearch,WebFetch,mcp__rifugio__search_memory,mcp__rifugio__breath,mcp__rifugio__dream,mcp__rifugio__dream_seen,mcp__rifugio__hold,mcp__rifugio__get_health,mcp__rifugio__speak,mcp__rifugio__radio_play,mcp__rifugio__toy_status,mcp__rifugio__toy_set,mcp__rifugio__toy_sequence,mcp__rifugio__toy_flow,mcp__rifugio__toy_wild,mcp__rifugio__toy_stop,mcp__rifugio__generate_image,mcp__rifugio__list_image_presets,mcp__rifugio__read,mcp__rifugio__write,mcp__rifugio__view_pyq,mcp__rifugio__post_pyq`;
 const MCP_MEMORY_CONFIG = path.join(__dirname, '..', 'mcp-rifugio.json');   // 唯一主 Rifugio MCP（stdio 仅作 loopback transport）
 
 // 给两个 spawn 点用：返回动态的 mcp 配置路径 / allowedTools / disallowedTools / 人格补丁
@@ -40,6 +40,7 @@ function mountToolRoutes(app, { hasTerminalAuth } = {}) {
     radio_search: '搜歌/电台/故事', radio_play: '播放', sleep_timer: '哄睡定时', radio_stop: '停止播放',
     toy_status: '设备状态', toy_set: '三通道控制', toy_sequence: '动作序列', toy_flow: '连续曲线', toy_wild: '失控模式', toy_stop: '紧急停',
     generate_image: '生成图片', list_image_presets: '看预设组',
+    read: '读社区表', write: '写社区表', view_pyq: '查看动态', post_pyq: '发布或评论动态',
     ai_sticker_list: '按情绪查AI表情', ai_sticker_set_resident: '管理常驻高频区',
   };
   const MCP_BUILTIN = new Set(['rifugio', 'memory', 'health', 'radio', 'toy', 'image', 'stickers']);

@@ -2,7 +2,7 @@
 
 const { USER_NAME, COMPANION_NAME } = require('./community-config');
 
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 function createClaudeConversationContext(deps = {}) {
   const {

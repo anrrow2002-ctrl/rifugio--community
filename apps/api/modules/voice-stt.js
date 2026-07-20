@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 const multer = require('multer');
 const { synthesizeSpeech, voiceStatus } = require('../voice-gateway');
 

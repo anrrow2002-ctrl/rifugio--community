@@ -1,6 +1,6 @@
 'use strict';
 
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 const { publicConfig, dataPath } = require('./community-config');
 
 function mountCommunityRoutes(app) {
@@ -8,7 +8,7 @@ function mountCommunityRoutes(app) {
     const db = new Database(process.env.RIFUGIO_MEMORY_DB || dataPath('rifugio-memory.db'));
     try {
       db.exec('BEGIN IMMEDIATE; CREATE TEMP TABLE __rifugio_rw_probe(value TEXT); INSERT INTO __rifugio_rw_probe VALUES (\'ok\');');
-      const value = db.prepare('SELECT value FROM __rifugio_rw_probe LIMIT 1').pluck().get();
+      const value = db.prepare('SELECT value FROM __rifugio_rw_probe LIMIT 1').get()?.value;
       db.exec('ROLLBACK');
       res.json({ ok: value === 'ok', storage: 'sqlite', writable: value === 'ok' });
     } catch (error) {

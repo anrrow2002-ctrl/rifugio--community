@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 const path = require('path');
 
 const { dataPath, USER_NAME, COMPANION_NAME, PET_PROFILE } = require('./community-config');

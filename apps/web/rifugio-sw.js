@@ -1,5 +1,5 @@
-const CACHE_NAME = 'rifugio-shell-v20260630-proactive-poke-bark-layout-v6';
-const DEFAULT_ICON = '/icon.svg';
+const CACHE_NAME = 'rifugio-community-20260720-moments-v1';
+const DEFAULT_ICON = '/icon-512.jpg';
 
 let proactiveTimer = null;
 let proactiveConfig = null;

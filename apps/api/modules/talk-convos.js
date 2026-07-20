@@ -1,11 +1,13 @@
 const crypto = require('crypto');
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 function createTalkConvos(ctx = {}) {
   const {
     DB_PATH,
     isClaudeSessionId,
     syncClaudeTalkConversation,
+    onMomentEvent,
+    sendWebPushNotification,
   } = ctx;
 
   const TOOL_USE_MARKER_RE = /\n?\[Using [^\]\n]+…\]\n?/g;
@@ -88,8 +90,8 @@ function createTalkConvos(ctx = {}) {
 
   function sanitizeTalkMomentImage(img) {
     if (!img || typeof img !== 'object') return null;
-    const dataUrl = String(img.dataUrl || img.data_url || '').trim();
-    const url = String(img.url || '').trim();
+    const dataUrl = String(img.dataUrl || img.data_url || '').trim().slice(0, 20 * 1024 * 1024);
+    const url = String(img.url || '').trim().slice(0, 4000);
     if (!dataUrl && !url) return null;
     return {
       id: String(img.id || crypto.randomUUID()).slice(0, 120),
@@ -100,6 +102,14 @@ function createTalkConvos(ctx = {}) {
     };
   }
 
+  function sanitizeTalkMomentAvatar(value) {
+    const raw = String(value || '').trim();
+    // Profile avatars are already available in the Talk profile. Duplicating a large
+    // data URL into every moment/comment bloats SQLite; the old 20k cap also produced broken images.
+    if (/^data:image\//i.test(raw)) return '';
+    return raw.slice(0, 4000);
+  }
+
   function sanitizeTalkMomentComment(comment) {
     if (!comment || typeof comment !== 'object') return null;
     const text = String(comment.text || '').trim();
@@ -107,8 +117,9 @@ function createTalkConvos(ctx = {}) {
     return {
       id: String(comment.id || crypto.randomUUID()).slice(0, 120),
       author: String(comment.author || '').slice(0, 120),
-      avatar: String(comment.avatar || '').slice(0, 20000),
+      avatar: sanitizeTalkMomentAvatar(comment.avatar),
       text: text.slice(0, 2000),
+      parentCommentId: String(comment.parentCommentId || comment.parent_comment_id || '').slice(0, 120),
       time: String(comment.time || '').slice(0, 80),
     };
   }
@@ -119,7 +130,7 @@ function createTalkConvos(ctx = {}) {
     return {
       id,
       author: String(m.author || '').slice(0, 120),
-      avatar: String(m.avatar || '').slice(0, 20000),
+      avatar: sanitizeTalkMomentAvatar(m.avatar),
       text: String(m.text || '').slice(0, 12000),
       images: safeJsonArray(m.images).slice(0, 9).map(sanitizeTalkMomentImage).filter(Boolean),
       comments: safeJsonArray(m.comments).slice(0, 200).map(sanitizeTalkMomentComment).filter(Boolean),
@@ -142,7 +153,16 @@ function createTalkConvos(ctx = {}) {
     };
   }
 
-  function upsertTalkMoment(db, moment) {
+  function mergeTalkMomentComments(existingRaw, incoming = []) {
+    const merged = new Map();
+    safeJsonArray(existingRaw).map(sanitizeTalkMomentComment).filter(Boolean).forEach(c => merged.set(c.id, c));
+    incoming.map(sanitizeTalkMomentComment).filter(Boolean).forEach(c => merged.set(c.id, c));
+    return [...merged.values()].slice(-200);
+  }
+
+  function upsertTalkMoment(db, moment, { mergeComments = true } = {}) {
+    const existing = mergeComments ? db.prepare('SELECT comments FROM talk_moments WHERE id=?').get(moment.id) : null;
+    const comments = existing ? mergeTalkMomentComments(existing.comments, moment.comments) : moment.comments;
     db.prepare(`INSERT INTO talk_moments (id, author, avatar, text, images, comments, time, created_at, updated_at)
       VALUES (@id, @author, @avatar, @text, @images, @comments, @time, @created_at, datetime('now'))
       ON CONFLICT(id) DO UPDATE SET
@@ -156,8 +176,29 @@ function createTalkConvos(ctx = {}) {
         updated_at=datetime('now')`).run({
       ...moment,
       images: JSON.stringify(moment.images),
-      comments: JSON.stringify(moment.comments),
+      comments: JSON.stringify(comments),
     });
+  }
+
+  function isAiMomentRequest(req) {
+    const token = String(req.headers['x-chat-token'] || '').trim();
+    return Boolean(token && process.env.CHAT_TOKEN && token === process.env.CHAT_TOKEN);
+  }
+
+  function momentTimeLabel() {
+    return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  function emitMomentEvent(event) {
+    try { if (typeof onMomentEvent === 'function') onMomentEvent(event); } catch (_) {}
+    if (event?.type === 'talk-moment-created' && typeof sendWebPushNotification === 'function') {
+      Promise.resolve(sendWebPushNotification({
+        title: event.author || process.env.COMPANION_NAME || 'Companion',
+        body: '发了一条新动态，点开看看吧。',
+        tag: `rifugio-moment-${event.momentId}`,
+        data: { app: 'talk', view: 'moments', momentId: event.momentId },
+      })).catch(() => {});
+    }
   }
 
   // 派生元数据：写入路径维护 message_count/last_content/last_time 三列，列表接口零 JSON 解析
@@ -394,6 +435,71 @@ function createTalkConvos(ctx = {}) {
         const limit = Math.max(1, Math.min(200, Number(req.query.limit || 80) || 80));
         const rows = db.prepare('SELECT * FROM talk_moments ORDER BY datetime(created_at) DESC, datetime(updated_at) DESC LIMIT ?').all(limit);
         res.json({ ok: true, moments: rows.map(talkMomentRowToJson) });
+      } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+      finally { db.close(); }
+    });
+
+    app.get('/api/talk/moments/:id', (req, res) => {
+      const db = new Database(DB_PATH, { readonly: true });
+      try {
+        const row = db.prepare('SELECT * FROM talk_moments WHERE id=?').get(String(req.params.id || ''));
+        if (!row) return res.status(404).json({ ok: false, error: 'dynamic not found' });
+        res.json({ ok: true, moment: talkMomentRowToJson(row) });
+      } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+      finally { db.close(); }
+    });
+
+    app.post('/api/talk/moments', (req, res) => {
+      const db = new Database(DB_PATH);
+      try {
+        const body = req.body && typeof req.body === 'object' ? req.body : {};
+        const imageUrl = String(body.image_url || body.imageUrl || '').trim();
+        const images = Array.isArray(body.images) ? body.images : (imageUrl ? [{ url: imageUrl, kind: 'moment', name: 'AI generated image' }] : []);
+        const aiRequest = isAiMomentRequest(req);
+        const moment = sanitizeTalkMoment({
+          ...body,
+          text: body.text ?? body.content ?? '',
+          author: aiRequest ? (process.env.COMPANION_NAME || 'Companion') : (body.author || process.env.USER_NAME || 'User'),
+          avatar: aiRequest ? (process.env.COMPANION_AVATAR || '') : (body.avatar || ''),
+          images,
+          comments: [],
+          time: body.time || momentTimeLabel(),
+        });
+        if (!moment.text && !moment.images.length) return res.status(400).json({ ok: false, error: 'dynamic content or image is required' });
+        upsertTalkMoment(db, moment, { mergeComments: false });
+        res.status(201).json({ ok: true, moment });
+        if (aiRequest) emitMomentEvent({ type: 'talk-moment-created', momentId: moment.id, author: moment.author });
+      } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+      finally { db.close(); }
+    });
+
+    app.post('/api/talk/moments/:id/comments', (req, res) => {
+      const db = new Database(DB_PATH);
+      try {
+        const row = db.prepare('SELECT * FROM talk_moments WHERE id=?').get(String(req.params.id || ''));
+        if (!row) return res.status(404).json({ ok: false, error: 'dynamic not found' });
+        const body = req.body && typeof req.body === 'object' ? req.body : {};
+        const content = String(body.text ?? body.content ?? '').trim().slice(0, 2000);
+        if (!content) return res.status(400).json({ ok: false, error: 'comment content is required' });
+        const comments = safeJsonArray(row.comments).map(sanitizeTalkMomentComment).filter(Boolean);
+        const parentCommentId = String(body.parent_comment_id || body.parentCommentId || '').trim().slice(0, 120);
+        const parent = parentCommentId ? comments.find(c => c.id === parentCommentId) : null;
+        if (parentCommentId && !parent) return res.status(400).json({ ok: false, error: 'reply target comment not found' });
+        const aiRequest = isAiMomentRequest(req);
+        const author = aiRequest ? (process.env.COMPANION_NAME || 'Companion') : String(body.author || process.env.USER_NAME || 'User').slice(0, 120);
+        const text = parent ? `回复 ${parent.author}：${content}` : content;
+        const comment = sanitizeTalkMomentComment({
+          id: body.id || `comment-${aiRequest ? 'ai' : 'user'}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`,
+          author,
+          avatar: aiRequest ? (process.env.COMPANION_AVATAR || '') : (body.avatar || ''),
+          text,
+          time: body.time || momentTimeLabel(),
+          parentCommentId,
+        });
+        comments.push(comment);
+        db.prepare("UPDATE talk_moments SET comments=?, updated_at=datetime('now') WHERE id=?").run(JSON.stringify(comments.slice(-200)), row.id);
+        res.status(201).json({ ok: true, moment_id: row.id, comment });
+        if (aiRequest) emitMomentEvent({ type: 'talk-moment-commented', momentId: row.id, author: comment.author, commentId: comment.id });
       } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
       finally { db.close(); }
     });

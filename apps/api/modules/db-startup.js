@@ -1,4 +1,4 @@
-const Database = require('better-sqlite3');
+const Database = require('./sqlite');
 
 // Creates tables that live in rifugio-settings.db (passkeys + terminal auth).
 function ensureSettingsSchema(SETTINGS_DB_PATH) {
@@ -62,6 +62,75 @@ function ensureCoreSchema(MEMORY_DB_PATH) {
     value      TEXT NOT NULL DEFAULT '',
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`);
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS echi (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content TEXT NOT NULL,
+      author TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      pinned INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS posta (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      from_who TEXT NOT NULL,
+      to_who TEXT NOT NULL,
+      body TEXT NOT NULL,
+      is_read INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      archived INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS diario (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author TEXT NOT NULL,
+      text TEXT NOT NULL,
+      date TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS tracce (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      event TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      archived INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS aforismi (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      quote TEXT NOT NULL,
+      author TEXT NOT NULL,
+      context TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS frammenti (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      text TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS anima (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author TEXT NOT NULL,
+      text TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS sussurri (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      author TEXT NOT NULL,
+      text TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      anonymous INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS sperimentato (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      text TEXT NOT NULL,
+      comments TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS da_esplorare (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      text TEXT NOT NULL,
+      comments TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
   db.exec(`
     CREATE TABLE IF NOT EXISTS ai_stickers (
       id TEXT PRIMARY KEY,

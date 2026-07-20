@@ -91,6 +91,7 @@ window.Rifugio.useTalk = function(ctx) {
                 appView: 'chats', chatView: 'list', profileEditCard:0,
                 moments: [], momentText: '', momentImages: [],
                 momentComposerOpen:false,
+                momentUnread:false,
                 sessionNotice:'',
                 handoffSummary:'',
                 sessionToolsOpen:false,
@@ -548,6 +549,7 @@ window.Rifugio.useTalk = function(ctx) {
                 return c;
             };
             const makeTalkMomentId = (prefix = 'moment') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const normalizeTalkMomentAvatar = (author, avatar) => { const raw = String(avatar || '').trim(); if (raw && !(raw.toLowerCase().startsWith('data:image/') && raw.length === 20000)) return raw; const who = String(author || '').trim(); const mine = who === String(talkProfile.userName || 'User').trim(); return String(mine ? (talkProfile.userAvatar || '') : (talkProfile.claudeAvatar || '')); };
             const normalizeTalkMomentForStorage = (m) => {
                 if (!m || typeof m !== 'object') return null;
                 if (!m.id) m.id = makeTalkMomentId();
@@ -561,14 +563,15 @@ window.Rifugio.useTalk = function(ctx) {
                 const comments = Array.isArray(m.comments) ? m.comments.slice(0, 200).map(comment => ({
                     id: String(comment?.id || makeTalkMomentId('comment')),
                     author: String(comment?.author || ''),
-                    avatar: String(comment?.avatar || ''),
+                    avatar: normalizeTalkMomentAvatar(comment?.author, comment?.avatar),
                     text: String(comment?.text || ''),
                     time: String(comment?.time || ''),
+                    parentCommentId: String(comment?.parentCommentId || comment?.parent_comment_id || ''),
                 })).filter(comment => comment.text) : [];
                 return {
                     id: String(m.id),
                     author: String(m.author || ''),
-                    avatar: String(m.avatar || ''),
+                    avatar: normalizeTalkMomentAvatar(m.author, m.avatar),
                     text: String(m.text || ''),
                     images,
                     time: String(m.time || ''),
@@ -1137,6 +1140,10 @@ window.Rifugio.useTalk = function(ctx) {
                 talk.appView = section;
                 talk.panel = '';
                 if (section === 'terminal') await openTerminalMode();
+                if (section === 'moments') {
+                    talk.momentUnread = false;
+                    await loadTalkMomentsFromServer();
+                }
                 if (section === 'chats' && !talk.convos.length) talk.chatView = 'list';
                 if (section === 'chats') Vue.nextTick(scrollTalkBottom);
             };
@@ -1976,7 +1983,7 @@ window.Rifugio.useTalk = function(ctx) {
                     const payload = {
                         title:textTitle,
                         body:textBody,
-                        icon:talkProfile.claudeAvatar || '/icon.svg',
+                        icon:talkProfile.claudeAvatar || '/icon-512.jpg',
                         data:{ app:'talk', convoId:talkToast.convoId || '' },
                     };
                     const fallbackNotification = () => {
@@ -1990,7 +1997,7 @@ window.Rifugio.useTalk = function(ctx) {
                             talkServiceWorkerRegistration.showNotification(textTitle, {
                                 body:textBody,
                                 icon:payload.icon,
-                                badge:'/icon.svg',
+                                badge:'/icon-512.jpg',
                                 tag:'rifugio-talk',
                                 renotify:true,
                                 data:payload.data,
@@ -2098,6 +2105,11 @@ window.Rifugio.useTalk = function(ctx) {
                             talkProactiveEventCursor = event.id;
                             localStorage.setItem('rifugio-talk-proactive-cursor', talkProactiveEventCursor);
                         }
+                        if (event.type === 'talk-moment-created' || event.type === 'talk-moment-commented') {
+                            if (talk.appView !== 'moments') talk.momentUnread = true;
+                            await loadTalkMomentsFromServer();
+                            continue;
+                        }
                         if (event.type !== 'talk-proactive-message' || !event.message || !event.conversationId) continue;
                         let c = talk.convos.find(x => x.id === event.conversationId);
                         if (!c) {
@@ -2177,7 +2189,10 @@ window.Rifugio.useTalk = function(ctx) {
                 loadTalkStickersFromServer().then(() => syncTalkStickersToServer());
                 scheduleTalkProactive();
                 pollTalkProactiveEvents();
-                talkProactivePollTimer = setInterval(pollTalkProactiveEvents, 15000);
+                talkProactivePollTimer = setInterval(() => {
+                    pollTalkProactiveEvents();
+                    if (document.visibilityState === 'visible' && talk.appView === 'moments') loadTalkMomentsFromServer();
+                }, 5000);
                 talkVisibilityRefreshHandler = () => {
                     if (document.visibilityState !== 'visible' || talk.thinking || talk.appView !== 'chats' || talk.chatView !== 'chat') return;
                     const now = Date.now();

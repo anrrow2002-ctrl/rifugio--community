@@ -815,6 +815,95 @@ def _radio_api(path, method='GET', body=None, timeout=20):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
+
+# ─── Safe community tables: strict table/field allowlist ────────────────────
+SAFE_TABLES = {
+    'echi': {'required': ('content', 'author'), 'fields': {'content': 'text', 'author': 'text', 'pinned': 'bool'}},
+    'posta': {'required': ('from_who', 'to_who', 'body'), 'fields': {'from_who': 'text', 'to_who': 'text', 'body': 'text', 'is_read': 'bool', 'archived': 'bool'}},
+    'diario': {'required': ('author', 'text'), 'fields': {'author': 'text', 'text': 'text', 'date': 'date'}},
+    'tracce': {'required': ('date', 'event'), 'fields': {'date': 'date', 'event': 'text', 'archived': 'bool'}},
+    'aforismi': {'required': ('quote', 'author'), 'fields': {'quote': 'text', 'author': 'text', 'context': 'text'}},
+    'frammenti': {'required': ('text',), 'fields': {'text': 'text'}},
+    'anima': {'required': ('author', 'text'), 'fields': {'author': 'text', 'text': 'text'}},
+    'sussurri': {'required': ('author', 'text'), 'fields': {'author': 'text', 'text': 'text', 'anonymous': 'bool'}},
+    'sperimentato': {'required': ('text',), 'fields': {'text': 'text', 'comments': 'json_text'}},
+    'da_esplorare': {'required': ('text',), 'fields': {'text': 'text', 'comments': 'json_text'}},
+}
+
+def _safe_table_spec(table):
+    name = str(table or '').strip()
+    spec = SAFE_TABLES.get(name)
+    if not spec:
+        raise ValueError('table is not allowed; choose one of: ' + ', '.join(SAFE_TABLES))
+    return name, spec
+
+def _safe_table_value(field, kind, value):
+    if kind == 'bool':
+        if isinstance(value, bool): return 1 if value else 0
+        if isinstance(value, int) and value in (0, 1): return value
+        raise ValueError(f'{field} must be boolean')
+    if kind == 'json_text' and isinstance(value, (list, dict)):
+        value = json.dumps(value, ensure_ascii=False)
+    if not isinstance(value, str):
+        raise ValueError(f'{field} must be a string')
+    value = value.strip()
+    if len(value) > 20000:
+        raise ValueError(f'{field} is too long (maximum 20000 characters)')
+    if kind == 'date' and value:
+        try:
+            datetime.date.fromisoformat(value)
+        except ValueError:
+            raise ValueError(f'{field} must be a real date in YYYY-MM-DD format') from None
+    return value
+
+def tool_write(table='', data=None):
+    table, spec = _safe_table_spec(table)
+    if not isinstance(data, dict):
+        raise ValueError('data must be an object')
+    unknown = sorted(set(data) - set(spec['fields']))
+    if unknown:
+        raise ValueError('unknown field(s) for ' + table + ': ' + ', '.join(unknown))
+    missing = [field for field in spec['required'] if field not in data or data.get(field) is None]
+    if missing:
+        raise ValueError('missing required field(s): ' + ', '.join(missing))
+    clean = {}
+    for field, value in data.items():
+        if value is None:
+            continue
+        clean[field] = _safe_table_value(field, spec['fields'][field], value)
+    empty = [field for field in spec['required'] if not str(clean.get(field, '')).strip()]
+    if empty:
+        raise ValueError('required field(s) cannot be empty: ' + ', '.join(empty))
+    columns = list(clean)
+    if not columns:
+        raise ValueError('data has no writable fields')
+    placeholders = ', '.join('?' for _ in columns)
+    sql = 'INSERT INTO "' + table + '" (' + ', '.join('"' + col + '"' for col in columns) + ') VALUES (' + placeholders + ')'
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    try:
+        cur = conn.execute(sql, tuple(clean[col] for col in columns))
+        conn.commit()
+        return json.dumps({'ok': True, 'table': table, 'id': cur.lastrowid}, ensure_ascii=False)
+    finally:
+        conn.close()
+
+def tool_read(table='', limit=20):
+    table, spec = _safe_table_spec(table)
+    try:
+        size = int(limit or 20)
+    except (TypeError, ValueError):
+        raise ValueError('limit must be an integer') from None
+    size = max(1, min(50, size))
+    columns = ['id'] + list(spec['fields']) + ['created_at']
+    sql = 'SELECT ' + ', '.join('"' + col + '"' for col in columns) + ' FROM "' + table + '" ORDER BY id DESC LIMIT ?'
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = [dict(row) for row in conn.execute(sql, (size,)).fetchall()]
+        return json.dumps({'ok': True, 'table': table, 'rows': rows}, ensure_ascii=False)
+    finally:
+        conn.close()
+
 def _semantic_ids(query, limit):
     """走 node bge-m3 语义检索，返回按相似度排好的 bucket id 列表；失败返回 None → 调用方退回 LIKE"""
     try:
@@ -878,6 +967,74 @@ def tool_generate_image(scene='', characters=None, preset='', negative=''):
     return (f"图片已生成（预设：{j.get('preset') or '无'}，seed {j.get('seed')}）。\n"
             f"请把这个相对链接原样写进你给用户的回复里：{j.get('url')}\n"
             f"前端会把它渲染成图片，她能看也能保存。不要改成别的地址、不要加域名。")
+
+# ─── 18 App 动态/朋友圈（复用 talk_moments，不另建一套数据）──────────────
+def _pyq_text(moment):
+    mid = str(moment.get('id') or '')
+    author = str(moment.get('author') or '未知')
+    created = str(moment.get('createdAt') or moment.get('time') or '')
+    content = str(moment.get('text') or '').strip() or '（只有图片）'
+    lines = [f'动态 #{mid}｜{author}｜{created}', content]
+    images = moment.get('images') or []
+    image_urls = [str(img.get('url') or img.get('dataUrl') or '') for img in images if isinstance(img, dict)]
+    image_urls = [url for url in image_urls if url and not url.startswith('data:')]
+    if image_urls:
+        lines.append('图片：' + '，'.join(image_urls))
+    comments = moment.get('comments') or []
+    if comments:
+        lines.append('评论：')
+        for comment in comments[-30:]:
+            if not isinstance(comment, dict):
+                continue
+            cid = str(comment.get('id') or '')
+            who = str(comment.get('author') or '未知')
+            text = str(comment.get('text') or '').strip()
+            parent = str(comment.get('parentCommentId') or comment.get('parent_comment_id') or '')
+            reply = f'，回复 {parent}' if parent else ''
+            lines.append(f'- [{cid}{reply}] {who}：{text}')
+    return '\n'.join(lines)
+
+def tool_view_pyq(id='', limit=5):
+    moment_id = str(id or '').strip()
+    if moment_id:
+        path = '/api/talk/moments/' + urllib.parse.quote(moment_id, safe='')
+        moment = (_radio_api(path).get('moment') or {})
+        return _pyq_text(moment)
+    size = max(1, min(20, int(limit or 5)))
+    payload = _radio_api('/api/talk/moments?' + urllib.parse.urlencode({'limit': size}))
+    moments = payload.get('moments') or []
+    if not moments:
+        return '还没有动态。'
+    return f'最新 {len(moments)} 条动态：\n\n' + '\n\n'.join(_pyq_text(moment) for moment in moments)
+
+def tool_post_pyq(content='', type='post', moment_id='', reply_to_comment_id='', image_url=''):
+    action = str(type or 'post').strip().lower()
+    text = str(content or '').strip()
+    if action not in ('post', 'comment', 'reply'):
+        return 'type 只能是 post、comment 或 reply。'
+    if action == 'post':
+        if not text and not str(image_url or '').strip():
+            return '发布动态需要 content 或 image_url。'
+        body = {'content': text}
+        if str(image_url or '').strip():
+            body['image_url'] = str(image_url).strip()
+        moment = (_radio_api('/api/talk/moments', 'POST', body).get('moment') or {})
+        return f"动态发布成功，id={moment.get('id')}。用户会在 18 App 动态页看到。"
+    target = str(moment_id or '').strip()
+    if not target:
+        return '评论或回复必须提供 moment_id。'
+    if not text:
+        return '评论内容不能为空。'
+    parent = str(reply_to_comment_id or '').strip()
+    if action == 'reply' and not parent:
+        return 'reply 必须提供 reply_to_comment_id。'
+    body = {'content': text}
+    if parent:
+        body['parent_comment_id'] = parent
+    path = '/api/talk/moments/' + urllib.parse.quote(target, safe='') + '/comments'
+    result = _radio_api(path, 'POST', body)
+    comment = result.get('comment') or {}
+    return f"评论成功，动态 id={target}，评论 id={comment.get('id')}。"
 
 # ─── FUNF 啵啵贝（SOSEXY）：统一经过 VPS API，受 PWA 授权并留下调用记录 ─────
 TOY_CHANNELS = ('suck', 'vibrate', 'current')
@@ -1264,6 +1421,42 @@ TOOLS = [
             'required': ['scene']
         }
     },
+
+    {
+        'name': 'read',
+        'description': '读取社区记忆库中一张获准表的最新记录。只允许十张固定表，最多返回 50 条。',
+        'inputSchema': {'type': 'object', 'properties': {
+            'table': {'type': 'string', 'enum': ['echi','posta','diario','tracce','aforismi','frammenti','anima','sussurri','sperimentato','da_esplorare']},
+            'limit': {'type': 'integer', 'minimum': 1, 'maximum': 50, 'default': 20}
+        }, 'required': ['table']}
+    },
+    {
+        'name': 'write',
+        'description': '向社区记忆库的一张获准表写入一条记录。表名和字段均严格校验，拒绝其他表或字段。',
+        'inputSchema': {'type': 'object', 'properties': {
+            'table': {'type': 'string', 'enum': ['echi','posta','diario','tracce','aforismi','frammenti','anima','sussurri','sperimentato','da_esplorare']},
+            'data': {'type': 'object', 'description': '按目标表字段填写，例如 echi 需要 content+author，posta 需要 from_who+to_who+body'}
+        }, 'required': ['table', 'data']}
+    },
+    {
+        'name': 'view_pyq',
+        'description': '查看动态/朋友圈。不传 id 查看最新动态；传 id 查看正文、图片和评论。',
+        'inputSchema': {'type': 'object', 'properties': {
+            'id': {'type': 'string'},
+            'limit': {'type': 'integer', 'minimum': 1, 'maximum': 20, 'default': 5}
+        }, 'required': []}
+    },
+    {
+        'name': 'post_pyq',
+        'description': '发布动态、评论动态或回复评论。作者由系统固定为 Companion。',
+        'inputSchema': {'type': 'object', 'properties': {
+            'content': {'type': 'string'},
+            'type': {'type': 'string', 'enum': ['post', 'comment', 'reply']},
+            'moment_id': {'type': 'string'},
+            'reply_to_comment_id': {'type': 'string'},
+            'image_url': {'type': 'string'}
+        }, 'required': ['content', 'type']}
+    },
     {
         'name': 'list_image_presets',
         'description': '列出生图的预设组（每组一套画师 prompt/质量串/负向），以及当前激活的是哪组。',
@@ -1355,6 +1548,10 @@ def handle_rpc(msg):
             elif name == 'radio_play': text = tool_radio_play(args.get('query',''), args.get('type',''), args.get('url',''), args.get('title',''), args.get('sleep_minutes', 0))
             elif name == 'generate_image': text = tool_generate_image(args.get('scene',''), args.get('characters'), args.get('preset',''), args.get('negative',''))
             elif name == 'list_image_presets': text = tool_list_image_presets()
+            elif name == 'read': text = tool_read(args.get('table',''), args.get('limit',20))
+            elif name == 'write': text = tool_write(args.get('table',''), args.get('data'))
+            elif name == 'view_pyq': text = tool_view_pyq(args.get('id',''), args.get('limit',5))
+            elif name == 'post_pyq': text = tool_post_pyq(args.get('content',''), args.get('type','post'), args.get('moment_id',''), args.get('reply_to_comment_id',''), args.get('image_url',''))
             elif name == 'toy_status': text = tool_toy_status()
             elif name == 'toy_stop': text = tool_toy_stop()
             elif name == 'toy_set': text = tool_toy_set(args.get('channel'), args.get('intensity'))

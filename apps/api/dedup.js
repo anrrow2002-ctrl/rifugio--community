@@ -1,7 +1,7 @@
 // ============================================================
 // dedup.js — Rifugio bucket dedup module
 // ============================================================
-const Database = require('better-sqlite3');
+const Database = require('./modules/sqlite');
 const { blobToVec, cosineSim } = require('./embedding');
 
 function tryParse(str, fallback) {
