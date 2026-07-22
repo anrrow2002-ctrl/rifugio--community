@@ -503,6 +503,15 @@ window.Rifugio.useTalk = function(ctx) {
             const fetchProviderModels = async (kind) => {
                 const statusKey = kind === 'tts' ? 'ttsFetchStatus' : (kind === 'image' ? 'imageFetchStatus' : 'modelFetchStatus');
                 const listKey = kind === 'tts' ? 'availableTtsVoices' : (kind === 'image' ? 'availableImageModels' : 'availableTextModels');
+                const isTextModels = kind !== 'tts' && kind !== 'image';
+                if (isTextModels && !String(talkSettings.baseUrl || '').trim()) {
+                    talkSettings[statusKey] = '请先填写 Base URL';
+                    return;
+                }
+                if (isTextModels && !String(talkSettings.apiKey || '').trim()) {
+                    talkSettings[statusKey] = '请先填写 API Key';
+                    return;
+                }
                 talkSettings[statusKey] = '正在拉取模型列表…';
                 const requestId = kind === 'tts' ? ++ttsFetchRequestId : 0;
                 const providerAtStart = kind === 'tts' ? normalizeTtsProvider(talkSettings.ttsProvider) : '';
@@ -518,8 +527,8 @@ window.Rifugio.useTalk = function(ctx) {
                             api_key: kind === 'image' ? talkSettings.naiApiKey : talkSettings.apiKey,
                         }),
                     });
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const data = await res.json();
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok || data.ok === false) throw new Error(data.error || ('HTTP ' + res.status));
                     if (kind === 'tts' && (requestId !== ttsFetchRequestId || providerAtStart !== normalizeTtsProvider(talkSettings.ttsProvider))) return;
                     const models = kind === 'tts'
                         ? ((Array.isArray(data.voices) && data.voices.length ? data.voices : data.models) || [])

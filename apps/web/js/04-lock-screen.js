@@ -76,8 +76,9 @@
         }
         applyLockWallpaperFromStorage();
         window.addEventListener('rifugio-wallpaper-updated', applyLockWallpaperFromStorage);
-        const isLocalPreview = window.location.protocol === 'file:' ||
-            ['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname);
+        // Only a literal file:// preview may skip server login. localhost and
+        // 127.0.0.1 are real Termux/Docker deployments and still need an auth cookie.
+        const isLocalPreview = window.location.protocol === 'file:';
         if (isLocalPreview) {
             sessionStorage.setItem(LOCK_KEY, '1');
             lockEl.style.display = 'none';
