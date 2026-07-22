@@ -11,5 +11,5 @@
     "test:web": "node --test apps/web/tests/*.test.js",
     "test": "npm run test:api && npm run test:web && npm run test:mcp && npm run privacy:scan"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0 AND PolyForm-Noncommercial-1.0.0"
 }

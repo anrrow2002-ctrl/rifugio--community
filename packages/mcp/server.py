@@ -1163,7 +1163,7 @@ def tool_toy_flow(steps_json):
         _toy_api('/mcp/flow', 'POST', {'steps': clean}, timeout=timeout),
         ensure_ascii=False)
 
-def tool_toy_wild(duration_sec=120, channels=None, ceiling=80):
+def tool_toy_wild(duration_sec=600, channels=None, ceiling=80):
     if isinstance(duration_sec, bool) or isinstance(ceiling, bool):
         raise ValueError('duration_sec and ceiling must be integers')
     try:
@@ -1173,8 +1173,8 @@ def tool_toy_wild(duration_sec=120, channels=None, ceiling=80):
         raise ValueError('duration_sec and ceiling must be integers') from None
     if duration != duration_sec or clean_ceiling != ceiling:
         raise ValueError('duration_sec and ceiling must be integers')
-    if duration < 1 or duration > 300:
-        raise ValueError('duration_sec must be from 1 to 300')
+    if duration < 1 or duration > 1800:
+        raise ValueError('duration_sec must be from 1 to 1800')
     if clean_ceiling < 60 or clean_ceiling > 90:
         raise ValueError('ceiling must be from 60 to 90')
     if channels is None:
@@ -1395,9 +1395,9 @@ TOOLS = [
     },
     {
         'name': 'toy_wild',
-        'description': '启动 SOSEXY 本地随机失控模式；最长 300 秒、强度上限最高 90，仅允许指定通道。需要 PWA 已开启“允许 AI 控制”；toy_stop 和实体停止始终可立即刹车。',
+        'description': '启动 SOSEXY 本地随机失控模式（fire-and-forget：立即返回启动确认，波形由 Mac 桥本地跑完全程）；最长 30 分钟、强度上限最高 90，仅允许指定通道。需要 PWA 已开启“允许 AI 控制”；toy_stop 和实体停止始终可立即刹车。',
         'inputSchema': {'type': 'object', 'properties': {
-            'duration_sec': {'type': 'integer', 'minimum': 1, 'maximum': 300, 'default': 120, 'description': '持续秒数，最多 5 分钟'},
+            'duration_sec': {'type': 'integer', 'minimum': 1, 'maximum': 1800, 'default': 600, 'description': '持续秒数；常用 600/900/1200/1800 即 10/15/20/30 分钟'},
             'channels': {'type': 'array', 'items': {'type': 'string', 'enum': ['suck', 'vibrate', 'current']}, 'minItems': 1, 'maxItems': 3, 'uniqueItems': True, 'default': ['suck', 'vibrate'], 'description': '参与随机变化的通道'},
             'ceiling': {'type': 'integer', 'minimum': 60, 'maximum': 90, 'default': 80, 'description': '随机强度上限，最高 90'}
         }, 'required': []}
@@ -1557,7 +1557,7 @@ def handle_rpc(msg):
             elif name == 'toy_set': text = tool_toy_set(args.get('channel'), args.get('intensity'))
             elif name == 'toy_sequence': text = tool_toy_sequence(args.get('steps_json'))
             elif name == 'toy_flow': text = tool_toy_flow(args.get('steps_json'))
-            elif name == 'toy_wild': text = tool_toy_wild(args.get('duration_sec', 120), args.get('channels'), args.get('ceiling', 80))
+            elif name == 'toy_wild': text = tool_toy_wild(args.get('duration_sec', 600), args.get('channels'), args.get('ceiling', 80))
             else: return {'jsonrpc':'2.0','id':mid,'error':{'code':-32602,'message':f'Unknown tool: {name}'}}
             res = {'content': [{'type':'text','text':text}]}
         except Exception as e:

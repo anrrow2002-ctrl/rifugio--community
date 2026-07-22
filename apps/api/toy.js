@@ -11,6 +11,15 @@ function bridgeToken() {
   return token;
 }
 
+function redactForLog(value) {
+  let clean = String(value == null ? '' : value);
+  try {
+    const token = bridgeToken();
+    if (token) clean = clean.split(token).join('[token]');
+  } catch (_) {}
+  return clean.split(BRIDGE_URL).join('[bridge]').replace(/https?:\/\/[^\s"'`]+/g, '[url]');
+}
+
 async function bridgeRequest(path, method = 'GET', body, timeoutMs = 30000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -28,10 +37,19 @@ async function bridgeRequest(path, method = 'GET', body, timeoutMs = 30000) {
     const text = await response.text();
     let data = {};
     try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { message: text.slice(0, 200) }; }
-    if (!response.ok) throw new Error(data.error || data.message || `bridge HTTP ${response.status}`);
+    if (!response.ok) {
+      console.error(`[toy] bridge ${path} HTTP ${response.status} body=${redactForLog(text).slice(0, 300)}`);
+      const failure = new Error(data.error || data.message || `bridge HTTP ${response.status}`);
+      failure.bridgeLogged = true;
+      throw failure;
+    }
     return data;
   } catch (error) {
-    if (error && error.name === 'AbortError') throw new Error('bridge request timed out');
+    if (error && error.name === 'AbortError') {
+      console.error(`[toy] bridge ${path} timed out after ${timeoutMs}ms`);
+      throw new Error('bridge request timed out');
+    }
+    if (!error || error.bridgeLogged !== true) console.error(`[toy] bridge ${path} failed: ${redactForLog(error && error.message)}`);
     throw error;
   } finally {
     clearTimeout(timer);
@@ -94,9 +112,9 @@ function flow(value) {
 
 function wild(value) {
   const body = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
-  const duration = Number(body.duration == null ? 120 : body.duration);
-  if (typeof body.duration === 'boolean' || !Number.isInteger(duration) || duration < 1 || duration > 300) {
-    throw new Error('duration must be an integer from 1 to 300 seconds');
+  const duration = Number(body.duration == null ? 600 : body.duration);
+  if (typeof body.duration === 'boolean' || !Number.isInteger(duration) || duration < 1 || duration > 1800) {
+    throw new Error('duration must be an integer from 1 to 1800 seconds');
   }
   const rawChannels = body.channels == null ? ['suck', 'vibrate'] : body.channels;
   if (!Array.isArray(rawChannels) || !rawChannels.length || rawChannels.length > CHANNELS.length) {
@@ -232,9 +250,10 @@ function mountToyRoutes(app) {
       const payload = wild(req.body);
       item = begin('wild', source, payload);
       if (requireConsent) ensureAiAllowed();
-      const result = await bridgeRequest('/wild', 'POST', payload, (payload.duration + 20) * 1000);
+      // The Mac bridge acknowledges immediately and runs the waveform locally.
+      const result = await bridgeRequest('/wild', 'POST', payload, 15000);
       finish(item, 'done', result);
-      await refreshBridge();
+      refreshBridge().catch(() => {});
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       if (item) finish(item, 'error', error);
@@ -277,6 +296,23 @@ function mountToyRoutes(app) {
   app.post('/api/toy/set', (req, res) => runSet(req, res, 'user', false));
   app.post('/api/toy/sequence', (req, res) => runSequence(req, res, 'user', false));
   app.post('/api/toy/stop', (req, res) => runStop(req, res, (req.body && req.body.source) || 'user'));
+  app.post('/api/toy/wild', (req, res) => runWild(req, res, 'user', false));
+
+  // Display-only status polling: a failed poll must never stop a bridge-local run.
+  app.get('/api/toy/wild-status', async (_req, res) => {
+    try {
+      const ping = await bridgeRequest('/ping', 'GET', undefined, 6000);
+      res.json({
+        ok: true,
+        running: ping.running === true,
+        remaining: Number.isFinite(Number(ping.remaining)) ? Math.max(0, Math.round(Number(ping.remaining))) : null,
+        mode: typeof ping.mode === 'string' ? ping.mode : null,
+        toyConnected: ping.toy_connected === true,
+      });
+    } catch (_) {
+      res.json({ ok: false, unavailable: true });
+    }
+  });
 
   app.post('/api/toy/mcp/set', (req, res) => runSet(req, res, 'mcp', true));
   app.post('/api/toy/mcp/sequence', (req, res) => runSequence(req, res, 'mcp', true));

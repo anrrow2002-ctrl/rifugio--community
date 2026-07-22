@@ -7,5 +7,7 @@
 - Use a new public repository with no inherited private commits.
 - Rotate any credential that ever appeared in source, logs, screenshots, issues, or commits.
 - Keep optional personal/device integrations disabled by default.
-- Keep the Apache-2.0 license and required notices when redistributing.
+- Keep `LICENSE`, `NOTICE`, `LICENSES/PolyForm-Noncommercial-1.0.0.md`, and every `Required Notice:` line when redistributing.
+- Do not describe the whole distribution as Apache-only: SullyOS-derived portions are noncommercial unless separately relicensed or removed after a provenance audit.
+- Do not add third-party App launcher photos without documented redistribution permission; community defaults must remain emoji/character icons.
 - Test from an empty `data/` directory.

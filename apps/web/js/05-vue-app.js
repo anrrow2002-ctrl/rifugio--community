@@ -3141,27 +3141,21 @@
             // ============================================================
             const wallpaperTabs = computed(() => [{ id: 'lock-screen', label: '锁屏' }, { id: 'phone-home', label: '主屏幕' }, ...phoneApps.map(a => ({ id: a.id, label: a.label }))]);
 
-            // ✦ App 图标自定义：美化中心统一管理，默认可用 emoji，上传后覆盖
-            const DEFAULT_DOCK_ICONS = {
-                talk:     'https://i.postimg.cc/5tzz0XJZ/IMG-2996.jpg',
-                memoria:  'https://i.postimg.cc/VkpMmqyy/IMG-2991.jpg',
-                segreti:  'https://i.postimg.cc/nhg7p48p/IMG-2992.jpg',
-                desideri: 'https://i.postimg.cc/nhg7p48p/IMG-2992.jpg',
-                echi:     'https://i.postimg.cc/kgz8qQrn/IMG-2994.jpg',
-                log:      'https://i.postimg.cc/CxXDSGyw/IMG-2995.jpg',
-                libreria: 'https://i.postimg.cc/CxXDSGyw/IMG-2995.jpg',
-                museo:    'https://i.postimg.cc/5tzz0XJZ/IMG-2996.jpg',
-                settings: '',
-                bellezza: '',
-                room: '/pets/crab/idle.png',
-                posta:    'https://i.postimg.cc/CxXDSGyw/IMG-2995.jpg',
-                health: '',
-                mcp: '',
-            };
+            // ✦ App 图标自定义：社区版只发布 emoji/字符默认图标，不附带来源不明的网络图片。
+            // 用户仍可在自己的实例中上传或填写自有授权图片；下面的列表只用于清理旧版默认值。
+            const DEFAULT_DOCK_ICONS = {};
+            const isLegacyCommunityDockIcon = value =>
+                value === '/pets/crab/idle.png' ||
+                /^https:\/\/i\.postimg\.cc\/[^/]+\/IMG-299[12456]\.jpg$/i.test(String(value || ''));
             const dockIcons = reactive({ ...DEFAULT_DOCK_ICONS });
             try {
                 const saved = JSON.parse(localStorage.getItem('rifugio-dock-icons') || '{}');
-                Object.keys(saved).forEach(k => { if (saved[k]) dockIcons[k] = saved[k]; });
+                let migrated = false;
+                Object.keys(saved).forEach(k => {
+                    if (!saved[k] || isLegacyCommunityDockIcon(saved[k])) { migrated = true; return; }
+                    dockIcons[k] = saved[k];
+                });
+                if (migrated) localStorage.setItem('rifugio-dock-icons', JSON.stringify({ ...dockIcons }));
             } catch(e) {}
             const saveDockIcons = () => {
                 try { localStorage.setItem('rifugio-dock-icons', JSON.stringify({ ...dockIcons })); } catch(e) {}

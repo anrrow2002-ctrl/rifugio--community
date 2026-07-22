@@ -40,6 +40,12 @@ Android phone-only hosting is documented in [Termux deployment](docs/TERMUX.md).
 
 Arbitrary shell execution is not part of the Community MCP. Health, radio, image, voice, toy, and CLI bridge integrations are off by default. The API bridge uses an allowlist. MCP accepts a bearer token at `/mcp`; legacy token-in-path transport remains compatible but should not be placed in proxy access logs.
 
-## License
+## License and attribution
 
-Apache License 2.0. See LICENSE.
+Rifugio-authored code is available under the Apache License 2.0 in [LICENSE](LICENSE). UI or virtual-phone portions that may be adapted from [SullyOS / 手抓糯米机](https://github.com/qegj567-cloud/SullyOS) remain subject to the PolyForm Noncommercial License 1.0.0. See [NOTICE](NOTICE) and [the included PolyForm license](LICENSES/PolyForm-Noncommercial-1.0.0.md).
+
+Required Notice: Copyright (c) 2024-2026 NMJ (SullyOS / 手抓糯米机)
+
+Redistributors must preserve all three files and the Required Notice. Commercial use is not authorized for SullyOS-derived portions without separate permission or a provenance audit that removes/replaces them.
+
+Community builds ship emoji/character App launcher defaults rather than third-party photo icons. The installable PWA icons are separate project assets.

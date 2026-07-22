@@ -71,7 +71,7 @@
 </button>
 
 
-<script src="./js/04-lock-screen.js"></script>
+<script src="./js/04-lock-screen.js?v=auth-ready-gate-20260722"></script>
 <script src="./js/02-global-refresh.js?v=global-refresh-soft-20260711"></script>
 
 <!-- ============ 🐱🦀 小黑猫趴在 Companion 小螃蟹头上 ============ -->
@@ -4096,6 +4096,28 @@
                         </div>
                     </div>
                     <div class="toy-card">
+                        <b>失控模式</b>
+                        <small>随机波形由 Mac 桥本地生成；启动后关掉页面、断网、手机锁屏都不会打断，直到时长跑完或你点停止。倒计时只是显示。</small>
+                        <div class="toy-control-grid mt-3">
+                            <label>时长
+                                <select v-model.number="toy.wildDuration" :disabled="toy.wildRunning || toy.wildBusy">
+                                    <option v-for="c in TOY_WILD_CHOICES" :key="c.value" :value="c.value">{{ c.label }}</option>
+                                </select>
+                            </label>
+                            <label>状态
+                                <div class="toy-status">
+                                    <template v-if="toy.wildRunning">运行中 · 剩余 {{ toyWildClock() }}</template>
+                                    <template v-else>未在运行</template>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="toy-actions mt-3">
+                            <button class="toy-action" :disabled="toy.wildBusy || toy.wildRunning || !toy.connected" @click="startToyWild">启动失控模式</button>
+                            <button class="toy-action stop" :disabled="toy.wildBusy" @click="stopToyWild">停止</button>
+                        </div>
+                        <small v-if="toy.wildNote" class="toy-status mt-2">{{ toy.wildNote }}</small>
+                    </div>
+                    <div class="toy-card">
                         <b>Claude 授权</b>
                         <small>关闭时 Claude 的设置和序列调用会被 VPS 拒绝；紧急停止永远可用。重新启动 VPS 后默认关闭。</small>
                         <label class="talk-switch mt-3">
@@ -5052,7 +5074,7 @@
 </div>
 
 <script src="./js/apps/00-core.js"></script>
-<script src="./js/apps/10-toy.js?v=toy-flow-wild-v1"></script>
+<script src="./js/apps/10-toy.js?v=toy-wild-fnf-community-20260722"></script>
 <script src="./js/apps/11-radio.js?v=music-listening-v3-20260714"></script>
 <script src="./js/apps/12-mcp.js"></script>
 <script src="./js/apps/13-health.js"></script>
@@ -5072,7 +5094,7 @@
 <script src="./js/apps/21-biblioteca.js?v=reading-nook-20260713"></script>
 <script src="./js/apps/21-room.js?v=crab-pet-chat-v11-20260714"></script>
 <script src="./js/apps/22-showroom.js?v=showroom-v1-20260715"></script>
-<script src="./js/05-vue-app.js?v=quote-swipe-v2-20260716"></script>
+<script src="./js/05-vue-app.js?v=community-auth-icons-toy-20260722"></script>
 <!-- iOS 键盘处理：只调整 App 内容高度，绝不平移 body 或缩短全屏锁屏。 -->
 <script src="./js/06-viewport-keyboard-fix.js"></script>
 </body>
