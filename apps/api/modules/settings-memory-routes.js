@@ -149,11 +149,16 @@ function createSettingsMemoryRoutes(ctx = {}) {
         db.close();
         if (!api_key) return res.json({ ok: false, error: 'No API key configured' });
 
-        const resp = await fetch((base_url || 'https://api.openai.com/v1') + '/models', {
+        const endpoint = String(base_url || 'https://api.openai.com/v1').replace(/\/+$/, '') + '/models';
+        const resp = await fetch(endpoint, {
           headers: { 'Authorization': 'Bearer ' + api_key }
         });
         if (resp.ok) {
-          res.json({ ok: true });
+          const payload = await resp.json().catch(() => ({}));
+          const data = (payload.data || payload.models || []).map(item => ({
+            id: item && (item.id || item.name || item.model),
+          })).filter(item => item.id);
+          res.json({ ok: true, data });
         } else {
           const body = await resp.text();
           res.json({ ok: false, error: `${resp.status}: ${body.slice(0, 200)}` });

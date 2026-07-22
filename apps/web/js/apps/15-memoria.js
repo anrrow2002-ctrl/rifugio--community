@@ -734,11 +734,19 @@ window.Rifugio.useMemoria = function(ctx) {
             const fetchModels = async () => {
                 if (!memSettings.base_url) return;
                 try {
-                    const res = await fetch(memSettings.base_url.replace(/\/$/,'')+'/models', {
-                        headers: { 'Authorization': 'Bearer '+memSettings.api_key }
+                    const res = await fetch('/api/settings/llm/test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            base_url: memSettings.base_url,
+                            api_key: memSettings.api_key,
+                            model: memSettings.model,
+                        }),
                     });
                     const j = await res.json();
-                    availableModels.value = (j.data||[]).map(m=>m.id).sort();
+                    if (!res.ok || !j.ok) throw new Error(j.error || ('HTTP ' + res.status));
+                    availableModels.value = (j.data || []).map(m => m.id || m.name || m.model).filter(Boolean).sort();
+                    if (!availableModels.value.length) alert('连接成功，但接口没有返回模型列表');
                 } catch(e) { availableModels.value = []; alert('获取失败: '+e.message); }
             };
 

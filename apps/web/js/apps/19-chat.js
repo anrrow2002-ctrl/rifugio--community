@@ -73,15 +73,14 @@ window.Rifugio.useChat = function(ctx) {
                     let reasoning = '';
                     // 优先用户配置的 API（部署到自家服务器时用）
                     if (llm.base_url && llm.api_key) {
-                        const base = llm.base_url.replace(/\/+$/, '');
                         const history = chat.messages.slice(-20).map(m => ({ role: m.role, content: m.content }));
-                        const r = await fetch(`${base}/chat/completions`, {
+                        const r = await fetch('/api/talk-api/v1/chat/completions', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${llm.api_key}`,
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
+                                provider: 'auto',
+                                base_url: llm.base_url,
+                                api_key: llm.api_key,
                                 model: llm.model || 'gpt-4o-mini',
                                 messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...history],
                                 temperature: 0.85,

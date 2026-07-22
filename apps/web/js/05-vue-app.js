@@ -1920,7 +1920,7 @@
                 if (!port.base_url) { port.status = '先填 Base URL'; return; }
                 port.status = '获取中…';
                 try {
-                    const isCc = port.id === 'cc' || /^\/api\/chatroom-cc\/v1/.test(String(port.base_url));
+                    const isCc = /^\/api\/chatroom-cc\/v1(?:\/|$)/.test(String(port.base_url));
                     let r;
                     if (isCc) {
                         const headers = {};
@@ -1994,7 +1994,7 @@
                 return [{ role:'system', content:system }, ...recent, { role:'user', content }];
             };
             const callChatroomPort = async (port, latestText, imageUrl='', excludeMsgId='') => {
-                const isCc = port.id === 'cc' || /^\/api\/chatroom-cc\/v1/.test(String(port.base_url));
+                const isCc = /^\/api\/chatroom-cc\/v1(?:\/|$)/.test(String(port.base_url));
                 const requestBody = { model:port.model, messages:roomHistoryMessages(port, latestText, imageUrl, excludeMsgId), temperature:.85 };
                 if (!isCc) {
                     Object.assign(requestBody, {
