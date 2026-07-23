@@ -73,3 +73,55 @@ test('community API rejects wild durations above 30 minutes before contacting th
     global.fetch = originalFetch;
   }
 });
+
+test('MCP commands prefer an authenticated Android direct executor over the optional bridge', async () => {
+  const routes = mountedRoutes();
+  const originalFetch = global.fetch;
+  let bridgeCalled = false;
+  global.fetch = async () => {
+    bridgeCalled = true;
+    return jsonResponse({ ok:true });
+  };
+  try {
+    const directState = responseCapture();
+    routes.post.get('/api/toy/direct/state')({
+      body:{ clientId:'android-test-client', supported:true, connected:true },
+    }, directState);
+    assert.equal(directState.body.state.transport, 'direct');
+
+    const consent = responseCapture();
+    await routes.post.get('/api/toy/ai-control')({ body:{ enabled:true } }, consent);
+    assert.equal(consent.body.state.aiControlEnabled, true);
+
+    const mcpResponse = responseCapture();
+    const mcpRequest = routes.post.get('/api/toy/mcp/set')({
+      body:{ channel:'vibrate', intensity:37 },
+    }, mcpResponse);
+
+    await new Promise(resolve => setImmediate(resolve));
+    const poll = responseCapture();
+    routes.get.get('/api/toy/direct/commands')({
+      query:{ client_id:'android-test-client' },
+    }, poll);
+    assert.equal(poll.body.commands.length, 1);
+    assert.deepEqual(poll.body.commands[0].payload, { channel:'vibrate', intensity:37 });
+
+    const result = responseCapture();
+    routes.post.get('/api/toy/direct/result')({
+      body:{
+        clientId:'android-test-client',
+        commandId:poll.body.commands[0].id,
+        ok:true,
+        result:{ direct:true },
+      },
+    }, result);
+    await mcpRequest;
+
+    assert.equal(mcpResponse.statusCode, 200);
+    assert.equal(mcpResponse.body.ok, true);
+    assert.equal(mcpResponse.body.state.transport, 'direct');
+    assert.equal(bridgeCalled, false);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});

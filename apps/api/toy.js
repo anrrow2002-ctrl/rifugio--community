@@ -1,9 +1,14 @@
-// SOSEXY 玩具控制：VPS 安全层 → Cloudflare Tunnel → Mac BLE Bridge。
-// 前端只负责状态、人工控制、AI 授权和记录；桥 token 永不返回或写入日志。
+// SOSEXY 玩具控制：
+// - Android/Chromium PWA uses Web Bluetooth and acts as the local BLE executor.
+// - A separately configured BLE bridge remains an optional fallback for remote use.
+// MCP commands always pass through this API so consent, history, and emergency stop
+// have one policy surface. Bridge tokens are never returned or written to logs.
 const crypto = require('crypto');
 const BRIDGE_URL = String(process.env.SOSEXY_BRIDGE_URL || '').replace(/\/$/, '');
 const CHANNELS = ['suck', 'vibrate', 'current'];
 const MAX_HISTORY = 50;
+const DIRECT_ONLINE_MS = 12000;
+const DIRECT_COMMAND_TIMEOUT_MS = 15000;
 
 function bridgeToken() {
   const token = String(process.env.SOSEXY_BRIDGE_TOKEN || '').trim();
@@ -132,16 +137,38 @@ function wild(value) {
 function mountToyRoutes(app) {
   const state = {
     bridgeAlive: false,
-    toyConnected: false,
+    bridgeToyConnected: false,
+    directSupported: false,
+    directConnected: false,
+    directClientId: '',
+    directLastSeenAt: 0,
+    directWildRunning: false,
+    directWildEndsAt: 0,
     aiControlEnabled: false,
     lastCheckedAt: null,
     lastError: '',
     history: [],
   };
+  const directQueue = [];
+  const directPending = new Map();
+  const bridgeConfigured = Boolean(BRIDGE_URL && String(process.env.SOSEXY_BRIDGE_TOKEN || '').trim());
+  const directOnline = () => Boolean(
+    state.directClientId
+    && state.directLastSeenAt
+    && Date.now() - state.directLastSeenAt < DIRECT_ONLINE_MS
+  );
 
   const snapshot = () => ({
     bridgeAlive: state.bridgeAlive,
-    toyConnected: state.toyConnected,
+    bridgeConfigured,
+    bridgeToyConnected: state.bridgeToyConnected,
+    directSupported: state.directSupported,
+    directOnline: directOnline(),
+    directConnected: directOnline() && state.directConnected,
+    directWildRunning: directOnline() && state.directWildRunning,
+    directWildEndsAt: directOnline() ? state.directWildEndsAt : 0,
+    transport: directOnline() && state.directConnected ? 'direct' : (state.bridgeToyConnected ? 'bridge' : 'none'),
+    toyConnected: (directOnline() && state.directConnected) || state.bridgeToyConnected,
     aiControlEnabled: state.aiControlEnabled,
     lastCheckedAt: state.lastCheckedAt,
     lastError: state.lastError,
@@ -175,13 +202,13 @@ function mountToyRoutes(app) {
     try {
       const ping = await bridgeRequest('/ping');
       state.bridgeAlive = ping.bridge === 'alive' || ping.ok === true;
-      state.toyConnected = ping.toy_connected === true;
+      state.bridgeToyConnected = ping.toy_connected === true;
       state.lastError = '';
       return ping;
     } catch (error) {
       state.bridgeAlive = false;
-      state.toyConnected = false;
-      state.lastError = String(error.message || error).slice(0, 240);
+      state.bridgeToyConnected = false;
+      if (bridgeConfigured) state.lastError = String(error.message || error).slice(0, 240);
       return null;
     } finally {
       state.lastCheckedAt = new Date().toISOString();
@@ -196,15 +223,64 @@ function mountToyRoutes(app) {
     }
   }
 
+  function ensureExecutor() {
+    if (directOnline() && state.directConnected) return 'direct';
+    if (bridgeConfigured) return 'bridge';
+    const error = new Error(
+      state.directSupported
+        ? '请先在安卓 Chrome/PWA 打开 Toy 并连接 SOSEXY'
+        : '没有可用的安卓蓝牙页面或外部蓝牙桥'
+    );
+    error.statusCode = 503;
+    throw error;
+  }
+
+  function enqueueDirect(action, payload, item, timeoutMs = DIRECT_COMMAND_TIMEOUT_MS) {
+    if (ensureExecutor() !== 'direct') throw new Error('Android direct executor is unavailable');
+    const command = {
+      id: item.id,
+      action,
+      payload,
+      createdAt: Date.now(),
+      leaseUntil: 0,
+      attempts: 0,
+    };
+    directQueue.push(command);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        directPending.delete(command.id);
+        const index = directQueue.findIndex(entry => entry.id === command.id);
+        if (index >= 0) directQueue.splice(index, 1);
+        const error = new Error('安卓蓝牙页面没有及时执行指令，请保持 Toy 页面打开');
+        error.statusCode = 504;
+        reject(error);
+      }, Math.max(3000, timeoutMs));
+      directPending.set(command.id, { resolve, reject, timer });
+    });
+  }
+
+  async function dispatchAction(action, payload, item, bridgeTimeoutMs = 30000) {
+    const executor = ensureExecutor();
+    if (executor === 'direct') {
+      return enqueueDirect(action, payload, item);
+    }
+    const path = action === 'sequence' ? '/sequence'
+      : action === 'flow' ? '/flow'
+      : action === 'wild' ? '/wild'
+      : action === 'stop' ? '/stop'
+      : '/set';
+    return bridgeRequest(path, 'POST', payload, bridgeTimeoutMs);
+  }
+
   async function runSet(req, res, source, requireConsent) {
     let item;
     try {
       const payload = { channel: channel(req.body && req.body.channel), intensity: intensity(req.body && req.body.intensity) };
       item = begin('set', source, payload);
       if (requireConsent) ensureAiAllowed();
-      const result = await bridgeRequest('/set', 'POST', payload);
+      const result = await dispatchAction('set', payload, item);
       finish(item, 'done', result);
-      await refreshBridge();
+      if (bridgeConfigured && !directOnline()) await refreshBridge();
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       if (item) finish(item, 'error', error);
@@ -218,9 +294,9 @@ function mountToyRoutes(app) {
       const clean = sequence(req.body && req.body.steps);
       item = begin('sequence', source, { steps: clean.steps });
       if (requireConsent) ensureAiAllowed();
-      const result = await bridgeRequest('/sequence', 'POST', { steps: clean.steps }, Math.max(30000, (clean.totalHold + 20) * 1000));
+      const result = await dispatchAction('sequence', { steps: clean.steps }, item, Math.max(30000, (clean.totalHold + 20) * 1000));
       finish(item, 'done', result);
-      await refreshBridge();
+      if (bridgeConfigured && !directOnline()) await refreshBridge();
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       if (item) finish(item, 'error', error);
@@ -234,9 +310,9 @@ function mountToyRoutes(app) {
       const clean = flow(req.body && req.body.steps);
       item = begin('flow', source, { steps: clean.steps, duration: clean.totalSeconds });
       if (requireConsent) ensureAiAllowed();
-      const result = await bridgeRequest('/flow', 'POST', { steps: clean.steps }, Math.max(30000, (clean.totalSeconds + 20) * 1000));
+      const result = await dispatchAction('flow', { steps: clean.steps }, item, Math.max(30000, (clean.totalSeconds + 20) * 1000));
       finish(item, 'done', result);
-      await refreshBridge();
+      if (bridgeConfigured && !directOnline()) await refreshBridge();
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       if (item) finish(item, 'error', error);
@@ -250,10 +326,10 @@ function mountToyRoutes(app) {
       const payload = wild(req.body);
       item = begin('wild', source, payload);
       if (requireConsent) ensureAiAllowed();
-      // The Mac bridge acknowledges immediately and runs the waveform locally.
-      const result = await bridgeRequest('/wild', 'POST', payload, 15000);
+      // Both executors acknowledge quickly and run the waveform beside the device.
+      const result = await dispatchAction('wild', payload, item, 15000);
       finish(item, 'done', result);
-      refreshBridge().catch(() => {});
+      if (bridgeConfigured && !directOnline()) refreshBridge().catch(() => {});
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       if (item) finish(item, 'error', error);
@@ -264,9 +340,9 @@ function mountToyRoutes(app) {
   async function runStop(req, res, source) {
     const item = begin('stop', source, { intensity: 0 });
     try {
-      const result = await bridgeRequest('/stop', 'POST', {});
+      const result = await dispatchAction('stop', {}, item);
       finish(item, 'done', result);
-      await refreshBridge();
+      if (bridgeConfigured && !directOnline()) await refreshBridge();
       res.json({ ok: true, result, state: snapshot() });
     } catch (error) {
       finish(item, 'error', error);
@@ -277,7 +353,85 @@ function mountToyRoutes(app) {
   app.locals.toyState = snapshot;
 
   app.get('/api/toy/state', async (_req, res) => {
-    await refreshBridge();
+    if (!directOnline() && bridgeConfigured) await refreshBridge();
+    res.json({ ok: true, state: snapshot() });
+  });
+
+  app.post('/api/toy/direct/state', (req, res) => {
+    const body = req.body || {};
+    const clientId = String(body.clientId || '').trim().slice(0, 96);
+    if (!clientId) return res.status(400).json({ ok: false, error: 'clientId is required' });
+    state.directClientId = clientId;
+    state.directSupported = body.supported === true;
+    state.directConnected = body.connected === true;
+    state.directWildRunning = body.wildRunning === true;
+    state.directWildEndsAt = Number.isFinite(Number(body.wildEndsAt)) ? Math.max(0, Number(body.wildEndsAt)) : 0;
+    state.directLastSeenAt = Date.now();
+    state.lastCheckedAt = new Date().toISOString();
+    if (state.directConnected) state.lastError = '';
+    res.json({ ok: true, state: snapshot() });
+  });
+
+  app.get('/api/toy/direct/commands', (req, res) => {
+    const clientId = String(req.query && req.query.client_id || '').trim().slice(0, 96);
+    if (!clientId || clientId !== state.directClientId) {
+      return res.status(409).json({ ok: false, error: 'direct client changed; refresh Toy state' });
+    }
+    state.directLastSeenAt = Date.now();
+    const now = Date.now();
+    const command = directQueue.find(entry => entry.leaseUntil <= now);
+    if (!command) return res.json({ ok: true, commands: [] });
+    command.leaseUntil = now + 5000;
+    command.attempts += 1;
+    res.json({
+      ok: true,
+      commands: [{
+        id: command.id,
+        action: command.action,
+        payload: command.payload,
+        createdAt: command.createdAt,
+      }],
+    });
+  });
+
+  app.post('/api/toy/direct/result', (req, res) => {
+    const body = req.body || {};
+    const clientId = String(body.clientId || '').trim().slice(0, 96);
+    const commandId = String(body.commandId || '').trim().slice(0, 96);
+    if (!clientId || clientId !== state.directClientId) {
+      return res.status(409).json({ ok: false, error: 'direct client changed' });
+    }
+    state.directLastSeenAt = Date.now();
+    const pending = directPending.get(commandId);
+    if (!pending) return res.json({ ok: true, ignored: true });
+    clearTimeout(pending.timer);
+    directPending.delete(commandId);
+    const index = directQueue.findIndex(entry => entry.id === commandId);
+    if (index >= 0) directQueue.splice(index, 1);
+    if (body.ok === true) pending.resolve(body.result || { direct: true });
+    else {
+      const error = new Error(String(body.error || '安卓蓝牙执行失败').slice(0, 240));
+      error.statusCode = 502;
+      pending.reject(error);
+    }
+    res.json({ ok: true });
+  });
+
+  app.post('/api/toy/direct/event', (req, res) => {
+    const body = req.body || {};
+    const action = String(body.action || '').trim();
+    if (!['set', 'sequence', 'flow', 'wild', 'stop', 'connect', 'disconnect'].includes(action)) {
+      return res.status(400).json({ ok: false, error: 'unknown direct event action' });
+    }
+    const item = begin(action, 'user', body.details && typeof body.details === 'object' ? body.details : {});
+    finish(item, body.ok === false ? 'error' : 'done', body.ok === false ? body.error : { direct: true });
+    state.directLastSeenAt = Date.now();
+    if (action === 'connect') state.directConnected = body.ok !== false;
+    if (action === 'disconnect') {
+      state.directConnected = false;
+      state.directWildRunning = false;
+      state.directWildEndsAt = 0;
+    }
     res.json({ ok: true, state: snapshot() });
   });
 
@@ -286,10 +440,10 @@ function mountToyRoutes(app) {
     state.aiControlEnabled = req.body.enabled;
     if (!state.aiControlEnabled) {
       const item = begin('stop', 'permission', { intensity: 0, note: 'AI control disabled' });
-      try { finish(item, 'done', await bridgeRequest('/stop', 'POST', {})); }
+      try { finish(item, 'done', await dispatchAction('stop', {}, item)); }
       catch (error) { finish(item, 'error', error); }
     }
-    await refreshBridge();
+    if (!directOnline() && bridgeConfigured) await refreshBridge();
     res.json({ ok: true, state: snapshot() });
   });
 
@@ -300,6 +454,18 @@ function mountToyRoutes(app) {
 
   // Display-only status polling: a failed poll must never stop a bridge-local run.
   app.get('/api/toy/wild-status', async (_req, res) => {
+    if (directOnline() && state.directConnected) {
+      const remaining = state.directWildRunning
+        ? Math.max(0, Math.round((state.directWildEndsAt - Date.now()) / 1000))
+        : null;
+      return res.json({
+        ok: true,
+        running: state.directWildRunning && remaining > 0,
+        remaining,
+        mode: 'direct',
+        toyConnected: true,
+      });
+    }
     try {
       const ping = await bridgeRequest('/ping', 'GET', undefined, 6000);
       res.json({

@@ -3706,7 +3706,7 @@
             const {
                 toy, saveToy, connectToy, pushToyCommand, applyToyCommand, sendToyTest, stopToyNow, mockToyCommand,
                 pollToyCommand, setToyAiControl, toyChannelLabel, toyActionLabel, toySourceLabel, toyCommandSummary,
-                toyCommandTime
+                toyCommandTime, TOY_WILD_CHOICES, startToyWild, stopToyWild, pollWildStatus, toyWildClock
             } = toyMod;
             const crabRoomMod = Rifugio.useCrabRoom(rifugioCtx);
             Object.assign(rifugioCtx, crabRoomMod);
@@ -3859,6 +3859,7 @@ return {
                 radio, saveRadio, radioTabs, radioProviders, radioLoginProviders, radioAudioRef, activeRadioPlaylist, radioVisibleResults, radioQueueItems, radioPlayModes, radioPlayModeLabel, radioIsCurrentFavorite, radioExternalLinks, radioDetailLines, toggleRadioProvider, setRadioTab, searchRadio, playRadioItem, openRadioDetail, createRadioPlaylist, addRadioItemToPlaylist, removeRadioPlaylistItem, deleteRadioPlaylist, toggleRadioFavorite, setRadioPlayMode, openRadioQueuePanel, playRadioQueueItem, playRadioQueue, toggleRadioPlay, resumeBlockedRadio, onRadioLoadedMetadata, onRadioTimeUpdate, onRadioEnded, onRadioAudioError, seekRadio, setRadioSleepTimer, clearRadioSleepTimer, openRadioLoginPicker, startRadioProviderLogin, onRadioLocalFiles, onRadioImageUpload, playNextRadio, playPrevRadio, radioTypeLabel, radioProviderLabel, formatRadioTime,
                 toy, connectToy, sendToyTest, stopToyNow, mockToyCommand, pollToyCommand,
                 setToyAiControl, toyChannelLabel, toyActionLabel, toySourceLabel, toyCommandSummary, toyCommandTime,
+                TOY_WILD_CHOICES, startToyWild, stopToyWild, pollWildStatus, toyWildClock,
                 CRAB_STATES, IDLE_STATE, PET_ACTIONS, PET_METRICS, FOOD_ITEMS,
                 crab, petStatus, petUi, petProfile, petFloatChanges, crabStateMeta, currentCrabAsset, crabFloatStyle, crabRoomMoment,
                 petMetricItems, lowestPetMetric, petLevel, petXpProgress, activeFoodItem, visiblePetSkills, petProfileTitle,

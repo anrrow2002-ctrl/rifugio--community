@@ -4062,17 +4062,18 @@
                             <div class="toy-heart">♥</div>
                             <div>
                                 <h3 class="text-[22px] font-bold text-[#68454f]">SOSEXY 控制台</h3>
-                                <small>iPhone PWA → VPS → Mac 蓝牙桥 → SOSEXY</small>
+                                <small>安卓 Chrome/PWA 直连 · 外部蓝牙桥可选</small>
                             </div>
-                            <span class="toy-status-pill" :class="{warn:toy.bridgeAlive && !toy.connected, offline:!toy.bridgeAlive}">
-                                {{ toy.connected ? 'SOSEXY 在线' : (toy.bridgeAlive ? '桥在线 · 等待玩具' : 'Mac 桥离线') }}
+                            <span class="toy-status-pill" :class="{warn:!toy.connected && (toy.bridgeAlive || toy.directSupported), offline:!toy.connected && !toy.bridgeAlive}">
+                                {{ toy.connected ? (toy.transport === 'direct' ? '安卓直连' : '桥接在线') : '尚未连接' }}
                             </span>
                         </div>
                         <p class="toy-status" :class="{error:toy.error}">{{ toy.error || toy.status }}</p>
                     </div>
                     <div class="toy-card">
                         <b>手动控制</b>
-                        <small>手机不直接连蓝牙。Mac 开机并保持唤醒时，打开玩具即可自动连接。</small>
+                        <small v-if="toy.directSupported">打开玩具后点击连接，在安卓系统弹窗里选择 SOSEXY；不需要 Mac。</small>
+                        <small v-else>当前浏览器没有 Web Bluetooth，可使用已配置的外部蓝牙桥。安卓请用最新版 Chrome/Edge，并从 localhost 或 HTTPS 打开。</small>
                         <div class="toy-control-grid">
                             <label>通道
                                 <select v-model="toy.channel">
@@ -4090,14 +4091,15 @@
                             <input v-model.number="toy.intensity" type="range" min="0" max="100" step="1">
                         </div>
                         <div class="toy-actions mt-3">
-                            <button class="toy-action" :disabled="toy.busy" @click="connectToy">刷新状态</button>
+                            <button class="toy-action" :disabled="toy.busy" @click="connectToy">{{ toy.directSupported ? (toy.transport === 'direct' ? '重新连接' : '连接安卓蓝牙') : '刷新桥状态' }}</button>
                             <button class="toy-action" :disabled="toy.busy || !toy.connected" @click="sendToyTest">发送到玩具</button>
                             <button class="toy-action stop" :disabled="toy.busy" @click="stopToyNow">紧急停止</button>
                         </div>
                     </div>
                     <div class="toy-card">
                         <b>失控模式</b>
-                        <small>随机波形由 Mac 桥本地生成；启动后关掉页面、断网、手机锁屏都不会打断，直到时长跑完或你点停止。倒计时只是显示。</small>
+                        <small v-if="toy.transport === 'direct'">随机波形由安卓手机本地生成。运行期间请保持页面打开、手机唤醒；锁屏或系统杀掉浏览器会中断。</small>
+                        <small v-else>随机波形由外部蓝牙桥本地生成；桥接模式下关闭网页不会打断。</small>
                         <div class="toy-control-grid mt-3">
                             <label>时长
                                 <select v-model.number="toy.wildDuration" :disabled="toy.wildRunning || toy.wildBusy">
@@ -4118,11 +4120,11 @@
                         <small v-if="toy.wildNote" class="toy-status mt-2">{{ toy.wildNote }}</small>
                     </div>
                     <div class="toy-card">
-                        <b>Claude 授权</b>
-                        <small>关闭时 Claude 的设置和序列调用会被 VPS 拒绝；紧急停止永远可用。重新启动 VPS 后默认关闭。</small>
+                        <b>AI / MCP 授权</b>
+                        <small>关闭时所有 AI 设置、序列和曲线都会被拒绝；紧急停止永远可用。安卓直连时页面负责执行 MCP 指令，因此必须保持打开。</small>
                         <label class="talk-switch mt-3">
                             <input type="checkbox" v-model="toy.allowAiControl" :disabled="toy.busy" @change="setToyAiControl">
-                            <span>允许 Claude 控制 SOSEXY</span>
+                            <span>允许 AI / MCP 控制 SOSEXY</span>
                         </label>
                         <div class="toy-actions">
                             <button class="toy-action" :disabled="toy.busy" @click="pollToyCommand">刷新调用记录</button>
@@ -4130,7 +4132,7 @@
                     </div>
                     <div class="toy-card">
                         <b>最近调用</b>
-                        <small>这里同时显示你在 PWA 的手动操作和 Claude 通过 MCP 发出的调用。</small>
+                        <small>这里同时显示你在 PWA 的手动操作和 AI 通过 MCP 发出的调用。</small>
                         <div class="toy-command-list mt-3">
                             <div v-if="!toy.commands.length" class="toy-status">暂无调用记录。</div>
                             <div v-for="cmd in toy.commands.slice(0,12)" :key="cmd.id" class="toy-command" :data-source="cmd.source" :data-status="cmd.status">
@@ -5074,7 +5076,7 @@
 </div>
 
 <script src="./js/apps/00-core.js"></script>
-<script src="./js/apps/10-toy.js?v=toy-wild-fnf-community-20260722"></script>
+<script src="./js/apps/10-toy.js?v=android-web-bluetooth-20260723"></script>
 <script src="./js/apps/11-radio.js?v=music-listening-v3-20260714"></script>
 <script src="./js/apps/12-mcp.js"></script>
 <script src="./js/apps/13-health.js"></script>
@@ -5094,7 +5096,7 @@
 <script src="./js/apps/21-biblioteca.js?v=reading-nook-20260713"></script>
 <script src="./js/apps/21-room.js?v=crab-pet-chat-v11-20260714"></script>
 <script src="./js/apps/22-showroom.js?v=showroom-v1-20260715"></script>
-<script src="./js/05-vue-app.js?v=community-auth-icons-toy-20260722"></script>
+<script src="./js/05-vue-app.js?v=android-toy-bindings-20260723"></script>
 <!-- iOS 键盘处理：只调整 App 内容高度，绝不平移 body 或缩短全屏锁屏。 -->
 <script src="./js/06-viewport-keyboard-fix.js"></script>
 </body>

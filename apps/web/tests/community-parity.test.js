@@ -20,8 +20,17 @@ assert.doesNotMatch(app, /https:\/\/i\.postimg\.cc\/[^'"\s]+\/IMG-299[12456]\.jp
 assert.equal(manifest.icons.length, 2, 'PWA install icons are separate and must remain available');
 
 assert.match(index, />失控模式</, 'toy wild mode must be visible in the community UI');
+assert.match(index, /连接安卓蓝牙/, 'Android users need a direct Bluetooth connection action');
+assert.match(index, /安卓 Chrome\/PWA 直连/, 'Toy UI must describe Android direct BLE as the primary path');
+assert.match(toy, /navigator\.bluetooth\.requestDevice/, 'Toy must request the nearby BLE device from Android Chromium');
+assert.match(toy, /0000ee01-0000-1000-8000-00805f9b34fb/, 'Toy must request its custom BLE service');
+assert.match(toy, /0000ee03-0000-1000-8000-00805f9b34fb/, 'Toy must write the known SOSEXY characteristic');
+assert.match(toy, /direct\/commands/, 'Android page must poll the authenticated MCP relay queue');
+assert.match(toy, /direct\/result/, 'Android page must report MCP relay execution results');
+assert.match(toy, /stopDirectChannels/, 'Android direct mode needs a local all-channel emergency stop');
 assert.match(toy, /TOY_WILD_CHOICES/, 'toy wild duration choices must be wired');
 assert.match(toy, /600,900,1200,1800/, 'toy wild choices must cover 10–30 minutes');
+assert.ok(app.includes('TOY_WILD_CHOICES, startToyWild, stopToyWild, pollWildStatus, toyWildClock'), 'wild controls must be exported from Vue setup to the template');
 assert.match(toy, /状态暂时不可用（运行不受影响）/, 'status polling failures must not stop a bridge-local run');
 assert.match(toy, /const stopToyWild = async/, 'wild mode needs an explicit stop action');
 

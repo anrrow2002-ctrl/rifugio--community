@@ -54,7 +54,9 @@ Optional flags do not supply external services by themselves:
 - `RIFUGIO_ENABLE_RADIO`: requires outbound network access to media providers.
 - `RIFUGIO_ENABLE_IMAGE`: requires a configured image provider and key.
 - `RIFUGIO_ENABLE_VOICE`: requires a configured TTS/STT provider and key.
-- `RIFUGIO_ENABLE_TOY`: requires the separate supported BLE bridge and physical device.
+- `RIFUGIO_ENABLE_TOY`: Android Chrome/Edge can connect directly to the physical
+  SOSEXY device with Web Bluetooth. An external BLE bridge is an optional fallback
+  for browsers and remote deployments without Web Bluetooth.
 - `RIFUGIO_ENABLE_CLI_BRIDGE`: requires a separately installed and authenticated compatible CLI/runtime. The standard API container does not bundle Claude Code, tmux, or host terminal sessions.
 
 Server-side long-chat image export additionally needs Chromium at `RIFUGIO_CHROMIUM`; the standard image does not bundle it, and the web app keeps a browser-side fallback.

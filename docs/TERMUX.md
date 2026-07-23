@@ -35,6 +35,7 @@ RIFUGIO_PUBLIC_URL=http://localhost:8080
 RIFUGIO_CORS_ORIGINS=http://localhost:8080
 PASSKEY_RP_ID=localhost
 PASSKEY_ORIGINS=http://localhost:8080
+RIFUGIO_ENABLE_TOY=true
 ```
 
 ## Start the API and MCP
@@ -92,6 +93,23 @@ caddy run --config ./Caddyfile
 
 Open `http://localhost:8080` on that Android phone and install the PWA from the browser menu.
 
+## Android direct Bluetooth for SOSEXY
+
+On Android, the Toy app uses Chrome/Chromium Web Bluetooth to connect directly to
+the nearby `SOSEXY` BLE device. A Mac is not required.
+
+1. Open Rifugio from `http://localhost:8080` in current Chrome or Edge on Android.
+2. Turn on the toy and Android Bluetooth.
+3. Open **Toy**, tap **连接安卓蓝牙**, and choose `SOSEXY` in the system picker.
+4. Keep the Toy page open and the phone awake while a local sequence, flow, wild
+   mode, or MCP command is running.
+
+The first device selection must be initiated by a tap; browsers do not permit a
+site to silently claim a Bluetooth device. Android direct mode writes BLE locally,
+so the API key, MCP token, and any optional bridge token are never sent to the
+toy. If Web Bluetooth is unavailable, an explicitly configured external bridge
+remains a fallback.
+
 ## Connect an MCP client
 
 The Streamable HTTP endpoint is:
@@ -116,7 +134,7 @@ A successful client connection performs `initialize`, `tools/list`, then `tools/
 | Browser speech recognition and notifications | Browser/Android dependent |
 | Long-chat server-side screenshot | Chromium is not bundled for Termux; the browser fallback remains |
 | Claude Code / terminal subscription bridge | Not a portable Termux guarantee; use OpenAI-compatible API mode unless you have separately validated a compatible CLI |
-| SOSEXY toy control | The bundled bridge expects the separate Mac BLE bridge; Android direct BLE is not implemented |
+| SOSEXY toy control | Android Chrome/Edge connects directly with Web Bluetooth; external BLE bridge is optional |
 | 24/7 background uptime | Android may stop Termux; disable battery optimization and use a wake lock if appropriate |
 
 This is phone-local storage: databases remain under `data/` on that Android device. To reach it from other devices, use a trusted LAN or private tunnel and HTTPS; do not expose ports or SQLite files directly to the public internet. Passkeys on other devices require an HTTPS origin whose hostname matches `PASSKEY_RP_ID`.

@@ -1036,7 +1036,7 @@ def tool_post_pyq(content='', type='post', moment_id='', reply_to_comment_id='',
     comment = result.get('comment') or {}
     return f"评论成功，动态 id={target}，评论 id={comment.get('id')}。"
 
-# ─── FUNF 啵啵贝（SOSEXY）：统一经过 VPS API，受 PWA 授权并留下调用记录 ─────
+# ─── FUNF 啵啵贝（SOSEXY）：经 API 转给安卓直连页面或可选外部桥 ──────────
 TOY_CHANNELS = ('suck', 'vibrate', 'current')
 
 def _toy_api(path, method='GET', body=None, timeout=30):
@@ -1192,6 +1192,8 @@ def tool_toy_wild(duration_sec=600, channels=None, ceiling=80):
 def tool_toy_status():
     state = (_toy_api('/state').get('state') or {})
     return json.dumps({
+        'transport': state.get('transport') or 'none',
+        'android_direct_online': state.get('directOnline') is True,
         'bridge': 'alive' if state.get('bridgeAlive') else 'offline',
         'toy_connected': state.get('toyConnected') is True,
         'ai_control_enabled': state.get('aiControlEnabled') is True,
@@ -1368,7 +1370,7 @@ TOOLS = [
     },
     {
         'name': 'toy_status',
-        'description': '检查 FUNF 啵啵贝（SOSEXY）Mac 蓝牙桥及玩具连接状态。控制前先确认 toy_connected=true。',
+        'description': '检查 FUNF 啵啵贝（SOSEXY）的安卓直连/外部桥及玩具状态。控制前先确认 toy_connected=true。',
         'inputSchema': {'type': 'object', 'properties': {}, 'required': []}
     },
     {
@@ -1395,7 +1397,7 @@ TOOLS = [
     },
     {
         'name': 'toy_wild',
-        'description': '启动 SOSEXY 本地随机失控模式（fire-and-forget：立即返回启动确认，波形由 Mac 桥本地跑完全程）；最长 30 分钟、强度上限最高 90，仅允许指定通道。需要 PWA 已开启“允许 AI 控制”；toy_stop 和实体停止始终可立即刹车。',
+        'description': '启动 SOSEXY 本地随机失控模式（立即返回启动确认，波形由安卓直连页面或外部桥在设备旁运行）；最长 30 分钟、强度上限最高 90，仅允许指定通道。需要 PWA 已开启“允许 AI 控制”；安卓直连时页面必须保持打开，toy_stop 和实体停止始终可立即刹车。',
         'inputSchema': {'type': 'object', 'properties': {
             'duration_sec': {'type': 'integer', 'minimum': 1, 'maximum': 1800, 'default': 600, 'description': '持续秒数；常用 600/900/1200/1800 即 10/15/20/30 分钟'},
             'channels': {'type': 'array', 'items': {'type': 'string', 'enum': ['suck', 'vibrate', 'current']}, 'minItems': 1, 'maxItems': 3, 'uniqueItems': True, 'default': ['suck', 'vibrate'], 'description': '参与随机变化的通道'},

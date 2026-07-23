@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Rifugio 内置 Claude 玩具 MCP：统一经过 VPS Toy API，受 PWA 的 AI 授权开关约束。
+// Rifugio 内置玩具 MCP：统一经过 Toy API，受 PWA 的 AI 授权开关约束。
 const fs = require('fs');
 const API = process.env.RIFUGIO_API || 'http://127.0.0.1:3457';
 
@@ -27,7 +27,7 @@ async function api(path, method = 'GET', body) {
 const intensity = { type: 'integer', minimum: 0, maximum: 100, description: '强度 0–100' };
 const channel = { type: 'string', enum: ['suck', 'vibrate', 'current'], description: 'suck=吮吸，vibrate=震动，current=电流' };
 const TOOLS = [
-  { name: 'toy_status', description: '查看 Mac 桥、SOSEXY 玩具和用户 AI 授权状态。控制前先调用。', inputSchema: { type: 'object', properties: {}, required: [] } },
+  { name: 'toy_status', description: '查看安卓直连/外部桥、SOSEXY 玩具和用户 AI 授权状态。控制前先调用。', inputSchema: { type: 'object', properties: {}, required: [] } },
   { name: 'toy_set', description: '设置 SOSEXY 的一个通道，强度 0–100。只有用户在 PWA 开启“允许 AI 控制”后才执行。', inputSchema: { type: 'object', properties: { channel, intensity }, required: ['channel', 'intensity'] } },
   { name: 'toy_sequence', description: '执行多步序列。steps_json 是 JSON 数组，每步含 channel、intensity(0–100)、hold(秒)。', inputSchema: { type: 'object', properties: { steps_json: { type: 'string', description: 'JSON 数组字符串，最多64步、总时长最多300秒' } }, required: ['steps_json'] } },
   { name: 'toy_stop', description: '立即停止所有通道；无论 AI 授权是否开启都可用。', inputSchema: { type: 'object', properties: {}, required: [] } },
@@ -48,7 +48,7 @@ async function handle(req) {
   try {
     if (name === 'toy_status') {
       const state = (await api('/api/toy/state')).state || {};
-      return ok(JSON.stringify({ bridge:state.bridgeAlive ? 'alive' : 'offline', toy_connected:state.toyConnected === true, ai_control_enabled:state.aiControlEnabled === true }, null, 2));
+      return ok(JSON.stringify({ transport:state.transport || 'none', android_direct_online:state.directOnline === true, bridge:state.bridgeAlive ? 'alive' : 'offline', toy_connected:state.toyConnected === true, ai_control_enabled:state.aiControlEnabled === true }, null, 2));
     }
     if (name === 'toy_stop') { await api('/api/toy/mcp/stop', 'POST', {}); return ok('已立即停止 SOSEXY 全部通道。'); }
     if (name === 'toy_set') {
