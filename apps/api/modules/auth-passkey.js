@@ -212,8 +212,11 @@ function createAuthPasskey({ IS_PROD = process.env.NODE_ENV === 'production', cl
     // 登录：服务端校验强密码 → 下发签名 cookie
     app.post('/api/auth/login', async (req, res) => {
       if (isLoginBlocked(clientIp(req))) {
-        recordLoginFailure(req, 'rate_limited');
-        return res.status(429).json({ ok: false, error: 'too many attempts' });
+        // 不再在锁定期间累计失败（否则每次尝试都会把锁重置回满 15 分钟）
+        const blockedUntil = loginAttempts.get(clientIp(req))?.blockedUntil || 0;
+        const retryAfterSec = Math.max(1, Math.ceil((blockedUntil - Date.now()) / 1000));
+        res.setHeader('Retry-After', String(retryAfterSec));
+        return res.status(429).json({ ok: false, error: 'locked', retryAfterSec });
       }
       const { password } = req.body || {};
       if (!password) return res.status(400).json({ ok: false, error: 'password required' });

@@ -138,3 +138,25 @@ A successful client connection performs `initialize`, `tools/list`, then `tools/
 | 24/7 background uptime | Android may stop Termux; disable battery optimization and use a wake lock if appropriate |
 
 This is phone-local storage: databases remain under `data/` on that Android device. To reach it from other devices, use a trusted LAN or private tunnel and HTTPS; do not expose ports or SQLite files directly to the public internet. Passkeys on other devices require an HTTPS origin whose hostname matches `PASSKEY_RP_ID`.
+
+## 常见问题：登录密码一直提示 "not right… try again"
+
+大概率不是密码错，是**触发了登录锁**：错 5 次会锁 15 分钟。旧版本还有个坑——锁定期间每试一次都会重新锁满 15 分钟，越试越进不去（新版已修复，被锁时会直接显示剩余等待时间）。
+
+解决办法（任选其一）：
+
+1. **重启 API 清锁**（锁存在内存里，重启即清零）：
+   ```bash
+   # 在跑着 npm start 的窗口按 Ctrl+C，然后
+   npm start
+   ```
+2. 或者干等 15 分钟再试。
+
+之后**只输一次**，慢慢输。如果怀疑设密码时打错了（`set-auth-password.sh` 输入不回显，容易多敲空格），重设一遍：
+
+```bash
+cd ~/rifugio--community
+bash scripts/set-auth-password.sh
+cp .env apps/api/.env
+cd apps/api && npm start
+```

@@ -176,7 +176,19 @@
                     credentials: 'include',
                     body: JSON.stringify({ password: val }),
                 });
-                if (!r.ok) throw new Error(r.status === 429 ? 'too many attempts' : 'bad password');
+                if (r.status === 429) {
+                    let mins = 15;
+                    try {
+                        const j = await r.json();
+                        if (j && j.retryAfterSec) mins = Math.max(1, Math.ceil(j.retryAfterSec / 60));
+                    } catch (_) {}
+                    errEl.textContent = `too many tries — locked, wait ~${mins} min (or restart the API to clear)`;
+                    throw new Error('locked');
+                }
+                if (!r.ok) {
+                    errEl.textContent = 'not right… try again';
+                    throw new Error('bad password');
+                }
                 unlock();
                 markAuthReady();
             } catch (_) {
