@@ -45,10 +45,27 @@ for (const [key, value] of Object.entries(values)) {
 fs.writeFileSync(envFile, text, { mode: 0o600 });
 try { fs.chmodSync(envFile, 0o600); } catch {}
 
-console.log('Private configuration created. These files are ignored by Git.');
+console.log('');
+console.log('╔══════════════════════════════════════════════════════════════╗');
+console.log('║  ✅ Setup complete!                                         ║');
+console.log('╠══════════════════════════════════════════════════════════════╣');
 if (!process.env.RIFUGIO_SETUP_PASSWORD) {
-  console.log('Login password (shown once): ' + password);
+  console.log('║  🔑 Your login password (shown ONCE, write it down!):      ║');
+  console.log('║     ' + password.padEnd(55) + '║');
 } else {
-  console.log('Login password set from RIFUGIO_SETUP_PASSWORD.');
+  console.log('║  🔑 Login password: set from RIFUGIO_SETUP_PASSWORD        ║');
+  console.log('║     (the value you passed in the command)                  ║');
 }
-console.log('Next: edit private/profile.json, then run docker compose up -d --build');
+console.log('╠══════════════════════════════════════════════════════════════╣');
+console.log('║  📝 This password is for the WEBSITE lock screen.           ║');
+console.log('║     You will type it in the BROWSER, not in Termux.         ║');
+console.log('║     If you lose it, run: bash scripts/set-auth-password.sh  ║');
+console.log('╠══════════════════════════════════════════════════════════════╣');
+console.log('║  MCP Token: see .env → RIFUGIO_MCP_TOKEN                    ║');
+console.log('╚══════════════════════════════════════════════════════════════╝');
+console.log('');
+console.log('Next steps:');
+console.log('  1. (Optional) Edit private/profile.json with your names');
+console.log('  2. Copy .env to API:  cp .env apps/api/.env');
+console.log('  3. Install deps:      npm --prefix apps/api ci --omit=dev --omit=optional');
+console.log('  4. Start the server — see docs/TERMUX-保姆级教程.md');
