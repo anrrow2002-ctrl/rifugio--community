@@ -175,3 +175,37 @@ bash scripts/set-auth-password.sh
 ---
 
 有问题欢迎来 GitHub 提 issue。祝你们把家搭起来 ❤️
+
+### 我打开的地址是 5173 不是 8080？
+
+说明你是用 `npm run dev`（开发模式）启动的前端，那是 Vite 开发服务器的端口。能用，但不是教程的标准路径。两条路选一条走，别混着来：
+
+- **标准路径（推荐）**：按第 5 步用 Caddy 启动，浏览器开 `http://localhost:8080`
+- **开发模式**：继续用你的 `http://localhost:5173`
+
+### 怎么把 MCP 连到 claude.ai？
+
+claude.ai 的连接器只认**公网 HTTPS 地址**，填 `localhost` 是连不上的。需要一层隧道把手机服务暴露出去：
+
+**方案一：免费临时隧道（先跑通用这个）**
+
+```bash
+pkg install -y cloudflared
+cloudflared tunnel --url http://localhost:8080
+```
+
+日志里会给你一个 `https://随机词.trycloudflare.com` 地址。在 claude.ai 添加自定义连接器，URL 填：
+
+```
+https://你的随机地址.trycloudflare.com/mcp
+```
+
+认证方式选 Bearer Token，值填 `.env` 里的 `RIFUGIO_MCP_TOKEN`。
+
+⚠️ 缺点：cloudflared 每次重启，地址都会变，要去 claude.ai 重新填。而且这个窗口也要保持开着（第 4 个窗口了，手机辛苦了）。
+
+**方案二：固定域名（长期用推荐）**
+
+买个便宜域名（一年十几块）托管到 Cloudflare，做一条固定隧道（Cloudflare Tunnel，免费），把域名指到 `localhost:8080`。之后 claude.ai 里填 `https://你的域名/mcp`，永远不用改。具体做法搜"Cloudflare Tunnel 教程"，或者来 issue 区问。
+
+⚠️ 无论哪种方案：地址+Token 等于你家大门钥匙，**别发群里、别截图、别写进公开仓库**。
