@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, '..');
 const lock = fs.readFileSync(path.join(root, 'js/04-lock-screen.js'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'js/05-vue-app.js'), 'utf8');
 const toy = fs.readFileSync(path.join(root, 'js/apps/10-toy.js'), 'utf8');
+const room = fs.readFileSync(path.join(root, 'js/apps/21-room.js'), 'utf8');
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'utf8'));
 
@@ -18,6 +19,17 @@ assert.ok(lock.includes("nativeFetch('/api/auth/logout'"), 'manual relock must i
 assert.ok(app.includes('const DEFAULT_DOCK_ICONS = {};'), 'community App launchers must default to emoji or characters');
 assert.doesNotMatch(app, /https:\/\/i\.postimg\.cc\/[^'"\s]+\/IMG-299[12456]\.jpg/, 'legacy photo App-icon URLs must not ship as concrete links');
 assert.equal(manifest.icons.length, 2, 'PWA install icons are separate and must remain available');
+
+const petAssetRefs = [...new Set(
+    [...(`${room}\n${index}`).matchAll(/\/pets\/crab\/([A-Za-z0-9_.-]+)/g)].map(match => match[1])
+)];
+assert.ok(petAssetRefs.length >= 30, 'Clawd room should keep the complete resident/action/food artwork set');
+for (const filename of petAssetRefs) {
+    assert.ok(
+        fs.existsSync(path.join(root, 'pets/crab', filename)),
+        `Clawd artwork referenced by the UI must ship in the community build: ${filename}`,
+    );
+}
 
 assert.match(index, />失控模式</, 'toy wild mode must be visible in the community UI');
 assert.match(index, /连接安卓蓝牙/, 'Android users need a direct Bluetooth connection action');

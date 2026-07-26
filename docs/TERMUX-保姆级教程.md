@@ -43,7 +43,7 @@ node -e "require('node:sqlite'); console.log('node:sqlite ok')"
 ## 第 2 步：下载 Rifugio
 
 ```bash
-git clone https://github.com/anrrow2002-ctrl/rifugio--community.git
+git clone https://github.com/YOUR_ACCOUNT/rifugio--community.git
 cd rifugio--community
 ```
 

@@ -65,12 +65,12 @@ node -v
 
 ```bash
 cd ~
-git clone https://github.com/anrrow2002-ctrl/rifugio--community.git
+git clone https://github.com/YOUR_ACCOUNT/rifugio--community.git
 cd rifugio--community
 ```
 
 > 国内服务器 git clone 很慢？挂代理，或者换镜像：  
-> `git clone https://ghproxy.com/https://github.com/anrrow2002-ctrl/rifugio--community.git`
+> `git clone https://ghproxy.com/https://github.com/YOUR_ACCOUNT/rifugio--community.git`
 
 ---
 
