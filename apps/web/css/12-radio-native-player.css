@@ -262,6 +262,8 @@
     width:100%; min-height:92px; display:grid; grid-template-columns:62px minmax(0,1fr); gap:15px; align-items:center; padding:14px; text-align:left; color:var(--radio-text);
 }
 .radio-sheet-login span { width:56px; height:56px; border-radius:20px; display:grid; place-items:center; border:1px solid rgba(216,141,165,.18); color:rgba(216,141,165,.90); font-size:1.875rem; background:rgba(255,246,249,.74); }
+.radio-sheet-login span img { width:100%; height:100%; border-radius:inherit; object-fit:cover; }
+.radio-sheet-login span i { font-style:normal; font-size:1rem; font-weight:950; }
 .radio-sheet-login b { font-size:1.1875rem; line-height:1.2; }
 .radio-sheet-login small { grid-column:2; color:var(--radio-muted); font-size:0.75rem; margin-top:-8px; }
 .radio-sheet-group { margin-top:26px; overflow:hidden; }
@@ -638,7 +640,7 @@
 }
 
 .radio-login-provider-picker {
-    display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0 0;
+    display:grid; grid-template-columns:minmax(0,1fr); gap:10px; margin:12px 0 0;
 }
 .radio-login-provider-picker button {
     min-width:0; min-height:92px; padding:12px 6px; border-radius:22px;
@@ -670,6 +672,45 @@
     color:#fff; background:rgba(210,119,151,.90); font-size:.8125rem; font-weight:800;
 }
 .radio-login-privacy { display:block; margin-top:12px; color:rgba(103,70,82,.52); font-size:.6875rem; line-height:1.55; }
+.radio-cloud-account {
+    margin-top:12px; padding:16px; border-radius:26px;
+    background:rgba(255,255,255,.62); border:1px solid rgba(255,255,255,.78);
+}
+.radio-cloud-account-head {
+    display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:12px; align-items:center;
+}
+.radio-cloud-account-head > img,
+.radio-cloud-account-head > span {
+    width:48px; height:48px; border-radius:17px; object-fit:cover;
+}
+.radio-cloud-account-head > span {
+    display:grid; place-items:center; color:#fff; background:#e5484d; font-size:.875rem; font-weight:950;
+}
+.radio-cloud-account-head > div { min-width:0; display:grid; gap:4px; text-align:left; }
+.radio-cloud-account-head b { color:rgba(62,40,49,.92); font-size:.9375rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.radio-cloud-account-head small { color:rgba(103,70,82,.56); font-size:.6875rem; }
+.radio-cloud-account-head button,
+.radio-cloud-playlist-head button {
+    min-height:34px; padding:0 12px; border-radius:999px; color:rgba(174,77,109,.88);
+    background:rgba(255,244,248,.9); border:1px solid rgba(216,141,165,.20); font-size:.75rem; font-weight:850;
+}
+.radio-cloud-playlist-head { margin:18px 2px 9px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.radio-cloud-playlist-head b { color:rgba(62,40,49,.86); font-size:.875rem; }
+.radio-cloud-playlists { display:grid; gap:8px; max-height:310px; overflow-y:auto; }
+.radio-cloud-playlists > button {
+    min-width:0; min-height:62px; padding:7px; display:grid; grid-template-columns:48px minmax(0,1fr) 20px; gap:11px; align-items:center;
+    border-radius:18px; text-align:left; color:rgba(62,40,49,.88); background:rgba(255,248,251,.74); border:1px solid rgba(216,141,165,.10);
+}
+.radio-cloud-playlists > button > img,
+.radio-cloud-playlists > button > span {
+    width:48px; height:48px; border-radius:14px; object-fit:cover;
+}
+.radio-cloud-playlists > button > span { display:grid; place-items:center; background:rgba(229,72,77,.10); color:#d4474d; font-size:1.125rem; }
+.radio-cloud-playlists > button > div { min-width:0; display:grid; gap:4px; }
+.radio-cloud-playlists > button b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.8125rem; }
+.radio-cloud-playlists > button small { color:rgba(103,70,82,.54); font-size:.6875rem; }
+.radio-cloud-playlists > button i { color:rgba(174,77,109,.64); font-size:1.375rem; font-style:normal; text-align:center; }
+.radio-cloud-empty { margin:14px 0 0; color:rgba(103,70,82,.54); font-size:.75rem; text-align:center; }
 
 @media (max-width:390px) {
     .radio-native-mini-player { left:14px !important; right:14px !important; gap:8px !important; }

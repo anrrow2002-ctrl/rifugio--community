@@ -174,7 +174,23 @@ function planSources(providers, type) {
   return plan;
 }
 
-function mountRadioRoutes(app, { defaultBitrate = 320 } = {}) {
+function mountRadioRoutes(app, {
+  defaultBitrate = 320,
+  readJsonSetting,
+  writeJsonSetting,
+  encrypt,
+  decrypt,
+  neteaseApi,
+} = {}) {
+  const { mountNeteaseAuthRoutes } = require('./modules/netease-auth');
+  mountNeteaseAuthRoutes(app, {
+    api: neteaseApi,
+    readJsonSetting,
+    writeJsonSetting,
+    encrypt,
+    decrypt,
+  });
+
   // 搜索结果内存缓存：GD 限流按 IP 记仇几秒，每次搜歌 = 搜索+每首直链/封面 ≈ 一二十发调用，
   // 是我们自己把自己打进限流窗口。同词重搜直接吃缓存，5 分钟内零外部调用。
   const searchCache = new Map(); // key -> { at, results }

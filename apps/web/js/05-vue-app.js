@@ -3699,7 +3699,7 @@
                 createRadioPlaylist, addRadioItemToPlaylist, removeRadioPlaylistItem, deleteRadioPlaylist, toggleRadioFavorite, setRadioPlayMode, openRadioQueuePanel, playRadioQueueItem, playRadioQueue, onRadioLocalFiles,
                 onRadioImageUpload, playRadioByOffset, playNextRadio, playPrevRadio, toggleRadioPlay, resumeBlockedRadio, onRadioLoadedMetadata, onRadioTimeUpdate,
                 onRadioEnded, onRadioAudioError, seekRadio, formatRadioTime, clearRadioSleepTimer, setRadioSleepTimer, consumePlaybackCommand, pollPlaybackCommand,
-                openRadioLoginPicker, startRadioProviderLogin
+                openRadioLoginPicker, startRadioProviderLogin, loadNeteaseAccount, loadNeteasePlaylists, loadNeteasePlaylistTracks, logoutNetease
             } = radioMod;
             const toyMod = Rifugio.useToy(rifugioCtx);
             Object.assign(rifugioCtx, toyMod);

@@ -27,6 +27,12 @@ Open `http://localhost:8080`. The API creates empty databases and schemas on fir
 
 Android phone-only hosting is documented in [Termux deployment](docs/TERMUX.md). See [deployment](docs/DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), and the [safe publishing checklist](docs/PUBLISHING.md).
 
+When radio is enabled, the Music settings page supports real NetEase Cloud
+Music QR login, account status, personal playlists/favorites, and logout. The
+login cookie stays encrypted on the self-hosted API and is never exposed to the
+browser. This is an unofficial integration and remains subject to NetEase
+network/device risk controls.
+
 ## Layout
 
 - `apps/web` — installable PWA frontend

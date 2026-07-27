@@ -150,7 +150,13 @@ addDehydratedColumn(MEMORY_DB_PATH);
 // 衰减评分取 top N，返回脱水版注入 Claude 上下文
 // --- Generic CRUD (table whitelist) ---
 // ── 搜索路由（必须在table middleware之前）──────────────────────────────
-mountToolRoutes(app, { hasTerminalAuth });
+mountToolRoutes(app, {
+  hasTerminalAuth,
+  readJsonSetting,
+  writeJsonSetting,
+  encrypt,
+  decrypt,
+});
 setInterval(() => { maybeRunTalkProactive().catch(e => console.warn('[talk proactive]', e.message)); }, TALK_PROACTIVE_POLL_MS);
 setTimeout(() => { maybeRunTalkProactive().catch(() => {}); }, 5000);
 

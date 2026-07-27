@@ -5,6 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const lock = fs.readFileSync(path.join(root, 'js/04-lock-screen.js'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'js/05-vue-app.js'), 'utf8');
+const radio = fs.readFileSync(path.join(root, 'js/apps/11-radio.js'), 'utf8');
 const toy = fs.readFileSync(path.join(root, 'js/apps/10-toy.js'), 'utf8');
 const room = fs.readFileSync(path.join(root, 'js/apps/21-room.js'), 'utf8');
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -54,5 +55,15 @@ assert.ok(chat.includes("fetch('/api/talk-api/v1/chat/completions'"), 'legacy ch
 assert.ok(!chat.includes("fetch(\`\$\{base\}/chat/completions\`"), 'legacy chat must not call provider URLs from the browser');
 assert.ok(!app.includes("port.id === 'cc' ||"), 'changing the CC seat to an external provider must not bypass the backend proxy');
 assert.equal((app.match(/const isCc = \/\^\\\/api\\\/chatroom-cc/g) || []).length, 2, 'only the same-origin CC shim may use the direct seat path');
+
+assert.ok(!radio.includes('api.qrserver.com'), 'NetEase login must use a real one-time QR session, not a homepage QR');
+assert.ok(!radio.includes("netease:'https://music.163.com/'"), 'the NetEase homepage is not a login callback');
+assert.match(radio, /\/api\/radio\/netease\/qr\/start/, 'the UI must request a real NetEase QR code from the backend');
+assert.match(radio, /\/api\/radio\/netease\/qr\/status/, 'the UI must poll the real QR authorization status');
+assert.match(radio, /\/api\/radio\/netease\/account/, 'the UI must restore the connected NetEase account');
+assert.match(radio, /\/api\/radio\/netease\/playlists/, 'the UI must load the user playlists');
+assert.match(radio, /logoutNetease/, 'the UI needs an explicit NetEase logout action');
+assert.ok(!index.includes('网易云、QQ 音乐、酷狗任选一家'), 'unsupported providers must not be presented as real login choices');
+assert.match(index, /登录凭证只加密保存在你的 Rifugio 服务端/, 'the settings sheet must explain credential handling');
 
 console.log('community parity checks passed');

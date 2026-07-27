@@ -3641,7 +3641,7 @@
                             <div v-else-if="!radioVisibleResults.length" class="radio-native-empty">暂无内容</div>
                             <div v-else class="radio-native-list">
                                 <div v-for="(item,idx) in radioVisibleResults" :key="item.id" class="radio-native-row"
-                                     :class="{ active: radio.player.url === item.url, disabled: !item.url }"
+                                     :class="{ active: radio.player.url === item.url, disabled: !item.url && !item.token }"
                                      @click="playRadioItem(item)">
                                     <span class="radio-native-index">{{ idx + 1 }}</span>
                                     <div class="radio-native-cover">
@@ -3813,24 +3813,46 @@
                     <div class="radio-native-sheet">
                         <i class="radio-sheet-handle"></i>
                         <button class="radio-sheet-login" @click="openRadioLoginPicker" :disabled="radio.auth.loading">
-                            <span>♫</span>
-                            <b>扫码登录音乐平台</b>
-                            <small>{{ radio.auth.provider ? ('已选择 ' + radioProviderLabel(radio.auth.provider) + '，点击可更换') : '网易云、QQ 音乐、酷狗任选一家' }}</small>
+                            <span><img v-if="radio.auth.account?.avatarUrl" :src="radio.auth.account.avatarUrl" alt=""><i v-else>云</i></span>
+                            <b>{{ radio.auth.account ? radio.auth.account.nickname : '连接网易云音乐' }}</b>
+                            <small>{{ radio.auth.account ? ('已连接 · ' + radio.auth.playlists.length + ' 个歌单，点此管理') : '真实扫码登录 · 读取我的歌单与收藏' }}</small>
                         </button>
-                        <div v-if="radio.auth.pickerOpen" class="radio-login-provider-picker">
+                        <div v-if="radio.auth.pickerOpen && !radio.auth.account" class="radio-login-provider-picker">
                             <button v-for="provider in radioLoginProviders" :key="provider.id" type="button" :class="'provider-' + provider.id" @click="startRadioProviderLogin(provider.id)">
-                                <span>{{ provider.id === 'netease' ? '云' : (provider.id === 'qqmusic' ? 'Q' : '酷') }}</span>
+                                <span>云</span>
                                 <b>{{ provider.label }}</b>
                             </button>
                         </div>
-                        <div v-if="radio.auth.provider && !radio.auth.pickerOpen" class="radio-login-result">
+                        <div v-if="radio.auth.account" class="radio-cloud-account">
+                            <div class="radio-cloud-account-head">
+                                <img v-if="radio.auth.account.avatarUrl" :src="radio.auth.account.avatarUrl" alt="">
+                                <span v-else>云</span>
+                                <div><b>{{ radio.auth.account.nickname }}</b><small>网易云音乐已连接{{ radio.auth.likedCount ? (' · ' + radio.auth.likedCount + ' 首喜欢') : '' }}</small></div>
+                                <button type="button" @click="logoutNetease" :disabled="radio.auth.loading">退出</button>
+                            </div>
+                            <div class="radio-cloud-playlist-head">
+                                <b>我的歌单与收藏</b>
+                                <button type="button" @click="loadNeteasePlaylists" :disabled="radio.auth.playlistLoading">{{ radio.auth.playlistLoading ? '读取中…' : '刷新' }}</button>
+                            </div>
+                            <div v-if="radio.auth.playlists.length" class="radio-cloud-playlists">
+                                <button v-for="playlist in radio.auth.playlists" :key="playlist.id" type="button" @click="loadNeteasePlaylistTracks(playlist)" :disabled="radio.auth.playlistLoading">
+                                    <img v-if="playlist.coverUrl" :src="playlist.coverUrl" alt="">
+                                    <span v-else>♪</span>
+                                    <div><b>{{ playlist.liked ? '我喜欢的音乐' : playlist.name }}</b><small>{{ playlist.trackCount }} 首{{ playlist.owned ? ' · 我创建的' : (playlist.subscribed ? ' · 已收藏' : '') }}</small></div>
+                                    <i>{{ radio.auth.activeCloudPlaylistId === playlist.id ? '…' : '›' }}</i>
+                                </button>
+                            </div>
+                            <p v-else class="radio-cloud-empty">{{ radio.auth.playlistLoading ? '正在读取歌单…' : '暂时没有读到歌单，可点刷新重试' }}</p>
+                            <small class="radio-login-privacy">登录凭证只加密保存在你的 Rifugio 服务端，不会发送到浏览器，也不会读取网易云密码。</small>
+                        </div>
+                        <div v-else-if="radio.auth.provider && !radio.auth.pickerOpen && radio.auth.status !== 'idle'" class="radio-login-result">
                             <div class="radio-login-result-head">
                                 <b>{{ radioProviderLabel(radio.auth.provider) }}</b>
                                 <span>{{ radio.auth.loading ? '二维码生成中…' : radio.auth.message }}</span>
                             </div>
                             <img v-if="radio.auth.qrUrl" class="radio-login-qr" :src="radio.auth.qrUrl" :alt="radioProviderLabel(radio.auth.provider) + '扫码入口二维码'" @error="radio.auth.message='二维码加载失败，可点击下方直接打开平台'">
-                            <a v-if="radio.auth.loginUrl" class="radio-login-direct" :href="radio.auth.loginUrl" target="_blank" rel="noopener">在当前设备打开 {{ radioProviderLabel(radio.auth.provider) }}</a>
-                            <small class="radio-login-privacy">扫码后在对应官方平台完成登录；Rifugio 的音乐搜索仍使用多音源聚合，不读取你的平台密码。</small>
+                            <button v-if="['expired','failed'].includes(radio.auth.status)" type="button" class="radio-login-direct" @click="startRadioProviderLogin('netease')">重新生成二维码</button>
+                            <small class="radio-login-privacy">请用网易云音乐 App 扫码并在 App 内确认。同一部安卓手机可长按二维码识别；Rifugio 不读取你的网易云密码。</small>
                         </div>
                         <div class="radio-sheet-group">
                             <label><span>▧</span><b>播放器背景图</b><input type="file" accept="image/*" @change="onRadioImageUpload('background', $event)"></label>

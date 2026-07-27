@@ -9,6 +9,7 @@
   "keywords": [],
   "description": "HTTP API for Rifugio Community",
   "dependencies": {
+    "@neteasecloudmusicapienhanced/api": "4.39.0",
     "@simplewebauthn/server": "^13.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

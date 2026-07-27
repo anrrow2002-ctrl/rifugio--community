@@ -52,6 +52,11 @@ Optional flags do not supply external services by themselves:
 
 - `RIFUGIO_ENABLE_HEALTH`: enables health integration surfaces; ingestion still needs a trusted source.
 - `RIFUGIO_ENABLE_RADIO`: requires outbound network access to media providers.
+  The NetEase connection uses a real one-time QR flow and keeps its account
+  cookie encrypted server-side with `RIFUGIO_SECRET`; the browser receives only
+  the QR image and sanitized account/playlists. This is an unofficial
+  integration, so NetEase may still reject a particular IP or device
+  environment.
 - `RIFUGIO_ENABLE_IMAGE`: requires a configured image provider and key.
 - `RIFUGIO_ENABLE_VOICE`: requires a configured TTS/STT provider and key.
 - `RIFUGIO_ENABLE_TOY`: Android Chrome/Edge can connect directly to the physical
@@ -60,6 +65,24 @@ Optional flags do not supply external services by themselves:
 - `RIFUGIO_ENABLE_CLI_BRIDGE`: requires a separately installed and authenticated compatible CLI/runtime. The standard API container does not bundle Claude Code, tmux, or host terminal sessions.
 
 Server-side long-chat image export additionally needs Chromium at `RIFUGIO_CHROMIUM`; the standard image does not bundle it, and the web app keeps a browser-side fallback.
+
+## Update an existing deployment
+
+For a Git checkout:
+
+```sh
+git pull --ff-only
+npm --prefix apps/api ci --omit=dev --omit=optional
+```
+
+Then restart the API/MCP processes. For Docker Compose, rebuild after pulling:
+
+```sh
+docker compose up -d --build
+```
+
+The dependency install/rebuild is required for the real NetEase QR login.
+Persistent `data/`, `.env`, and `private/` remain local and must not be replaced.
 
 ## Backups
 

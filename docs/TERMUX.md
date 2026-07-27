@@ -36,7 +36,31 @@ RIFUGIO_CORS_ORIGINS=http://localhost:8080
 PASSKEY_RP_ID=localhost
 PASSKEY_ORIGINS=http://localhost:8080
 RIFUGIO_ENABLE_TOY=true
+RIFUGIO_ENABLE_RADIO=true
 ```
+
+With radio enabled, **Music → Settings → Connect NetEase Cloud Music** uses a
+real one-time NetEase QR session. Scan it with the NetEase Cloud Music app and
+confirm there. On the same Android phone, long-press the QR image and use the
+browser/system image-recognition action. The resulting account cookie is
+encrypted with `RIFUGIO_SECRET` in the local settings database; it is never
+returned to browser JavaScript. NetEase login is an unofficial integration and
+still depends on NetEase accepting the current network/device environment.
+
+## Update an existing Termux install
+
+Stop the running API, MCP, and Caddy sessions, then:
+
+```sh
+cd ~/rifugio--community
+git pull --ff-only
+npm --prefix apps/api ci --omit=dev --omit=optional
+```
+
+Restart the three sessions with the same commands below. `data/`, `.env`, and
+`private/` are not replaced by this update. Do not skip the `npm ci` step: the
+real NetEase QR login adds a server dependency that old installations do not
+already have.
 
 ## Start the API and MCP
 
@@ -130,7 +154,9 @@ A successful client connection performs `initialize`, `tools/list`, then `tools/
 | PWA, login, SQLite memory, pet, books, Talk/Room with OpenAI-compatible APIs | Supported |
 | Canonical MCP memory/read/write tools | Supported |
 | OpenAI model list and chat calls | Supported through the Rifugio backend; the browser no longer calls OpenAI directly |
-| Health, radio, image, TTS/STT | Conditional: enable the feature and configure the provider/device |
+| Health, image, TTS/STT | Conditional: enable the feature and configure the provider/device |
+| Radio search/playback | Supported when `RIFUGIO_ENABLE_RADIO=true` and the phone has outbound network access |
+| NetEase account, playlists, favorites | Real QR login is supported; acceptance can still vary with NetEase network/device risk controls |
 | Browser speech recognition and notifications | Browser/Android dependent |
 | Long-chat server-side screenshot | Chromium is not bundled for Termux; the browser fallback remains |
 | Claude Code / terminal subscription bridge | Not a portable Termux guarantee; use OpenAI-compatible API mode unless you have separately validated a compatible CLI |

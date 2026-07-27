@@ -32,12 +32,7 @@ window.Rifugio.useRadio = function(ctx) {
                 { id:'podcast', label:'Podcast' },
                 { id:'radio_garden', label:'Radio Garden' },
             ];
-            const radioLoginProviders = radioProviders.filter(p => ['netease','qqmusic','kugou'].includes(p.id));
-            const radioLoginTargets = {
-                netease:'https://music.163.com/',
-                qqmusic:'https://y.qq.com/',
-                kugou:'https://www.kugou.com/',
-            };
+            const radioLoginProviders = radioProviders.filter(p => p.id === 'netease');
             const radio = reactive({
                 tab:'all',
                 query:'',
@@ -64,7 +59,22 @@ window.Rifugio.useRadio = function(ctx) {
                 commandRetry:{},
                 commandPollBusy:false,
                 seenCommandIds:[],
-                auth:{ provider:'', loading:false, message:'', qrUrl:'', loginUrl:'', pickerOpen:false },
+                auth:{
+                    provider:'netease',
+                    loading:false,
+                    message:'',
+                    qrUrl:'',
+                    qrSourceUrl:'',
+                    pickerOpen:false,
+                    status:'idle',
+                    expiresAt:0,
+                    account:null,
+                    playlists:[],
+                    likedCount:0,
+                    playlistLoading:false,
+                    activeCloudPlaylistId:'',
+                    pollTimer:null,
+                },
                 detail:{ item:null, loading:false, lyrics:'', summary:'' },
                 sleepCustom:30,
                 sleepUntil:0,
@@ -141,6 +151,7 @@ window.Rifugio.useRadio = function(ctx) {
             ];
             const radioPlayModeLabel = computed(() => radioPlayModes.find(x => x.id === radio.playMode)?.label || '顺序播放');
             const radioItemMatches = (a, b) => !!(a && b && ((a.url && b.url && a.url === b.url) || (a.id && b.id && a.id === b.id)));
+            const radioItemPlayable = item => Boolean(item?.url || item?.token);
             const radioCurrentItem = computed(() => radio.detail.item || (radio.player.url ? {
                 id:'current-' + radio.player.url,
                 title:radio.player.title,
@@ -186,8 +197,8 @@ window.Rifugio.useRadio = function(ctx) {
             const radioQueueItems = computed(() => {
                 let list = Array.isArray(radio.queue) && radio.queue.length
                     ? radio.queue
-                    : radioVisibleResults.value.filter(item => item?.url);
-                if (!list.length) list = radio.recent.filter(item => item?.url);
+                    : radioVisibleResults.value.filter(radioItemPlayable);
+                if (!list.length) list = radio.recent.filter(radioItemPlayable);
                 const current = radioCurrentItem.value;
                 if (current?.url && !list.some(item => radioItemMatches(item, current))) list = [current, ...list];
                 return list;
@@ -228,6 +239,8 @@ window.Rifugio.useRadio = function(ctx) {
                     lyrics:item.lyrics || item.lrc || '',
                     lyricsUrl:item.lyricsUrl || item.lrcUrl || '',
                     description:item.description || item.summary || item.desc || '',
+                    token:String(item.token || ''),
+                    mediaId:String(item.mediaId || ''),
                 };
             };
             const archiveDownloadUrl = (identifier, fileName) => {
@@ -430,6 +443,27 @@ window.Rifugio.useRadio = function(ctx) {
                 saveRadio();
             };
             const playRadioItem = async (item, fromCommand = false, retryCount = 0) => {
+                if (!item?.url && item?.token) {
+                    radio.player.loading = true;
+                    radio.status = `正在准备「${item.title || '这首歌'}」…`;
+                    try {
+                        const response = await fetch('/api/radio/resolve', {
+                            method:'POST',
+                            credentials:'include',
+                            headers:{ 'Content-Type':'application/json' },
+                            body:JSON.stringify({ token:item.token, pic:false }),
+                        });
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok || !data.ok || !data.url) throw new Error(data.error || '暂时无法播放');
+                        item.url = data.url;
+                        if (data.coverUrl && !item.coverUrl) item.coverUrl = data.coverUrl;
+                        radio.player.loading = false;
+                    } catch(error) {
+                        radio.player.loading = false;
+                        radio.status = String(error?.message || '暂时无法播放这首歌');
+                        return;
+                    }
+                }
                 if (!item?.url) {
                     radio.status = '暂无可播放音乐';
                     return;
@@ -496,8 +530,8 @@ window.Rifugio.useRadio = function(ctx) {
             };
             const addRadioItemToPlaylist = (item, playlistId = radio.activePlaylistId) => {
                 const p = radio.playlists.find(x => x.id === playlistId) || ensureRadioPlaylist();
-                if (!p || !item?.url) return;
-                if (!p.items.some(x => x.url === item.url || x.id === item.id)) p.items.push(normalizeRadioItem(item));
+                if (!p || !radioItemPlayable(item)) return;
+                if (!p.items.some(x => radioItemMatches(x, item))) p.items.push(normalizeRadioItem(item));
                 radio.activePlaylistId = p.id;
                 radio.status = `已加入「${p.name}」；搜索仍会在全局音乐源里进行。`;
                 saveRadio();
@@ -553,20 +587,20 @@ window.Rifugio.useRadio = function(ctx) {
                 radio.modePanelOpen = false;
                 if (radio.queuePanelOpen) { radio.queuePanelOpen = false; return; }
                 if (!radio.queue.length && radioQueueItems.value.length) {
-                    radio.queue = radioQueueItems.value.map(normalizeRadioItem).filter(item => item.url);
+                    radio.queue = radioQueueItems.value.map(normalizeRadioItem).filter(radioItemPlayable);
                     radio.queueIndex = Math.max(0, radio.queue.findIndex(item => item.url === radio.player.url));
                 }
                 radio.queuePanelOpen = true;
             };
             const playRadioQueueItem = async (item, index) => {
-                if (!item?.url) return;
-                if (!radio.queue.length) radio.queue = radioQueueItems.value.map(normalizeRadioItem).filter(x => x.url);
+                if (!radioItemPlayable(item)) return;
+                if (!radio.queue.length) radio.queue = radioQueueItems.value.map(normalizeRadioItem).filter(radioItemPlayable);
                 const queueIndex = radio.queue.findIndex(x => radioItemMatches(x, item));
                 radio.queueIndex = queueIndex >= 0 ? queueIndex : Math.max(0, Number(index) || 0);
                 await playRadioItem(item);
             };
             const playRadioQueue = async (items, startIndex = 0, opts = {}) => {
-                const list = (Array.isArray(items) ? items : []).map(normalizeRadioItem).filter(item => item.url);
+                const list = (Array.isArray(items) ? items : []).map(normalizeRadioItem).filter(radioItemPlayable);
                 if (!list.length) { radio.status = '这个歌单还没有可播放音频'; return; }
                 radio.queue = list;
                 radio.queueIndex = Math.max(0, Math.min(list.length - 1, Number(startIndex) || 0));
@@ -611,7 +645,7 @@ window.Rifugio.useRadio = function(ctx) {
             };
             const playRadioByOffset = async (offset) => {
                 const hasQueue = Array.isArray(radio.queue) && radio.queue.length;
-                const list = hasQueue ? radio.queue : radioQueueItems.value.filter(item => item.url);
+                const list = hasQueue ? radio.queue : radioQueueItems.value.filter(radioItemPlayable);
                 if (!list.length) return false;
                 const current = hasQueue ? radio.queueIndex : list.findIndex(item => item.url === radio.player.url);
                 let nextIndex;
@@ -812,26 +846,151 @@ window.Rifugio.useRadio = function(ctx) {
                 radio.auth = {
                     ...radio.auth,
                     loading:false,
-                    message:'选择要登录的音乐平台',
+                    message:'连接后可读取我的歌单与收藏',
                     qrUrl:'',
-                    loginUrl:'',
                     pickerOpen:true,
                 };
             };
-            const startRadioProviderLogin = (providerId) => {
-                const provider = radioLoginProviders.find(p => p.id === providerId);
-                const loginUrl = radioLoginTargets[providerId] || '';
-                if (!provider || !loginUrl) return;
-                radio.auth = {
-                    provider:providerId,
-                    loading:false,
-                    message:'请扫码打开官方平台并完成登录',
-                    qrUrl:'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=12&data=' + encodeURIComponent(loginUrl),
-                    loginUrl,
-                    pickerOpen:false,
-                };
+            const stopNeteaseQrPolling = () => {
+                if (radio.auth.pollTimer) clearTimeout(radio.auth.pollTimer);
+                radio.auth.pollTimer = null;
             };
+            const fetchNeteaseJson = async (url, options = {}) => {
+                const response = await fetch(url, {
+                    credentials:'include',
+                    cache:'no-store',
+                    ...options,
+                    headers:{
+                        ...(options.body ? { 'Content-Type':'application/json' } : {}),
+                        ...(options.headers || {}),
+                    },
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || data.ok === false) throw new Error(data.error || `HTTP ${response.status}`);
+                return data;
+            };
+            const loadNeteasePlaylists = async () => {
+                if (!radio.auth.account) return;
+                radio.auth.playlistLoading = true;
+                radio.auth.message = '正在读取我的网易云歌单…';
+                try {
+                    const data = await fetchNeteaseJson('/api/radio/netease/playlists?limit=100');
+                    radio.auth.playlists = Array.isArray(data.playlists) ? data.playlists : [];
+                    radio.auth.likedCount = Number(data.likedCount || 0);
+                    radio.auth.message = `已连接 · ${radio.auth.playlists.length} 个歌单`;
+                } catch(error) {
+                    radio.auth.message = String(error?.message || '读取歌单失败');
+                } finally {
+                    radio.auth.playlistLoading = false;
+                }
+            };
+            const loadNeteaseAccount = async () => {
+                try {
+                    const data = await fetchNeteaseJson('/api/radio/netease/account');
+                    radio.auth.account = data.loggedIn ? data.account : null;
+                    radio.auth.status = data.loggedIn ? 'authorized' : 'idle';
+                    if (radio.auth.account) {
+                        radio.auth.provider = 'netease';
+                        radio.auth.pickerOpen = false;
+                        await loadNeteasePlaylists();
+                    }
+                } catch(_) {
+                    radio.auth.account = null;
+                    radio.auth.status = 'idle';
+                }
+            };
+            const pollNeteaseQrStatus = async () => {
+                stopNeteaseQrPolling();
+                if (!['waiting','scanned'].includes(radio.auth.status)) return;
+                try {
+                    const data = await fetchNeteaseJson('/api/radio/netease/qr/status');
+                    radio.auth.status = data.status || 'waiting';
+                    radio.auth.message = data.message || (
+                        data.status === 'scanned'
+                            ? '已扫码，请在网易云音乐 App 内确认'
+                            : '等待网易云音乐 App 扫码'
+                    );
+                    if (data.status === 'authorized') {
+                        radio.auth.account = data.account || null;
+                        radio.auth.qrUrl = '';
+                        radio.auth.message = '登录成功，正在读取我的歌单…';
+                        await loadNeteaseAccount();
+                        return;
+                    }
+                    if (data.status === 'expired' || data.status === 'failed' || data.status === 'idle') return;
+                } catch(error) {
+                    radio.auth.message = String(error?.message || '查询登录状态失败');
+                    radio.auth.status = 'failed';
+                    return;
+                }
+                radio.auth.pollTimer = setTimeout(pollNeteaseQrStatus, 2000);
+            };
+            const startRadioProviderLogin = async (providerId) => {
+                const provider = radioLoginProviders.find(p => p.id === providerId);
+                if (!provider) return;
+                stopNeteaseQrPolling();
+                radio.auth = {
+                    ...radio.auth,
+                    provider:'netease',
+                    loading:true,
+                    message:'正在向网易云申请一次性二维码…',
+                    qrUrl:'',
+                    qrSourceUrl:'',
+                    pickerOpen:false,
+                    status:'starting',
+                };
+                try {
+                    const data = await fetchNeteaseJson('/api/radio/netease/qr/start', { method:'POST' });
+                    radio.auth.qrUrl = data.qrDataUrl || '';
+                    radio.auth.qrSourceUrl = data.qrUrl || '';
+                    radio.auth.expiresAt = Number(data.expiresAt || 0);
+                    radio.auth.status = 'waiting';
+                    radio.auth.message = '请用网易云音乐 App 扫码';
+                    radio.auth.pollTimer = setTimeout(pollNeteaseQrStatus, 1000);
+                } catch(error) {
+                    radio.auth.status = 'failed';
+                    radio.auth.message = String(error?.message || '二维码生成失败');
+                } finally {
+                    radio.auth.loading = false;
+                }
+            };
+            const loadNeteasePlaylistTracks = async (playlist) => {
+                if (!playlist?.id || radio.auth.playlistLoading) return;
+                radio.auth.playlistLoading = true;
+                radio.auth.activeCloudPlaylistId = String(playlist.id);
+                radio.auth.message = `正在读取「${playlist.name}」…`;
+                try {
+                    const data = await fetchNeteaseJson(`/api/radio/netease/playlists/${encodeURIComponent(playlist.id)}/tracks?limit=500`);
+                    radio.results = (Array.isArray(data.tracks) ? data.tracks : []).map(normalizeRadioItem);
+                    radio.tab = 'song';
+                    radio.query = playlist.name || '我的网易云歌单';
+                    radio.view = 'list';
+                    radio.settingsOpen = false;
+                    radio.status = `已载入「${playlist.name}」· ${radio.results.length} 首`;
+                } catch(error) {
+                    radio.auth.message = String(error?.message || '读取歌曲失败');
+                } finally {
+                    radio.auth.playlistLoading = false;
+                    radio.auth.activeCloudPlaylistId = '';
+                }
+            };
+            const logoutNetease = async () => {
+                stopNeteaseQrPolling();
+                radio.auth.loading = true;
+                try {
+                    await fetchNeteaseJson('/api/radio/netease/logout', { method:'POST' });
+                } catch(_) {}
+                radio.auth.account = null;
+                radio.auth.playlists = [];
+                radio.auth.likedCount = 0;
+                radio.auth.qrUrl = '';
+                radio.auth.status = 'idle';
+                radio.auth.message = '已退出网易云账号';
+                radio.auth.loading = false;
+            };
+            onMounted(loadNeteaseAccount);
+            onUnmounted(stopNeteaseQrPolling);
 
-        return { radioAudioRef, radioTabs, radioProviders, radioLoginProviders, radio, saveRadio, radioTypeLabel, radioProviderLabel, toggleRadioProvider, setRadioTab, activeRadioPlaylist, ensureRadioPlaylist, radioVisibleResults, radioQueueItems, radioPlayModes, radioPlayModeLabel, radioIsCurrentFavorite, radioExternalLinks, radioDetailLines, normalizeRadioType, normalizeRadioItem, archiveDownloadUrl, dedupeRadioItems, clientFreeRadioSearch, searchRadio, plainRadioText, loadRadioDetail, openRadioDetail, playRadioItem, createRadioPlaylist, addRadioItemToPlaylist, removeRadioPlaylistItem, deleteRadioPlaylist, toggleRadioFavorite, setRadioPlayMode, openRadioQueuePanel, playRadioQueueItem, playRadioQueue, onRadioLocalFiles, onRadioImageUpload, playRadioByOffset, playNextRadio, playPrevRadio, toggleRadioPlay, resumeBlockedRadio, onRadioLoadedMetadata, onRadioTimeUpdate, onRadioEnded, onRadioAudioError, seekRadio, formatRadioTime, clearRadioSleepTimer, setRadioSleepTimer, consumePlaybackCommand, pollPlaybackCommand, openRadioLoginPicker, startRadioProviderLogin };
+        return { radioAudioRef, radioTabs, radioProviders, radioLoginProviders, radio, saveRadio, radioTypeLabel, radioProviderLabel, toggleRadioProvider, setRadioTab, activeRadioPlaylist, ensureRadioPlaylist, radioVisibleResults, radioQueueItems, radioPlayModes, radioPlayModeLabel, radioIsCurrentFavorite, radioExternalLinks, radioDetailLines, normalizeRadioType, normalizeRadioItem, archiveDownloadUrl, dedupeRadioItems, clientFreeRadioSearch, searchRadio, plainRadioText, loadRadioDetail, openRadioDetail, playRadioItem, createRadioPlaylist, addRadioItemToPlaylist, removeRadioPlaylistItem, deleteRadioPlaylist, toggleRadioFavorite, setRadioPlayMode, openRadioQueuePanel, playRadioQueueItem, playRadioQueue, onRadioLocalFiles, onRadioImageUpload, playRadioByOffset, playNextRadio, playPrevRadio, toggleRadioPlay, resumeBlockedRadio, onRadioLoadedMetadata, onRadioTimeUpdate, onRadioEnded, onRadioAudioError, seekRadio, formatRadioTime, clearRadioSleepTimer, setRadioSleepTimer, consumePlaybackCommand, pollPlaybackCommand, openRadioLoginPicker, startRadioProviderLogin, loadNeteaseAccount, loadNeteasePlaylists, loadNeteasePlaylistTracks, logoutNetease };
     }
 };

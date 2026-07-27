@@ -21,9 +21,21 @@ function buildChatTools() {
   return { configPath, allowed, disallow, persona };
 }
 
-function mountToolRoutes(app, { hasTerminalAuth } = {}) {
+function mountToolRoutes(app, {
+  hasTerminalAuth,
+  readJsonSetting,
+  writeJsonSetting,
+  encrypt,
+  decrypt,
+} = {}) {
   // ── Radio 电台/音乐/有声 + 播放指令队列（2026-06-21）：必须在 /api/:table 兜底前注册 ──
-  if (features.radio) mountRadioRoutes(app, { defaultBitrate: Number(process.env.RADIO_BITRATE) || 320 });
+  if (features.radio) mountRadioRoutes(app, {
+    defaultBitrate: Number(process.env.RADIO_BITRATE) || 320,
+    readJsonSetting,
+    writeJsonSetting,
+    encrypt,
+    decrypt,
+  });
   if (features.toy) mountToyRoutes(app);
   if (features.image) mountImageRoutes(app);
   // 用户自助 MCP 管理（前端粘贴链接 + 选权限）：动态合并进聊天的 --mcp-config
