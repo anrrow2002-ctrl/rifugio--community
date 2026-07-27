@@ -1023,7 +1023,7 @@ window.Rifugio.useTalkStream = function(ctx) {
                             credentials:'include',
                             headers:{ 'Content-Type':'application/json' },
                             body:JSON.stringify({
-                                provider:'auto',
+                                provider:talkSettings.apiProtocol === 'anthropic' ? 'anthropic' : 'compatible',
                                 base_url:base,
                                 api_key:talkSettings.apiKey,
                                 model:talkSettings.apiModel || c.model || 'gpt-4o-mini',
@@ -1034,7 +1034,12 @@ window.Rifugio.useTalkStream = function(ctx) {
                             }),
                         });
                         if (!r.ok) {
-                            const detail = await r.text().catch(() => '');
+                            const detailText = await r.text().catch(() => '');
+                            let detail = detailText;
+                            try {
+                                const parsed = JSON.parse(detailText);
+                                detail = String(parsed?.error?.message || parsed?.error || parsed?.message || detailText);
+                            } catch(_) {}
                             throw new Error(`API 桥连接失败（HTTP ${r.status}）${detail ? '：' + detail.slice(0, 240) : ''}`);
                         }
                         const j = await r.json();

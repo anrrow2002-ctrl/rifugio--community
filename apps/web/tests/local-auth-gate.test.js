@@ -22,7 +22,7 @@ test('Termux localhost and 127.0.0.1 require a real server login', () => {
 test('model pull explains missing configuration before making an API request', () => {
   const baseGuard = talk.indexOf("talkSettings[statusKey] = '请先填写 Base URL'");
   const keyGuard = talk.indexOf("talkSettings[statusKey] = '请先填写 API Key'");
-  const request = talk.indexOf("fetch('/api/integrations/models'");
+  const request = talk.indexOf("'/api/talk-api/v1/models'");
   assert.ok(baseGuard > 0 && keyGuard > baseGuard && request > keyGuard);
-  assert.match(talk, /throw new Error\(data\.error \|\| \('HTTP ' \+ res\.status\)\)/, 'backend error text must reach the UI');
+  assert.match(talk, /throw new Error\(data\.error\?\.message \|\| data\.error \|\| \('HTTP ' \+ res\.status\)\)/, 'backend error text must reach the UI');
 });

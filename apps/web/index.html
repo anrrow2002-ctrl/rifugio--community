@@ -2444,15 +2444,20 @@
                                     <label class="talk-switch mini"><input type="checkbox" v-model="talkSettings.timestampUserMessages"><span>每条用户消息附带当前时间给 AI</span></label>
                                     </template>
                                     <template v-if="talkSettings.provider === 'openai-compatible'">
-                                        <input v-model="talkSettings.baseUrl" placeholder="Base URL">
-                                        <input v-model="talkSettings.apiKey" type="password" placeholder="API Key">
+                                        <select v-model="talkSettings.apiProtocol" @change="saveTalkSettings">
+                                            <option value="compatible">OpenAI 兼容（Bearer · /chat/completions）</option>
+                                            <option value="anthropic">Anthropic 原生（x-api-key · /messages）</option>
+                                        </select>
+                                        <input v-model="talkSettings.baseUrl" @change="saveTalkSettings" placeholder="Base URL，例如 https://relay.example/v1">
+                                        <input v-model="talkSettings.apiKey" @change="saveTalkSettings" type="password" placeholder="API Key（不用加 Bearer）">
                                         <div class="talk-settings-inline">
-                                            <input v-model="talkSettings.apiModel" placeholder="API Model">
+                                            <input v-model="talkSettings.apiModel" @change="saveTalkSettings" placeholder="API Model">
                                             <button @click="fetchProviderModels('openai')">拉取</button>
                                         </div>
-                                        <select v-if="talkSettings.availableTextModels.length" v-model="talkSettings.apiModel">
+                                        <select v-if="talkSettings.availableTextModels.length" v-model="talkSettings.apiModel" @change="saveTalkSettings">
                                             <option v-for="m in talkSettings.availableTextModels" :key="m.id || m" :value="m.id || m">{{ m.label || m.id || m }}</option>
                                         </select>
+                                        <p class="talk-settings-note">国内中转一般选“OpenAI 兼容”，即使模型名含 Claude。Base URL 建议填到版本根目录（如 /v1）；误填完整 /models、/chat/completions 或 /messages 也会自动修正。</p>
                                         <p v-if="talkSettings.modelFetchStatus" class="talk-settings-note">{{ talkSettings.modelFetchStatus }}</p>
                                     </template>
                                     </details>
@@ -5105,14 +5110,14 @@
 <script src="./js/apps/15-memoria.js?v=self-i-v1"></script>
 <script src="./js/apps/18-terminal.js?v=white-screen-restore-20260713"></script>
 <script src="./js/apps/18-talk-profile-context.js?v=profile-contract-v3-20260716"></script>
-<script src="./js/apps/18-talk.js?v=community-ai-moments-v1-20260720"></script>
+<script src="./js/apps/18-talk.js?v=community-api-protocol-v1-20260728"></script>
 <script src="./js/apps/18-talk-image.js?v=split-20260707"></script>
 <script src="./js/apps/18-talk-stickers.js?v=sticker-resident-20260712"></script>
 <script src="./js/apps/18-talk-voice.js?v=voice-affect-20260711e"></script>
 <script src="./js/apps/18-talk-call-tts-stream.js?v=three-provider-stream-20260716a"></script>
 <script src="./js/apps/18-talk-call.js?v=three-provider-stream-20260716a"></script>
 <script src="./js/apps/18-talk-moments.js?v=community-ai-moments-v1-20260720"></script>
-<script src="./js/apps/18-talk-stream.js?v=wss-turn-isolation-v3-20260716"></script>
+<script src="./js/apps/18-talk-stream.js?v=community-api-protocol-v1-20260728"></script>
 <script src="./js/apps/18-talk-export.js?v=quote-swipe-v1-20260716"></script>
 <script src="./js/apps/19-chat.js"></script>
 <script src="./js/apps/21-biblioteca.js?v=reading-nook-20260713"></script>

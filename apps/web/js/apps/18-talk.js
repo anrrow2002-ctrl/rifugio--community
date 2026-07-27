@@ -199,6 +199,7 @@ window.Rifugio.useTalk = function(ctx) {
                 baseUrl: '',
                 apiKey: '',
                 apiModel: '',
+                apiProtocol: 'compatible',
                 claudeModel: 'default',
                 ttsProvider: '',
                 ttsApiKey: '',
@@ -301,6 +302,7 @@ window.Rifugio.useTalk = function(ctx) {
                 catch(_) { talkSettings.proactiveTimezone = 'Asia/Kuala_Lumpur'; }
             }
             if (!['claude-code', 'openai-compatible'].includes(String(talkSettings.provider || ''))) talkSettings.provider = 'claude-code';
+            if (!['compatible', 'anthropic'].includes(String(talkSettings.apiProtocol || ''))) talkSettings.apiProtocol = 'compatible';
             if (!['agent', 'terminal'].includes(String(talkSettings.executionMode || ''))) talkSettings.executionMode = 'agent';
             // API 大脑只接管当前消息，不能覆盖用户为 Claude 保存的 Terminal / -p 偏好。
             if (['agent', 'terminal'].includes(String(savedTalkSettings.claudeExecutionMode || ''))) {
@@ -513,24 +515,28 @@ window.Rifugio.useTalk = function(ctx) {
                     return;
                 }
                 talkSettings[statusKey] = '正在拉取模型列表…';
+                if (isTextModels) saveTalkSettings();
                 const requestId = kind === 'tts' ? ++ttsFetchRequestId : 0;
                 const providerAtStart = kind === 'tts' ? normalizeTtsProvider(talkSettings.ttsProvider) : '';
                 try {
-                    const res = await fetch('/api/integrations/models', {
+                    const endpoint = isTextModels ? '/api/talk-api/v1/models' : '/api/integrations/models';
+                    const res = await fetch(endpoint, {
                         method:'POST',
                         headers:{ 'Content-Type':'application/json' },
                         credentials:'include',
                         body:JSON.stringify(kind === 'tts' ? buildTtsModelRequest() : {
                             kind,
-                            provider: kind === 'image' ? talkSettings.imageProvider : talkSettings.provider,
+                            provider: kind === 'image' ? talkSettings.imageProvider : (isTextModels ? talkSettings.apiProtocol : talkSettings.provider),
                             base_url: kind === 'image' ? normalizeImageBaseUrl(talkSettings.imageBaseUrl, talkSettings.imageProvider) : talkSettings.baseUrl,
                             api_key: kind === 'image' ? talkSettings.naiApiKey : talkSettings.apiKey,
                         }),
                     });
                     const data = await res.json().catch(() => ({}));
-                    if (!res.ok || data.ok === false) throw new Error(data.error || ('HTTP ' + res.status));
+                    if (!res.ok || data.ok === false) throw new Error(data.error?.message || data.error || ('HTTP ' + res.status));
                     if (kind === 'tts' && (requestId !== ttsFetchRequestId || providerAtStart !== normalizeTtsProvider(talkSettings.ttsProvider))) return;
-                    const models = kind === 'tts'
+                    const models = isTextModels
+                        ? (Array.isArray(data.data) ? data.data : (data.models || []))
+                        : kind === 'tts'
                         ? ((Array.isArray(data.voices) && data.voices.length ? data.voices : data.models) || [])
                         : ((Array.isArray(data.models) && data.models.length ? data.models : data.voices) || []);
                     talkSettings[listKey] = Array.isArray(models) ? models : [];

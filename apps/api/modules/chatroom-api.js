@@ -90,17 +90,28 @@ function providerFor(value, baseUrl, model) {
   return 'compatible';
 }
 
+function normalizeApiKey(value) {
+  return String(value || '').trim().replace(/^Bearer\s+/i, '').trim();
+}
+
 function endpointFor(baseUrl, provider) {
   const clean = String(baseUrl).replace(/\/+$/, '');
   if (provider === 'anthropic') {
-    return /\/messages$/i.test(clean) ? clean : `${clean}/messages`;
+    if (/\/messages$/i.test(clean)) return clean;
+    if (/\/models$/i.test(clean)) return clean.replace(/\/models$/i, '/messages');
+    return `${clean}/messages`;
   }
-  return /\/chat\/completions$/i.test(clean) ? clean : `${clean}/chat/completions`;
+  if (/\/chat\/completions$/i.test(clean)) return clean;
+  if (/\/models$/i.test(clean)) return clean.replace(/\/models$/i, '/chat/completions');
+  return `${clean}/chat/completions`;
 }
 
 function modelsEndpointFor(baseUrl) {
   const clean = String(baseUrl).replace(/\/+$/, '');
-  return /\/models$/i.test(clean) ? clean : `${clean}/models`;
+  if (/\/models$/i.test(clean)) return clean;
+  if (/\/chat\/completions$/i.test(clean)) return clean.replace(/\/chat\/completions$/i, '/models');
+  if (/\/messages$/i.test(clean)) return clean.replace(/\/messages$/i, '/models');
+  return `${clean}/models`;
 }
 
 function stableCacheKey(model, messages, tools, namespace) {
@@ -146,7 +157,10 @@ async function fetchJson(url, options) {
     if (response.status >= 300 && response.status < 400) throw new Error('上游 API 重定向已拒绝');
     if (!response.ok) {
       const message = data.error && (data.error.message || data.error.type) || data.message || text || `HTTP ${response.status}`;
-      throw new Error(String(message).slice(0, 500));
+      const error = new Error(`上游 HTTP ${response.status}: ${String(message).slice(0, 450)}`);
+      error.status = response.status;
+      error.upstream = true;
+      throw error;
     }
     return data;
   } finally {
@@ -324,7 +338,7 @@ function mountProviderApiRoutes(app, options = {}) {
   app.post(`${prefix}/models`, async (req, res) => {
     try {
       const body = req.body || {};
-      const apiKey = String(body.api_key || '').trim();
+      const apiKey = normalizeApiKey(body.api_key);
       const baseUrl = String(body.base_url || '').trim();
       if (!apiKey || !baseUrl) throw new Error('base_url / api_key 必填');
       const provider = providerFor(body.provider, baseUrl, body.model);
@@ -339,7 +353,9 @@ function mountProviderApiRoutes(app, options = {}) {
       })).filter(item => item.id);
       res.json({ object: 'list', data, rifugio: { provider } });
     } catch (error) {
-      const status = /必填|无效|只允许|不能包含|私网/.test(error.message) ? 400 : 502;
+      const status = error.upstream && error.status >= 400 && error.status <= 599
+        ? error.status
+        : (/必填|无效|只允许|不能包含|私网/.test(error.message) ? 400 : 502);
       res.status(status).json({ error: { message: String(error.message || error).slice(0, 500) } });
     }
   });
@@ -351,7 +367,7 @@ function mountProviderApiRoutes(app, options = {}) {
     let auditModel = '';
     try {
       const body = req.body || {};
-      const apiKey = String(body.api_key || '').trim();
+      const apiKey = normalizeApiKey(body.api_key);
       const model = String(body.model || '').trim();
       const baseUrl = String(body.base_url || '').trim();
       if (!apiKey || !model || !baseUrl) throw new Error('base_url / api_key / model 必填');
@@ -396,7 +412,9 @@ function mountProviderApiRoutes(app, options = {}) {
         event: 'request_error', request_id: requestId, provider: auditProvider, model: auditModel,
         duration_ms: Date.now() - requestStartedAt, error_type: error && error.name || 'Error',
       });
-      const status = /必填|required|无效|只允许|不能包含|私网|工具调用轮数/.test(error.message) ? 400 : 502;
+      const status = error.upstream && error.status >= 400 && error.status <= 599
+        ? error.status
+        : (/必填|required|无效|只允许|不能包含|私网|工具调用轮数/.test(error.message) ? 400 : 502);
       res.status(status).json({ error: { message: String(error.message || error).slice(0, 500) } });
     }
   });
@@ -416,6 +434,9 @@ module.exports = {
   mountTalkApiRoutes,
   mountProviderApiRoutes,
   providerFor,
+  normalizeApiKey,
+  endpointFor,
+  modelsEndpointFor,
   cacheUsage,
   isPrivateIp,
   stableCacheKey,

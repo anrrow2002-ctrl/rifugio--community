@@ -2,6 +2,18 @@ const Database = require('./sqlite');
 const multer = require('multer');
 const { synthesizeSpeech, voiceStatus } = require('../voice-gateway');
 
+function normalizeProviderApiKey(value) {
+  return String(value || '').trim().replace(/^Bearer\s+/i, '').trim();
+}
+
+function normalizeModelsEndpoint(value) {
+  const clean = String(value || '').trim().replace(/\/+$/, '');
+  if (/\/models$/i.test(clean)) return clean;
+  if (/\/chat\/completions$/i.test(clean)) return clean.replace(/\/chat\/completions$/i, '/models');
+  if (/\/messages$/i.test(clean)) return clean.replace(/\/messages$/i, '/models');
+  return `${clean}/models`;
+}
+
 function mountVoiceSttRoutes(app, ctx = {}) {
   const { DB_PATH, maskKey, encrypt, decrypt } = ctx;
 
@@ -248,14 +260,24 @@ function mountVoiceSttRoutes(app, ctx = {}) {
       }
       // kind=text/默认：OpenAI 兼容 /models
       if (!base_url) throw new Error('base_url required');
-      if (!api_key) throw new Error('api_key required');
-      const r = await fetch(`${String(base_url).replace(/\/+$/, '')}/models`, { headers: { 'Authorization': `Bearer ${api_key}` } });
-      if (!r.ok) throw new Error('列模型失败: ' + (await r.text().catch(() => '')).slice(0, 200));
+      const normalizedApiKey = normalizeProviderApiKey(api_key);
+      if (!normalizedApiKey) throw new Error('api_key required');
+      const p = String(provider || '').trim().toLowerCase();
+      const headers = p === 'anthropic'
+        ? { 'x-api-key': normalizedApiKey, 'anthropic-version': '2023-06-01' }
+        : { 'Authorization': `Bearer ${normalizedApiKey}` };
+      const r = await fetch(normalizeModelsEndpoint(base_url), { headers });
+      if (!r.ok) {
+        const error = new Error(`上游 HTTP ${r.status}: ${(await r.text().catch(() => '')).slice(0, 180) || '列模型失败'}`);
+        error.status = r.status;
+        throw error;
+      }
       const j = await r.json();
       const models = (j.data || j.models || []).map(m => ({ id: m.id || m.name, name: m.id || m.name })).filter(m => m.id);
       return res.json({ ok: true, models });
     } catch (e) {
-      res.status(400).json({ ok: false, error: e.message || String(e) });
+      const status = Number(e.status) >= 400 && Number(e.status) <= 599 ? Number(e.status) : 400;
+      res.status(status).json({ ok: false, error: e.message || String(e) });
     }
   });
 

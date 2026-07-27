@@ -165,6 +165,12 @@ A successful client connection performs `initialize`, `tools/list`, then `tools/
 
 This is phone-local storage: databases remain under `data/` on that Android device. To reach it from other devices, use a trusted LAN or private tunnel and HTTPS; do not expose ports or SQLite files directly to the public internet. Passkeys on other devices require an HTTPS origin whose hostname matches `PASSKEY_RP_ID`.
 
+## Talk 中转 API：模型拉取或聊天提示 401 / Invalid token
+
+在 Talk 的“OpenAI Compatible API”设置里，国内中转站通常要选 **OpenAI 兼容（Bearer · /chat/completions）**，即使模型 ID 里带 `claude`。只有中转站文档明确要求 Anthropic 原生的 `x-api-key` 和 `/messages` 时，才选 **Anthropic 原生**。
+
+Base URL 建议填版本根目录，例如 `https://example.com/v1`，API Key 只粘贴密钥本身，不必手动加 `Bearer `。新版也会自动修正常见的完整 `/models`、`/chat/completions`、`/messages` 地址，并直接显示中转站返回的 401/403，方便区分密钥、余额、IP/地区限制和协议不匹配。
+
 ## 常见问题：登录密码一直提示 "not right… try again"
 
 大概率不是密码错，是**触发了登录锁**：错 5 次会锁 15 分钟。旧版本还有个坑——锁定期间每试一次都会重新锁满 15 分钟，越试越进不去（新版已修复，被锁时会直接显示剩余等待时间）。

@@ -49,12 +49,20 @@ assert.match(toy, /const stopToyWild = async/, 'wild mode needs an explicit stop
 
 const memoria = fs.readFileSync(path.join(root, 'js/apps/15-memoria.js'), 'utf8');
 const chat = fs.readFileSync(path.join(root, 'js/apps/19-chat.js'), 'utf8');
+const talk = fs.readFileSync(path.join(root, 'js/apps/18-talk.js'), 'utf8');
+const talkStream = fs.readFileSync(path.join(root, 'js/apps/18-talk-stream.js'), 'utf8');
 assert.ok(memoria.includes("fetch('/api/settings/llm/test'"), 'memory model lookup must use the authenticated backend proxy');
 assert.ok(!memoria.includes("fetch(memSettings.base_url"), 'memory model lookup must never expose the key to browser-side upstream fetch');
 assert.ok(chat.includes("fetch('/api/talk-api/v1/chat/completions'"), 'legacy chat must use the backend provider proxy');
 assert.ok(!chat.includes("fetch(\`\$\{base\}/chat/completions\`"), 'legacy chat must not call provider URLs from the browser');
 assert.ok(!app.includes("port.id === 'cc' ||"), 'changing the CC seat to an external provider must not bypass the backend proxy');
 assert.equal((app.match(/const isCc = \/\^\\\/api\\\/chatroom-cc/g) || []).length, 2, 'only the same-origin CC shim may use the direct seat path');
+assert.match(talk, /apiProtocol:\s*'compatible'/, 'community Talk must default relay APIs to OpenAI-compatible protocol');
+assert.match(talk, /'\/api\/talk-api\/v1\/models'/, 'Talk model lookup must use the protocol-aware backend route');
+assert.match(talkStream, /provider:talkSettings\.apiProtocol === 'anthropic' \? 'anthropic' : 'compatible'/, 'Talk chat must honor the explicit API protocol');
+assert.doesNotMatch(talkStream, /provider:'auto'/, 'Claude-named relay models must not silently switch to Anthropic auth');
+assert.match(index, /OpenAI 兼容（Bearer · \/chat\/completions）/, 'Talk settings must explain compatible relay authentication');
+assert.match(index, /Anthropic 原生（x-api-key · \/messages）/, 'Talk settings must keep native Anthropic as an explicit option');
 
 assert.ok(!radio.includes('api.qrserver.com'), 'NetEase login must use a real one-time QR session, not a homepage QR');
 assert.ok(!radio.includes("netease:'https://music.163.com/'"), 'the NetEase homepage is not a login callback');
