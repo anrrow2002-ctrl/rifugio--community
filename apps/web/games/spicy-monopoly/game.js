@@ -180,6 +180,23 @@
     } catch (error) { $('setupStatus').textContent = error.message; }
   }
 
+  async function joinGame(event) {
+    event.preventDefault();
+    const gameId = String(new FormData(event.currentTarget).get('game_id') || '').trim();
+    $('joinStatus').textContent = '正在寻找 AI 的棋盘…';
+    try {
+      const view = await request(`/view/${encodeURIComponent(gameId)}`);
+      state.gameId = gameId; state.token = ''; state.last = { say:'已接入 AI 的这一局' }; state.view = view; saveSession();
+      setupView.classList.add('hidden'); gameView.classList.remove('hidden'); render(); startPolling();
+    } catch (error) { $('joinStatus').textContent = error.message; }
+  }
+
+  async function copyGameId() {
+    if (!state.gameId) return;
+    try { await navigator.clipboard.writeText(state.gameId); $('gameStatus').textContent = `局号 ${state.gameId} 已复制，发给 AI 就能同桌`; }
+    catch (_) { $('gameStatus').textContent = `把局号 ${state.gameId} 发给 AI`; }
+  }
+
   async function showFinal() {
     try { setBusy(true,'正在结算终局…'); const r=await request(`/final/${encodeURIComponent(state.gameId)}`); state.last={say:r.result}; await loadView(true); render(); setBusy(false,r.result); }
     catch(error){ setBusy(false,error.message); }
@@ -188,7 +205,7 @@
   function startPolling() { clearInterval(state.poll); state.poll=setInterval(() => loadView(true), 3000); }
   function reset() { clearInterval(state.poll); localStorage.removeItem(storageKey); state.gameId=''; state.view=null; state.last=null; gameView.classList.add('hidden'); setupView.classList.remove('hidden'); }
 
-  $('setupForm').addEventListener('submit', startGame); $('rollBtn').addEventListener('click', roll); $('refreshBtn').addEventListener('click', () => loadView()); $('newBtn').addEventListener('click', reset); $('finalBtn').addEventListener('click', showFinal);
+  $('setupForm').addEventListener('submit', startGame); $('joinForm').addEventListener('submit', joinGame); $('copyBtn').addEventListener('click', copyGameId); $('rollBtn').addEventListener('click', roll); $('refreshBtn').addEventListener('click', () => loadView()); $('newBtn').addEventListener('click', reset); $('finalBtn').addEventListener('click', showFinal);
   $('identityToggle').addEventListener('click', () => $('identityToggle').parentElement.classList.toggle('open'));
   window.addEventListener('visibilitychange', () => { if (!document.hidden && state.gameId) loadView(true); });
 

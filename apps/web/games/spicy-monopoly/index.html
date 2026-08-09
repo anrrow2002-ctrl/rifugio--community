@@ -51,12 +51,18 @@
         <button class="primary" type="submit"><span>开启这一局</span><i>↗</i></button>
         <p class="form-status" id="setupStatus" role="status"></p>
       </form>
+
+      <form id="joinForm" class="join-card">
+        <div><b>AI 已经开好一局？</b><span>把它给你的 8 位局号填进来，棋盘会接上同一局。</span></div>
+        <div class="join-controls"><input name="game_id" maxlength="8" autocomplete="off" placeholder="例如 5255064c" required><button type="submit">查看这局</button></div>
+        <p class="form-status" id="joinStatus" role="status"></p>
+      </form>
     </section>
 
     <section class="game hidden" id="gameView">
       <header class="game-head">
         <div><p class="eyebrow">SPICY MONOPOLY</p><h1>我们的这一局</h1></div>
-        <div class="head-actions"><button id="refreshBtn" class="icon-btn" aria-label="刷新">↻</button><button id="newBtn" class="text-btn">新局</button></div>
+        <div class="head-actions"><button id="copyBtn" class="text-btn">复制局号</button><button id="refreshBtn" class="icon-btn" aria-label="刷新">↻</button><button id="newBtn" class="text-btn">新局</button></div>
       </header>
 
       <div class="round-line"><span id="roundLabel">回合 0 / 18</span><div><i id="roundProgress"></i></div><span id="turnLabel">等待开局</span></div>
