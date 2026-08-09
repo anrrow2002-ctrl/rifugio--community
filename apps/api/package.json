@@ -25,5 +25,8 @@
   },
   "optionalDependencies": {
     "sharp": "^0.35.3"
+  },
+  "overrides": {
+    "ip-address": "10.3.1"
   }
 }
