@@ -3671,6 +3671,70 @@
                 terminalProfile, saveTerminalProfile, uploadTerminalAvatar, addStickerToTerminal,
                 startTerminalCall, endTerminalCall, toggleTerminalCallMute, startTerminalCallListening
             } = terminalMod;
+            const spicyGameFrame = () => document.querySelector('.rifugio-game-board-frame');
+            const postToSpicyGame = (source, payload) => {
+                try { source?.postMessage?.(payload, window.location.origin); } catch (_) {}
+            };
+            const handleSpicyGameMessage = async (event) => {
+                if (event.origin !== window.location.origin || event.source !== spicyGameFrame()?.contentWindow) return;
+                const data = event.data || {};
+                if (data.type === 'rifugio-spicy-game-context') {
+                    const gameId = String(data.gameId || '').trim();
+                    terminalChat.gameId = /^[a-f0-9]{8}$/i.test(gameId) ? gameId : '';
+                    terminalChat.gameTurn = String(data.turn || '').slice(0, 80);
+                    terminalChat.gameTurnCount = Number(data.turnCount || 0);
+                    terminalChat.gameOver = Boolean(data.gameOver);
+                    return;
+                }
+                if (data.type === 'rifugio-game-terminal-open') {
+                    terminalChat.panel = 'game-terminal';
+                    await openTerminalRaw();
+                    return;
+                }
+                if (data.type !== 'rifugio-game-terminal-sync') return;
+                const gameId = String(data.gameId || '').trim();
+                const requestId = String(data.requestId || '');
+                if (!/^[a-f0-9]{8}$/i.test(gameId)) {
+                    postToSpicyGame(event.source, { type:'rifugio-game-terminal-result', requestId, ok:false, error:'局号无效，请先开局' });
+                    return;
+                }
+                if (terminalChat.gameSyncing) {
+                    postToSpicyGame(event.source, { type:'rifugio-game-terminal-result', requestId, ok:false, error:'上一条还在送进 Terminal' });
+                    return;
+                }
+                terminalChat.gameSyncing = true;
+                terminalChat.panel = 'game-terminal';
+                try {
+                    await openTerminalRaw();
+                    if (terminalState.value !== 'ready') throw new Error(terminalMessage.value || '请先完成 Terminal 本机验证');
+                    await Vue.nextTick();
+                    const prompt = `我们正在 Rifugio 游戏屋玩 Spicy Monopoly，当前 game_id 是 ${gameId}。请使用 spicy_monopoly MCP 的 game_info 接入并读取这局，绝对不要另开新局。先告诉我轮到谁、棋盘发生了什么，然后等我一起决定下一步。`;
+                    let sent = false;
+                    let lastError = null;
+                    for (let attempt = 0; attempt < 10; attempt += 1) {
+                        try {
+                            await apiJson('/api/terminal-chat/shortcut', {
+                                method:'POST',
+                                body:JSON.stringify({ target:'raw', conversation_id:`game-spicy-${gameId}`, text:prompt, enter:true }),
+                            });
+                            sent = true;
+                            break;
+                        } catch (error) {
+                            lastError = error;
+                            if (error?.status !== 409) throw error;
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                    }
+                    if (!sent) throw lastError || new Error('Terminal 还没有准备好');
+                    postToSpicyGame(event.source, { type:'rifugio-game-terminal-result', requestId, ok:true, gameId });
+                } catch (error) {
+                    postToSpicyGame(event.source, { type:'rifugio-game-terminal-result', requestId, ok:false, error:error?.message || 'Terminal 暂时没有回应' });
+                } finally {
+                    terminalChat.gameSyncing = false;
+                }
+            };
+            onMounted(() => window.addEventListener('message', handleSpicyGameMessage));
+            onUnmounted(() => window.removeEventListener('message', handleSpicyGameMessage));
             const healthMod = Rifugio.useHealth(rifugioCtx);
             Object.assign(rifugioCtx, healthMod);
             const {

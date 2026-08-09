@@ -26,10 +26,85 @@
     background: #140f1d;
 }
 
-.rifugio-game-frame-shell iframe {
+.rifugio-game-board-frame {
     display: block;
     width: 100%;
     height: 100%;
     border: 0;
     background: #140f1d;
+}
+
+.rifugio-game-terminal-drawer {
+    position: absolute;
+    z-index: 9;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    height: min(52dvh, 540px);
+    display: grid;
+    grid-template-rows: 54px minmax(0, 1fr);
+    overflow: hidden;
+    color: #f9f2e8;
+    background: rgba(13, 9, 18, .98);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 20px;
+    box-shadow: 0 -18px 70px rgba(0, 0, 0, .48);
+    transform: translateY(calc(100% - 54px));
+    transition: transform .28s cubic-bezier(.2, .78, .25, 1);
+    backdrop-filter: blur(24px);
+}
+
+.rifugio-game-terminal-drawer.open { transform: translateY(0); }
+
+.rifugio-game-terminal-head {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 14px;
+    border: 0;
+    color: inherit;
+    background: linear-gradient(105deg, rgba(212, 84, 125, .22), rgba(255, 255, 255, .035));
+    text-align: left;
+}
+
+.rifugio-game-terminal-head > span:nth-child(2) { min-width: 0; }
+.rifugio-game-terminal-head b,
+.rifugio-game-terminal-head small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rifugio-game-terminal-head b { font-size: 12px; letter-spacing: .04em; }
+.rifugio-game-terminal-head small { margin-top: 2px; color: rgba(255, 255, 255, .54); font-size: 9px; }
+
+.rifugio-game-terminal-lights { display: flex; gap: 4px; }
+.rifugio-game-terminal-lights i { width: 6px; height: 6px; border-radius: 50%; background: #d4547d; }
+.rifugio-game-terminal-lights i:nth-child(2) { background: #f2c66d; }
+.rifugio-game-terminal-lights i:nth-child(3) { background: #86d3af; }
+.rifugio-game-terminal-chevron { font-style: normal; color: #fa8cad; transition: transform .25s; }
+.rifugio-game-terminal-drawer.open .rifugio-game-terminal-chevron { transform: rotate(180deg); }
+
+.rifugio-game-terminal-body { min-height: 0; position: relative; background: #09070c; }
+.rifugio-game-terminal-body iframe { display: block; width: 100%; height: 100%; border: 0; background: #09070c; }
+.rifugio-game-terminal-placeholder { height: 100%; display: grid; place-content: center; justify-items: center; gap: 9px; padding: 24px; text-align: center; }
+.rifugio-game-terminal-placeholder b { font-size: 14px; }
+.rifugio-game-terminal-placeholder p { max-width: 290px; margin: 0; color: rgba(255, 255, 255, .58); font-size: 10px; line-height: 1.65; }
+.rifugio-game-terminal-placeholder button { margin-top: 5px; padding: 10px 15px; border: 1px solid rgba(250, 140, 173, .38); border-radius: 12px; color: #fff; background: rgba(250, 140, 173, .13); font-size: 11px; }
+.rifugio-game-terminal-placeholder button:disabled { opacity: .55; }
+.rifugio-game-terminal-orbit { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid rgba(250, 140, 173, .42); border-radius: 50%; color: #fa8cad; font-size: 18px; }
+
+@media (max-width: 520px) {
+    .rifugio-game-terminal-drawer {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: min(54dvh, 560px);
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: 20px 20px 0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rifugio-game-terminal-drawer { transition: none; }
 }

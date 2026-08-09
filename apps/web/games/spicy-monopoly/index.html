@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#140f1d">
   <title>Rifugio 游戏屋</title>
-  <link rel="stylesheet" href="./game.css?v=1">
+  <link rel="stylesheet" href="./game.css?v=2">
 </head>
 <body>
   <main class="app" id="app">
@@ -89,6 +89,7 @@
 
       <section class="dice-panel">
         <button id="rollBtn" class="roll-btn"><span class="die" id="dieFace">•</span><span><b>掷骰</b><small>由引擎决定这一轮</small></span></button>
+        <button id="syncAiBtn" class="ai-sync-btn"><span>⌘</span><span><b>让 Terminal 接管这局</b><small>自动发送当前局号，不会另开新局</small></span><i>↗</i></button>
         <button id="finalBtn" class="final-btn hidden">查看终局</button>
         <p id="gameStatus" role="status"></p>
       </section>
@@ -97,6 +98,6 @@
       <footer>Original game by Ren & Puppy · CC BY-NC 4.0</footer>
     </section>
   </main>
-  <script src="./game.js?v=1"></script>
+  <script src="./game.js?v=2"></script>
 </body>
 </html>

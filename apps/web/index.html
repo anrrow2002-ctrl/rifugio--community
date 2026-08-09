@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="./css/18-radio-reference-detail.css?v=reference-detail-v2-20260714">
     <link rel="stylesheet" href="./css/22-showroom.css?v=showroom-v2-20260715">
     <link rel="stylesheet" href="./css/23-talk-profile-cards.css?v=profile-cards-v3-20260716">
-    <link rel="stylesheet" href="./css/28-game-app.css?v=gameapp-v1-20260809">
+    <link rel="stylesheet" href="./css/28-game-app.css?v=gameapp-v2-20260809">
 </head>
 <body id="body-wrap">
 
@@ -606,7 +606,29 @@
         </div>
 
         <div v-if="mainTab === 'game'" class="rifugio-game-frame-shell">
-            <iframe src="./games/spicy-monopoly/" title="Rifugio 游戏屋" allow="clipboard-write" loading="eager"></iframe>
+            <iframe class="rifugio-game-board-frame" src="./games/spicy-monopoly/" title="Rifugio 游戏屋" allow="clipboard-write" loading="eager"></iframe>
+            <aside class="rifugio-game-terminal-drawer" :class="{ open: terminalChat.panel === 'game-terminal' }">
+                <button class="rifugio-game-terminal-head" type="button"
+                    :aria-expanded="terminalChat.panel === 'game-terminal'"
+                    @click="terminalChat.panel === 'game-terminal' ? terminalChat.panel = '' : (terminalChat.panel = 'game-terminal', openTerminalRaw())">
+                    <span class="rifugio-game-terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span><b>Terminal 同桌</b><small>{{ terminalChat.gameId ? ('NO. ' + terminalChat.gameId + ' · ' + (terminalState === 'ready' ? '已连接' : '等待连接')) : (terminalState === 'ready' ? '已连接 · 等待开局' : '拉起后验证并对话') }}</small></span>
+                    <i class="rifugio-game-terminal-chevron">⌃</i>
+                </button>
+                <div class="rifugio-game-terminal-body">
+                    <iframe v-if="terminalState === 'ready'" :key="claudeTerminalKey" :src="claudeTerminalUrl"
+                        title="游戏屋中的 Claude Code Terminal"
+                        allow="clipboard-read; clipboard-write"></iframe>
+                    <div v-else class="rifugio-game-terminal-placeholder">
+                        <span class="rifugio-game-terminal-orbit" aria-hidden="true">⌘</span>
+                        <b>{{ terminalState === 'checking' ? '正在连接 Terminal…' : '先确认是你本人' }}</b>
+                        <p>{{ terminalMessage || '验证一次后，就能在这里边看棋盘边和 Terminal 对话。' }}</p>
+                        <button type="button" :disabled="passkeyBusy" @click.stop="openTerminalRaw">
+                            {{ passkeyBusy ? '验证中…' : '本机验证并连接' }}
+                        </button>
+                    </div>
+                </div>
+            </aside>
         </div>
 
         <div v-if="activePhoneAppId === 'room'" class="crab-room-app" @click="closePetMenus">

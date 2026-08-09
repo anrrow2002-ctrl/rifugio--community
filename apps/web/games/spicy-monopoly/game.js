@@ -5,7 +5,7 @@
   const setupView = $('setupView');
   const gameView = $('gameView');
   const storageKey = 'rifugio-spicy-monopoly-session-v1';
-  const state = { gameId:'', token:'', rulesAck:'', view:null, last:null, busy:false, poll:0 };
+  const state = { gameId:'', token:'', rulesAck:'', view:null, last:null, busy:false, poll:0, terminalRequestId:'', terminalTimer:0 };
   const tileEmoji = { start:'🏁', task:'✦', truth:'💬', shop:'🛍', jail:'🔒', chance:'🎴', mystery:'?' };
   const coords = [[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[6,5],[6,4],[6,3],[6,2],[6,1],[5,1],[4,1],[3,1],[2,1]];
 
@@ -127,10 +127,11 @@
     $('finalBtn').classList.toggle('hidden', !v.game_over);
     $('identityText').textContent = v.status || '';
     renderPlayers(); renderBoard(); renderMoment();
+    publishGameContext();
   }
 
-  async function loadView(silent = false) {
-    if (!state.gameId || state.busy) return;
+  async function loadView(silent = false, force = false) {
+    if (!state.gameId || (state.busy && !force)) return;
     try {
       if (!silent) setBusy(true, '正在同步棋盘…');
       const previousTurn = state.view?.turn_count;
@@ -148,7 +149,7 @@
     try {
       setBusy(true, '正在结算…');
       const result = await request(`/action/${encodeURIComponent(state.gameId)}/${encodeURIComponent(action)}`, { method:'POST', body:JSON.stringify(payload) });
-      state.last = { say:result.result || result.say || '操作已完成' }; saveSession(); await loadView(true); render(); setBusy(false, result.result || '已完成');
+      state.last = { say:result.result || result.say || '操作已完成' }; saveSession(); await loadView(true, true); render(); setBusy(false, result.result || '已完成');
     } catch (error) { setBusy(false, error.message); }
   }
 
@@ -158,7 +159,7 @@
     try {
       setBusy(true, '骰子正在滚动…');
       const payload = await request(`/roll/${encodeURIComponent(state.gameId)}`, { method:'POST', body:'{}' });
-      state.last = payload; saveSession(); await loadView(true); render(); setBusy(false, payload.settled || '这一轮已经落定');
+      state.last = payload; saveSession(); await loadView(true, true); render(); setBusy(false, payload.settled || '这一轮已经落定');
     } catch (error) { setBusy(false, error.message); }
   }
 
@@ -197,16 +198,51 @@
     catch (_) { $('gameStatus').textContent = `把局号 ${state.gameId} 发给 AI`; }
   }
 
+  function openTerminalDrawer() {
+    window.parent.postMessage({ type:'rifugio-game-terminal-open' }, window.location.origin);
+  }
+
+  function publishGameContext() {
+    window.parent.postMessage({
+      type:'rifugio-spicy-game-context', gameId:state.gameId || '', turn:state.view?.turn || '',
+      turnCount:Number(state.view?.turn_count || 0), gameOver:Boolean(state.view?.game_over),
+    }, window.location.origin);
+  }
+
+  function syncAiGame() {
+    if (!state.gameId || state.busy) return;
+    const requestId = `game-terminal-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    state.terminalRequestId = requestId;
+    $('syncAiBtn').disabled = true;
+    $('gameStatus').textContent = '正在把这局交给 Terminal…';
+    window.parent.postMessage({ type:'rifugio-game-terminal-sync', requestId, gameId:state.gameId }, window.location.origin);
+    clearTimeout(state.terminalTimer);
+    state.terminalTimer = setTimeout(() => {
+      if (state.terminalRequestId !== requestId) return;
+      state.terminalRequestId = '';
+      $('syncAiBtn').disabled = false;
+      $('gameStatus').textContent = 'Terminal 连接超时，可以再点一次接管';
+    }, 45000);
+  }
+
   async function showFinal() {
-    try { setBusy(true,'正在结算终局…'); const r=await request(`/final/${encodeURIComponent(state.gameId)}`); state.last={say:r.result}; await loadView(true); render(); setBusy(false,r.result); }
+    try { setBusy(true,'正在结算终局…'); const r=await request(`/final/${encodeURIComponent(state.gameId)}`); state.last={say:r.result}; await loadView(true, true); render(); setBusy(false,r.result); }
     catch(error){ setBusy(false,error.message); }
   }
 
   function startPolling() { clearInterval(state.poll); state.poll=setInterval(() => loadView(true), 3000); }
-  function reset() { clearInterval(state.poll); localStorage.removeItem(storageKey); state.gameId=''; state.view=null; state.last=null; gameView.classList.add('hidden'); setupView.classList.remove('hidden'); }
+  function reset() { clearInterval(state.poll); clearTimeout(state.terminalTimer); localStorage.removeItem(storageKey); state.gameId=''; state.token=''; state.view=null; state.last=null; state.terminalRequestId=''; publishGameContext(); gameView.classList.add('hidden'); setupView.classList.remove('hidden'); }
 
-  $('setupForm').addEventListener('submit', startGame); $('joinForm').addEventListener('submit', joinGame); $('copyBtn').addEventListener('click', copyGameId); $('rollBtn').addEventListener('click', roll); $('refreshBtn').addEventListener('click', () => loadView()); $('newBtn').addEventListener('click', reset); $('finalBtn').addEventListener('click', showFinal);
+  $('setupForm').addEventListener('submit', startGame); $('joinForm').addEventListener('submit', joinGame); $('copyBtn').addEventListener('click', copyGameId); $('syncAiBtn').addEventListener('click', syncAiGame); $('rollBtn').addEventListener('click', roll); $('refreshBtn').addEventListener('click', () => loadView()); $('newBtn').addEventListener('click', reset); $('finalBtn').addEventListener('click', showFinal);
   $('identityToggle').addEventListener('click', () => $('identityToggle').parentElement.classList.toggle('open'));
+  window.addEventListener('message', event => {
+    if (event.origin !== window.location.origin || event.source !== window.parent) return;
+    const data = event.data || {};
+    if (data.type === 'rifugio-spicy-game-context-request') publishGameContext();
+    if (data.type !== 'rifugio-game-terminal-result' || data.requestId !== state.terminalRequestId) return;
+    clearTimeout(state.terminalTimer); state.terminalRequestId = ''; $('syncAiBtn').disabled = false;
+    $('gameStatus').textContent = data.ok ? `局号 ${state.gameId} 已送进 Terminal，可以在下方直接聊了` : (data.error || 'Terminal 暂时没有回应');
+  });
   window.addEventListener('visibilitychange', () => { if (!document.hidden && state.gameId) loadView(true); });
 
   try {
