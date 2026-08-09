@@ -111,6 +111,7 @@
                 { id:'tracce',    label:'痕迹', title:'Traces · 痕迹', subtitle:'Timeline traces', tab:'libreria', sub:'tracce', icon:'🧭' },
                 { id:'radio',     label:'音乐', title:'音乐', subtitle:'LISTENING', tab:'radio', icon:'♫' },
                 { id:'biblioteca',label:'书房', title:'Lettura · 共读', subtitle:'Read together', tab:'biblioteca', icon:'📖' },
+                { id:'game',      label:'游戏屋', title:'Game · 游戏屋', subtitle:'和 AI 一起玩', tab:'game', icon:'🎲' },
                 { id:'showroom',  label:'展厅', title:'Galleria · 展厅', subtitle:'Artworks & small worlds', tab:'showroom', icon:'◫' },
                 { id:'galleria',  label:'相册', title:'Gallery · 相册', subtitle:'Polaroids', tab:'museo', sub:'galleria', icon:'🖼️' },
                 { id:'frammenti', label:'碎片', title:'Snippets · 碎片', subtitle:'Little fragments', tab:'museo', sub:'frammenti', icon:'🧩' },

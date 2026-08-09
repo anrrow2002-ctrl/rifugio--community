@@ -58,6 +58,8 @@ initHealth(MEMORY_DB_PATH);
 mountHealthRoutes(app, MEMORY_DB_PATH, { ingestToken: process.env.HEALTH_INGEST_TOKEN });
 const { mountBooksRoutes } = require('./books');
 mountBooksRoutes(app, { MEMORY_DB_PATH });
+const { mountSpicyMonopolyRoutes } = require('./modules/game-spicy-monopoly');
+mountSpicyMonopolyRoutes(app);
 const { mountPetRoutes } = require('./modules/pet');
 mountPetRoutes(app);
 const { maskKey, encrypt, decrypt } = createSecretCrypto({ isProd: IS_PROD });

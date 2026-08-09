@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#140f1d">
+  <title>Rifugio 游戏屋</title>
+  <link rel="stylesheet" href="./game.css?v=1">
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="setup" id="setupView">
+      <div class="hero">
+        <div class="hero-dice" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="eyebrow">RIFUGIO · GAME ROOM 01</p>
+        <h1>一起走一圈，<br><em>让今晚发生点什么。</em></h1>
+        <p class="lede">第一款游戏已经住进来。你和 AI 各占一个席位，规则由引擎记住，故事留给你们。</p>
+        <img class="game-cover" src="./og.jpg" alt="Rifugio Game Room · 一起玩一局">
+      </div>
+
+      <form id="setupForm" class="setup-card">
+        <div class="section-title"><span>01</span><b>两位玩家</b></div>
+        <div class="players-form">
+          <label>你<input name="p1_name" autocomplete="nickname" value="你" required></label>
+          <label>AI<input name="p2_name" autocomplete="off" value="AI" required></label>
+          <label>你的性别<select name="p1_sex"><option>女</option><option>男</option></select></label>
+          <label>AI 性别<select name="p2_sex"><option>男</option><option>女</option></select></label>
+          <label>你的角色<select name="p1_role"><option>受</option><option>攻</option></select></label>
+          <label>AI 角色<select name="p2_role"><option>攻</option><option>受</option></select></label>
+        </div>
+
+        <div class="section-title"><span>02</span><b>这局的温度</b></div>
+        <div class="choice-row" id="flavorChoices">
+          <label><input type="radio" name="flavor" value="light"><span><b>轻</b><small>调情与爱抚</small></span></label>
+          <label><input type="radio" name="flavor" value="medium" checked><span><b>中</b><small>慢慢升温</small></span></label>
+          <label><input type="radio" name="flavor" value="heavy"><span><b>重</b><small>高强度整局</small></span></label>
+        </div>
+        <div class="compact-grid">
+          <label>局长<select name="game_length"><option value="12">速玩 · 12 回合</option><option value="18" selected>标准 · 18 回合</option><option value="24">长局 · 24 回合</option></select></label>
+          <label>反转概率<select name="reverse_chance"><option value="0">关闭</option><option value="0.3" selected>偶尔 · 30%</option><option value="0.5">经常 · 50%</option></select></label>
+        </div>
+
+        <details>
+          <summary>安全与边界设置 <span>展开</span></summary>
+          <label class="wide-label">不想出现的内容<input name="redline" placeholder="用逗号分开，例如：绑, 玩具, 打"></label>
+          <label class="wide-label">两人的专属暗号<input name="pair_code" placeholder="可选，用于跨局识别和防止撞名"></label>
+          <p class="safety-note">后庭默认关闭；任何时候说“404”或“停”都应立即停止。每道任务都可以免费跳过。</p>
+        </details>
+
+        <label class="consent"><input type="checkbox" name="consent" required><span>我们均已成年，并确认这局的强度与边界。游戏只在双方自愿时继续。</span></label>
+        <button class="primary" type="submit"><span>开启这一局</span><i>↗</i></button>
+        <p class="form-status" id="setupStatus" role="status"></p>
+      </form>
+    </section>
+
+    <section class="game hidden" id="gameView">
+      <header class="game-head">
+        <div><p class="eyebrow">SPICY MONOPOLY</p><h1>我们的这一局</h1></div>
+        <div class="head-actions"><button id="refreshBtn" class="icon-btn" aria-label="刷新">↻</button><button id="newBtn" class="text-btn">新局</button></div>
+      </header>
+
+      <div class="round-line"><span id="roundLabel">回合 0 / 18</span><div><i id="roundProgress"></i></div><span id="turnLabel">等待开局</span></div>
+
+      <section class="players" id="players"></section>
+
+      <section class="board-wrap">
+        <div class="board" id="board">
+          <div class="board-center">
+            <span class="center-mark">R</span>
+            <p>RIFUGIO<br><b>GAME ROOM</b></p>
+            <small id="gameIdLabel">NO. —</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="moment" id="momentCard">
+        <div class="moment-top"><span id="momentType">等待掷骰</span><small id="momentMeta">轮到你们</small></div>
+        <h2 id="momentTitle">棋盘已经铺好</h2>
+        <p id="momentText">掷出第一颗骰子，让引擎决定你们会落在哪里。</p>
+        <div id="momentTags" class="tags"></div>
+        <div id="contextActions" class="context-actions"></div>
+      </section>
+
+      <section class="dice-panel">
+        <button id="rollBtn" class="roll-btn"><span class="die" id="dieFace">•</span><span><b>掷骰</b><small>由引擎决定这一轮</small></span></button>
+        <button id="finalBtn" class="final-btn hidden">查看终局</button>
+        <p id="gameStatus" role="status"></p>
+      </section>
+
+      <section class="identity-panel"><button id="identityToggle">身份与状态 <span>＋</span></button><pre id="identityText"></pre></section>
+      <footer>Original game by Ren & Puppy · CC BY-NC 4.0</footer>
+    </section>
+  </main>
+  <script src="./game.js?v=1"></script>
+</body>
+</html>

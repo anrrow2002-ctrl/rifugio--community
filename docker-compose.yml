@@ -32,6 +32,7 @@ services:
       RIFUGIO_SECRET: ${RIFUGIO_SECRET:?Run node scripts/setup.mjs first}
       RIFUGIO_MCP_LOOPBACK: http://mcp:3456
       RIFUGIO_MCP_TOKEN: ${RIFUGIO_MCP_TOKEN:?Run node scripts/setup.mjs first}
+      SPICY_MONOPOLY_BASE_URL: http://game:8069
       CHAT_TOKEN: ${CHAT_TOKEN:-${RIFUGIO_MCP_TOKEN}}
       USER_NAME: ${USER_NAME:-User}
       COMPANION_NAME: ${COMPANION_NAME:-Companion}
@@ -52,6 +53,22 @@ services:
     depends_on:
       mcp:
         condition: service_healthy
+      game:
+        condition: service_healthy
+    restart: unless-stopped
+
+  game:
+    build:
+      context: .
+      dockerfile: deploy/spicy-game.Dockerfile
+    volumes:
+      - spicy_game_state:/app/monopoly-games
+      - spicy_seen_state:/app/monopoly-seen
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8069/help', timeout=3)"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
     restart: unless-stopped
 
   mcp:
@@ -83,3 +100,7 @@ services:
       timeout: 4s
       retries: 12
     restart: unless-stopped
+
+volumes:
+  spicy_game_state:
+  spicy_seen_state:

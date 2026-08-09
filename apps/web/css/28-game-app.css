@@ -1,0 +1,35 @@
+.phone-game-app {
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: #140f1d;
+}
+
+.phone-game-app > .phone-app-topbar {
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(16, 10, 24, .92), rgba(16, 10, 24, .55), transparent);
+    border: 0;
+}
+
+.phone-game-app > .phone-app-topbar .sub { color: rgba(255,255,255,.62); }
+.phone-game-app > .phone-app-topbar .phone-back,
+.phone-game-app > .phone-app-topbar .phone-mini-btn { color: #fff; }
+
+.rifugio-game-frame-shell {
+    position: absolute;
+    inset: 0;
+    min-height: 100%;
+    background: #140f1d;
+}
+
+.rifugio-game-frame-shell iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #140f1d;
+}

@@ -1,0 +1,3 @@
+[submodule "games/spicy-monopoly"]
+	path = games/spicy-monopoly
+	url = https://github.com/anrrow2002-ctrl/spicy-monopoly.git
